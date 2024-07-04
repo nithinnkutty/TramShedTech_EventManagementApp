@@ -13,9 +13,6 @@ public class User {
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Page> pages;
-
     //Getters and Setters
     public String getName() {
         return name;
@@ -49,11 +46,4 @@ public class User {
         this.password = password;
     }
 
-    public Set<Page> getPages() {
-        return pages;
-    }
-
-    public void setPages(Set<Page> pages) {
-        this.pages = pages;
-    }
 }
