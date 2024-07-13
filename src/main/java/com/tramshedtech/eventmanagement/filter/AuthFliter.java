@@ -71,7 +71,7 @@ public class AuthFliter implements Filter {
 
     // Determine if uri can be accessed anonymously (without logging in)
     public boolean anon(String uri){
-
+        if (1 == 1) return true; // Temporary release of all requests
         // If it's the root path, just let it go.
         if(uri.equals("/")) return true;
 
