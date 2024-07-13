@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 100%;">
+        <el-header style="background-color: antiquewhite;height: 80px;margin: 0px;padding: 0px;">
+            <el-row style="height: 100%;">
+                <el-col :span="3" style="background-color: white;height: 100%;">
+                    <img src="img/logo.png" class="logo-image" alt="Logo">
+                </el-col>
+                <el-col :span="3" :offset="18" style="height: 100%;">
+                    <div class="login-container">
+                        <el-avatar class="user-avatar" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
+                        <el-button type="text" @click="handleLogin">Login</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-container style="background-color: white;height: 600px;">
+            <el-aside width="214px" style="background-color: yellow;height: 100%;">
+                <div>
+                    <el-menu
+                            default-active="1"
+                            class="el-menu-vertical-demo custom-menu">
+                        <el-menu-item index="1" @click="change('student.html')" class="custom-menu-item">
+                            <i class="el-icon-s-promotion"></i>
+                            <span slot="title">Main Page</span>
+                        </el-menu-item>
+                        <el-menu-item index="2" @click="change('teacher.html')" class="custom-menu-item">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title">Event management</span>
+                        </el-menu-item>
+                        <el-menu-item index="3" @click="change('clazz.html')" class="custom-menu-item">
+                            <i class="el-icon-document"></i>
+                            <span slot="title">Order Management</span>
+                        </el-menu-item>
+                        <el-menu-item index="4" @click="change('personal.html')" class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">Meeting Management</span>
+                        </el-menu-item>
+                    </el-menu>
+                </div>
+            </el-aside>
+            <el-main style="background-color: beige;height: 100%;">
+                <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
+                <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+</body>
+<style scoped>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #app {
+        height: 100%;
+    }
+    .custom-menu {
+        padding: 10px; /* 调整菜单周围的空隙 */
+        background-color: yellow; /* 设置周围空隙的背景颜色 */
+    }
+
+    .custom-menu-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0; /* 调整菜单项上下的空隙 */
+        border-radius: 8px; /* 调整菜单项的圆角 */
+        background-color: white; /* 调整菜单项的背景颜色 */
+    }
+
+    /* 重写 Element UI 的样式 */
+    .custom-menu-item > .el-menu-item {
+        width: 100%; /* 确保菜单项占满父容器的宽度 */
+        text-align: center; /* 菜单项内容居中 */
+    }
+
+
+    .logo-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .login-container {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-avatar {
+        margin-right: 10px; /* 调整头像与按钮之间的间距 */
+    }
+</style>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            // currentPage:"login.html"
+        },
+        methods:{
+            change : function (uri) {
+                this.currentPage = uri
+            }
+        }
+    })
+</script>
+
+</html>
