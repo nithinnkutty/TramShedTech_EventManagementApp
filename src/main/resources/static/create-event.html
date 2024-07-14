@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/create-eventstyle.css" />
+    <script src="js/vue.js"></script>
+    <script src="js/create-event.js"></script>
+    <script src="js/element-index.js"></script>
+    <title>Create Event Page</title>
+</head>
+<body>
+<div  id="event">
+    <div class="title">
+        <el-col :span="24" style="padding-bottom: 20px">
+            <div class="grid-content caption">CREATE EVENT</div>
+        </el-col>
+    </div>
+    <el-row class="input-field">
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event Name</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.eventName" placeholder="event name"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Date</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.date" placeholder="date"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Time</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.time" placeholder="Time"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.room" placeholder="room"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Tags</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.tags" placeholder="tags"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Speaker</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.speaker" placeholder="speaker"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Responsible</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.responsible" placeholder="responsible"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+    </el-row>
+
+    <div class="form">
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content operations">Operations:</div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="6"><div class="grid-content"></div></el-col>
+
+            <el-table :data="tableData" border style="width: 55%;">
+                <el-table-column prop="type" label="Event Type" width="180">
+                </el-table-column>
+                <el-table-column prop="staff" label="Support Staff" width="180">
+                </el-table-column>
+                <el-table-column prop="company" label="Company" width="180">
+                </el-table-column>
+                <el-table-column prop="contact" label="Contact" width="180">
+                </el-table-column>
+                <el-table-column prop="email" label="Contact Email" width="180">
+                </el-table-column>
+                <el-table-column prop="location" label="Location" width="180">
+                </el-table-column>
+                <el-table-column prop="AV" label="AV" width="180">
+                </el-table-column>
+                <el-table-column prop="notes" label="AV Notes" width="180">
+                </el-table-column>
+            </el-table>
+
+        </el-row>
+    </div>
+
+    <div class="button">
+    <el-button type="success" round>Create Event</el-button>
+    </div>
+</div>
+</body>
+
+<script>
+    new Vue({
+        el: '#event',
+        data() {
+            return {
+                formData: {
+                    eventName: '',
+                    date: '',
+                    time: '',
+                    room: '',
+                    tags: '',
+                    speaker: '',
+                    responsible: ''
+                },
+                tableData: [{
+                    type: 'meeting',
+                    staff: 'Jerry',
+                    company: 'ABC',
+                    contact: '123',
+                    email: '123@outlook.com',
+                    location: 'Cardiff',
+                    AV: '123',
+                    notes: '123'
+                }]
+            };
+        }
+    });
+</script>
+</html>
