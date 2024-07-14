@@ -128,13 +128,13 @@ form.sign-in-form {
 }
 
 .social-icon:hover {
-  color: #f3e70b;
-  border-color: #f3e70b;
+  color: #F9B117;
+  border-color: #F9B117;
 }
 
 .btn {
   width: 150px;
-  background-color: #f3e70b;
+  background-color: #F9B117;
   border: none;
   outline: none;
   height: 49px;
@@ -148,7 +148,7 @@ form.sign-in-form {
 }
 
 .btn:hover {
-  background-color: #f3e70b;
+  background-color: #F9B117;
 }
 .panels-container {
   position: absolute;
@@ -168,7 +168,7 @@ form.sign-in-form {
   top: -10%;
   right: 48%;
   transform: translateY(-50%);
-  background-image: linear-gradient(-45deg, #f3e70b 0%, #f3e70b 100%);
+  background-image: linear-gradient(-45deg, #F9B117 0%, #F9B117 100%);
   transition: 1.8s ease-in-out;
   border-radius: 50%;
   z-index: 6;
