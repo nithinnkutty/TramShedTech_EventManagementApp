@@ -11,12 +11,12 @@
 <body>
 <div id="app">
     <el-container style="height: 100%;">
-        <el-header style="background-color: antiquewhite;height: 80px;margin: 0px;padding: 0px;">
+        <el-header style="background-color: #F9B117;height: 80px;margin: 20px;padding: 0px;">
             <el-row style="height: 100%;">
-                <el-col :span="3" style="background-color: white;height: 100%;">
+                <el-col :span="4" style="background-color:white;height: 100%;">
                     <img src="img/logo.png" class="logo-image" alt="Logo">
                 </el-col>
-                <el-col :span="3" :offset="18" style="height: 100%;">
+                <el-col :span="3" :offset="16" style="height: 100%;">
                     <div class="login-container">
                         <el-avatar class="user-avatar" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
                         <el-button type="text" @click="handleLogin">Login</el-button>
@@ -25,7 +25,7 @@
             </el-row>
         </el-header>
         <el-container style="background-color: white;height: 600px;">
-            <el-aside width="214px" style="background-color: yellow;height: 100%;">
+            <el-aside width="214px" style="background-color: #F9B117;height: 100%;">
                 <div>
                     <el-menu
                             default-active="1"
@@ -68,7 +68,7 @@
     }
     .custom-menu {
         padding: 10px; /* 调整菜单周围的空隙 */
-        background-color: yellow; /* 设置周围空隙的背景颜色 */
+        background-color: #F9B117; /* 设置周围空隙的背景颜色 */
     }
 
     .custom-menu-item {
