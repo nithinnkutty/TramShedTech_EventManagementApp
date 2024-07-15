@@ -18,7 +18,7 @@
                 </el-col>
                 <el-col :span="3" :offset="16" style="height: 100%;">
                     <div class="login-container">
-                        <el-avatar class="user-avatar" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
+                        <el-avatar class="user-avatar" :src="imageUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' "></el-avatar>
                         <el-button type="text" @click="handleLogin">Login</el-button>
                     </div>
                 </el-col>
@@ -106,11 +106,32 @@
     new Vue({
         el:"#app",
         data:{
-            // currentPage:"login.html"
+            currentPage:"avatar.html",
+            imageUrl:'',
+            token: '',
         },
-        methods:{
-            change : function (uri) {
+        mounted() {
+            this.token = JSON.parse(window.localStorage.getItem('token'));
+            if (!this.token) {
+                return; // 如果没有token，结束方法
+            }
+            this.fetchAvatar();
+        },
+        methods: {
+            change: function (uri) {
                 this.currentPage = uri
+            },
+            fetchAvatar() {
+                console.log("方法调用成功")
+                axios.get('/user/findAvatar', {
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        this.imageUrl = response.data.data; // 假设返回的数据中包含avatarUrl
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch avatar:', error);
+                    });
             }
         }
     })

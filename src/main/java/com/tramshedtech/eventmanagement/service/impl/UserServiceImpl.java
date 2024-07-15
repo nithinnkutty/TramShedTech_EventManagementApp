@@ -24,5 +24,11 @@ public class UserServiceImpl implements UserService {
         return r;
     }
 
+    @Override
+    public String findAvatar(int uid) {
+        String avatar = userMapper.findAvatar(uid);
+        return avatar;
+    }
+
 
 }
