@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Room Management</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 0;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #B3C0D1;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+        }
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 160px;
+            margin-top: 20px;
+        }
+        .el-row {
+            margin-bottom: 20px;
+        }
+        .el-row:last-child {
+            margin-bottom: 0;
+        }
+        .el-col {
+            border-radius: 4px;
+        }
+        .bg-purple-dark {
+            background: #99a9bf;
+        }
+        .grid-content {
+            border-radius: 4px;
+            min-height: 36px;
+        }
+    </style>
+
+
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>Header</el-header>
+        <el-main>
+            <el-row>
+                <el-col :span="24">
+                    <div class="grid-content bg-purple-dark">Main Content - Full Width</div>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <div class="grid-content bg-purple-dark">Left Half</div>
+                </el-col>
+                <el-col :span="12">
+                    <div class="grid-content bg-purple-dark">Right Half</div>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+</div>
+<script>
+    new Vue({
+        el: '#app'
+    });
+</script>
+</body>
+<!--<script>-->
+<!--    new Vue({-->
+<!--        el:"#app",-->
+<!--        data:{ }-->
+<!--    })-->
+<!--</script>-->
+</html>
