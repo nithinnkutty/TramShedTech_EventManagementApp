@@ -11,5 +11,5 @@ public interface UserMapper {
 
     boolean regis(User user);
 
-    String findAvatar(int uid);
+    List<User> allUsers();
 }
