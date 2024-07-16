@@ -14,4 +14,8 @@
     <select id="findAvatar" parameterType="int" resultType="String">
         select avatar from user where id = #{uid}
     </select>
+
+    <select id="allUsers" resultType="User">
+        select * from user where status = 0
+    </select>
 </mapper>
