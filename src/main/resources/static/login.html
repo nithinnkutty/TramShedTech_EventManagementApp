@@ -207,14 +207,11 @@ Share：Watson Zhang haoxuan
             console.log(status)
             if (status === "LOGIN_SUCCESS") {
               console.log(xhttp.response.status)
+              window.localStorage.setItem("token",JSON.stringify(response.data))
+              console.log(response.data)
               const loginSuccess = window.confirm("Login successful, press confirm jump to main page.")
               if (loginSuccess) {
-                window.location.href = "index.html"
-              }
-            } else if (status === "ADMINISTRATOR_LOGIN") {
-              const adminLoginSuccess = window.confirm("Administrator login successful, press confirm jump to background page.")
-              if (adminLoginSuccess) {
-                window.location.href = "http://localhost:8080/adminpage.html"
+                window.location.href = "header.html"
               }
             } else if (status === "ACCOUNT_OR_PASSWORD_ERROR") {
               alert("Username or password wrong");
