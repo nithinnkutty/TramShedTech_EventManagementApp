@@ -10,4 +10,8 @@
     <insert id="regis">
         INSERT INTO user(account,password,email,status) VALUES (#{account}, #{password},#{email},0)
     </insert>
+
+    <select id="allUsers" resultType="User">
+        select * from user where status = 0
+    </select>
 </mapper>

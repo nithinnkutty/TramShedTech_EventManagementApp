@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -69,6 +70,17 @@ public class UserController {
 
     @PostMapping("/regis")
     public ResponseResult regis(@RequestBody User user) throws SQLException {
+
+        List<User> allUsers = userService.allUsers();
+
+        for (User existingUser : allUsers) {
+            if (existingUser.getAccount().toLowerCase().equals(user.getAccount().toLowerCase())) {
+                return new ResponseResult().setCode(500).setStatus(ResponseStatus.ACCOUNT_OR_PASSWORD_ERROR);
+            }
+            if (existingUser.getEmail().toLowerCase().equals(user.getEmail().toLowerCase())) {
+                return new ResponseResult().setCode(500).setStatus(ResponseStatus.EMAIL_ERROR);
+            }
+        }
 
         boolean r = userService.regis(user);
 
