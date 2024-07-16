@@ -7,4 +7,6 @@ public interface UserService {
     public User findByAccount(String account);
 
     boolean regis(User user);
+
+    String findAvatar(int uid);
 }

@@ -10,4 +10,8 @@
     <insert id="regis">
         INSERT INTO user(account,password,email,status) VALUES (#{account}, #{password},#{email},0)
     </insert>
+
+    <select id="findAvatar" parameterType="int" resultType="String">
+        select avatar from user where id = #{uid}
+    </select>
 </mapper>

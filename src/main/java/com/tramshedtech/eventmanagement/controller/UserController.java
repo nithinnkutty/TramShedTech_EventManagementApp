@@ -7,17 +7,19 @@ import com.tramshedtech.eventmanagement.service.UserService;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/user")
@@ -26,9 +28,11 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private ConfigurationPropertiesAutoConfiguration configurationPropertiesAutoConfiguration;
 
     @PostMapping("/login")
-    public ResponseResult login(@RequestBody User user, HttpSession session) throws SQLException {
+    public ResponseResult login(@RequestBody User user, HttpSession session, HttpServletResponse response) throws SQLException, IOException {
         System.out.println(user);
 
         // Access to user information by account number
@@ -53,16 +57,21 @@ public class UserController {
         session.setAttribute("uid", result.getId());
         session.setAttribute("uname",result.getAccount());
 
-        Date date = new Date();
-        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-        String format = dateFormat.format(date);
+        String token = UUID.randomUUID().toString();
+        session.setAttribute("token", token);
+
+
+
+//        Date date = new Date();
+//        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+//        String format = dateFormat.format(date);
 
 
         // The code executes here indicating that the login was successful and returns the user information to the front-end.
         responseResult.setCode(200);
         responseResult.setMessage("Login successful");
         responseResult.setStatus(ResponseStatus.LOGIN_SUCCESS);
-        responseResult.setData(result);
+        responseResult.setData(token);
 
         return responseResult;
     }
@@ -78,6 +87,27 @@ public class UserController {
         return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
     }
 
+    @GetMapping("/findAvatar")
+    public ResponseResult findAvatar(HttpSession session) {
+        int uid = (int) session.getAttribute("uid");
+        System.out.println(uid);
 
+        String avatar = userService.findAvatar(uid);
+        System.out.println(avatar);
+        if(avatar != null) {
+            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(avatar);
+        }
+        return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    }
 
+    @GetMapping("/getUsername")
+    public ResponseResult getUsername(HttpSession session) {
+        String uname = (String) session.getAttribute("uname");
+//        System.out.println("方法调用成功");
+//        System.out.println(uname);
+        if(uname != null) {
+            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(uname);
+        }
+        return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    }
 }

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 100%;">
+        <el-header style="background-color: #F9B117;height: 80px;margin: 20px;padding: 0px;">
+            <el-row style="height: 100%;">
+                <el-col :span="4" style="background-color:white;height: 100%;">
+                    <img src="img/logo.png" class="logo-image" alt="Logo">
+                </el-col>
+                <el-col :span="3" :offset="16" style="height: 100%;">
+                    <div class="login-container">
+                        <el-avatar class="user-avatar" :src="imageUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' "></el-avatar>
+                        <el-dropdown v-if="token" @command="handleCommand">
+                            <el-button type="text" class="el-dropdown-link">
+                                {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <el-button v-else type="text" @click="handleLogin" class="underline-button">Login</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-container style="background-color: white;height: 600px;">
+            <el-aside width="214px" style="background-color: #F9B117;height: 100%;">
+                <div>
+                    <el-menu
+                            default-active="1"
+                            class="el-menu-vertical-demo custom-menu">
+                        <el-menu-item index="1" @click="change('student.html')" class="custom-menu-item">
+                            <i class="el-icon-s-promotion"></i>
+                            <span slot="title">Main Page</span>
+                        </el-menu-item>
+                        <el-menu-item index="2" @click="change('teacher.html')" class="custom-menu-item">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title">Event management</span>
+                        </el-menu-item>
+                        <el-menu-item index="3" @click="change('clazz.html')" class="custom-menu-item">
+                            <i class="el-icon-document"></i>
+                            <span slot="title">Order Management</span>
+                        </el-menu-item>
+                        <el-menu-item index="4" @click="change('personal.html')" class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">Meeting Management</span>
+                        </el-menu-item>
+                    </el-menu>
+                </div>
+            </el-aside>
+            <el-main style="background-color: beige;height: 100%;">
+                <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
+                <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;"></iframe>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+</body>
+<style scoped>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #app {
+        height: 100%;
+    }
+    .custom-menu {
+        padding: 10px; /* 调整菜单周围的空隙 */
+        background-color: #F9B117; /* 设置周围空隙的背景颜色 */
+    }
+
+    .custom-menu-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0; /* 调整菜单项上下的空隙 */
+        border-radius: 8px; /* 调整菜单项的圆角 */
+        background-color: white; /* 调整菜单项的背景颜色 */
+    }
+
+    /* 重写 Element UI 的样式 */
+    .custom-menu-item > .el-menu-item {
+        width: 100%; /* 确保菜单项占满父容器的宽度 */
+        text-align: center; /* 菜单项内容居中 */
+    }
+    .underline-button {
+        text-decoration: underline;
+        color: #409EFF;
+    }
+
+    .logo-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .login-container {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-avatar {
+        margin-right: 10px; /* 调整头像与按钮之间的间距 */
+    }
+</style>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            currentPage:"avatar.html",
+            imageUrl:'',
+            token: '',
+            username: '',
+        },
+        mounted() {
+            this.token = JSON.parse(window.localStorage.getItem('token'));
+            if (!this.token) {
+                return; // 如果没有token，结束方法
+            } else {
+                this.fetchAvatar();
+                this.getUsername();
+            }
+
+        },
+        methods: {
+            change: function (uri) {
+                this.currentPage = uri
+            },
+            fetchAvatar() {
+                console.log("方法调用成功")
+                axios.get('/user/findAvatar', {
+                })
+                    .then(response => {
+                        console.log(response.data);
+                        this.imageUrl = response.data.data; // 假设返回的数据中包含avatarUrl
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch avatar:', error);
+                    });
+            },
+            getUsername: function () {
+                axios.get('/user/getUsername').then(res =>{
+                    this.username = res.data.data;
+                    console.log(res.data.data);
+                })
+            },
+            handleLogin() {
+                window.location.href = 'login.html';
+            },
+            handleCommand(command) {
+                if (command === 'logout') {
+                    this.logout();
+                }
+            },
+            logout() {
+                window.localStorage.removeItem('token');
+                this.token = '';
+                this.username = '';
+                this.$message({
+                    message: 'Logged out successfully',
+                    type: 'success'
+                });
+            }
+        }
+    })
+</script>
+
+</html>
