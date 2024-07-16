@@ -13,6 +13,11 @@
             margin: 0;
         }
 
+        .app-container{
+            margin: 20px;
+        }
+
+
         .el-container {
             display: flex;
             flex-direction: column;
@@ -20,17 +25,21 @@
         }
 
         .el-header, .el-footer {
-            background-color: #B3C0D1;
+            background-color: #E9EEF3;
             color: #333;
             text-align: center;
             line-height: 60px;
+            height: 120px;
         }
         .el-main {
             background-color: #E9EEF3;
             color: #333;
-            text-align: center;
-            line-height: 160px;
+            /*text-align: center;*/
+            /*line-height: 160px;*/
             margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
         }
         .el-row {
             margin-bottom: 20px;
@@ -48,20 +57,64 @@
             border-radius: 4px;
             min-height: 36px;
         }
+
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .select-container {
+            /*position: absolute;*/
+            /*top: 20px; !* 距离顶部20px *!*/
+            /*left: 20px; !* 距离左侧20px *!*/
+
+            margin: 0; /* 确保选择器没有额外的外边距 */
+            display: flex;
+            align-items: center;
+
+        }
+
+        .el-select {
+            width: 100%;
+        }
+
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
     </style>
 
 
 </head>
 <body>
-<div id="app">
+<div id="app" class="app-container">
     <el-container>
-        <el-header>Header</el-header>
-        <el-main>
-            <el-row>
-                <el-col :span="24">
-                    <div class="grid-content bg-purple-dark">Main Content - Full Width</div>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Book a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Inquiry History</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Cancel Booking</el-button>
                 </el-col>
             </el-row>
+        </el-header>
+        <el-main>
             <el-row :gutter="20">
                 <el-col :span="12">
                     <div class="grid-content bg-purple-dark">Left Half</div>
@@ -73,6 +126,8 @@
         </el-main>
     </el-container>
 </div>
+
+
 <script>
     new Vue({
         el: '#app'
