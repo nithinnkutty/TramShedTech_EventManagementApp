@@ -6,6 +6,7 @@ import com.tramshedtech.eventmanagement.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 @Service
@@ -28,6 +29,12 @@ public class UserServiceImpl implements UserService {
     public String findAvatar(int uid) {
         String avatar = userMapper.findAvatar(uid);
         return avatar;
+    }
+
+    @Override
+    public List<User> allUsers() {
+        List<User> allUsers = userMapper.allUsers();
+        return allUsers;
     }
 
 
