@@ -9,6 +9,8 @@ import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,8 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private ConfigurationPropertiesAutoConfiguration configurationPropertiesAutoConfiguration;
 
     @PostMapping("/login")
     public ResponseResult login(@RequestBody User user, HttpSession session, HttpServletResponse response) throws SQLException, IOException {
@@ -96,5 +100,14 @@ public class UserController {
         return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
     }
 
-
+    @GetMapping("/getUsername")
+    public ResponseResult getUsername(HttpSession session) {
+        String uname = (String) session.getAttribute("uname");
+//        System.out.println("方法调用成功");
+//        System.out.println(uname);
+        if(uname != null) {
+            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(uname);
+        }
+        return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    }
 }

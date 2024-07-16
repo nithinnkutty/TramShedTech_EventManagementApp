@@ -19,7 +19,15 @@
                 <el-col :span="3" :offset="16" style="height: 100%;">
                     <div class="login-container">
                         <el-avatar class="user-avatar" :src="imageUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' "></el-avatar>
-                        <el-button type="text" @click="handleLogin">Login</el-button>
+                        <el-dropdown v-if="token" @command="handleCommand">
+                            <el-button type="text" class="el-dropdown-link">
+                                {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                        <el-button v-else type="text" @click="handleLogin" class="underline-button">Login</el-button>
                     </div>
                 </el-col>
             </el-row>
@@ -85,7 +93,10 @@
         width: 100%; /* 确保菜单项占满父容器的宽度 */
         text-align: center; /* 菜单项内容居中 */
     }
-
+    .underline-button {
+        text-decoration: underline;
+        color: #409EFF;
+    }
 
     .logo-image {
         max-width: 100%;
@@ -109,13 +120,17 @@
             currentPage:"avatar.html",
             imageUrl:'',
             token: '',
+            username: '',
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
             if (!this.token) {
                 return; // 如果没有token，结束方法
+            } else {
+                this.fetchAvatar();
+                this.getUsername();
             }
-            this.fetchAvatar();
+
         },
         methods: {
             change: function (uri) {
@@ -132,6 +147,29 @@
                     .catch(error => {
                         console.error('Failed to fetch avatar:', error);
                     });
+            },
+            getUsername: function () {
+                axios.get('/user/getUsername').then(res =>{
+                    this.username = res.data.data;
+                    console.log(res.data.data);
+                })
+            },
+            handleLogin() {
+                window.location.href = 'login.html';
+            },
+            handleCommand(command) {
+                if (command === 'logout') {
+                    this.logout();
+                }
+            },
+            logout() {
+                window.localStorage.removeItem('token');
+                this.token = '';
+                this.username = '';
+                this.$message({
+                    message: 'Logged out successfully',
+                    type: 'success'
+                });
             }
         }
     })
