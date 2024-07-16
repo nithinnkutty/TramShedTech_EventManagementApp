@@ -10,7 +10,7 @@
     <style>
         html, body, #app {
             height: 100%;
-            margin: 0;
+            margin: 10px;
         }
 
         .app-container{
@@ -116,11 +116,50 @@
         </el-header>
         <el-main>
             <el-row :gutter="20">
-                <el-col :span="12">
-                    <div class="grid-content bg-purple-dark">Left Half</div>
+                <el-col :span="6">
+                    <div class="select-container">
+                        <el-select v-model="value" clearable placeholder="Please select">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
                 </el-col>
-                <el-col :span="12">
-                    <div class="grid-content bg-purple-dark">Right Half</div>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <el-table
+                            :data="tableData"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName">
+                        <el-table-column
+                                prop="date"
+                                label="Application Date"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="Applicant Name"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="address"
+                                label="Address">
+                        </el-table-column>
+                        <el-table-column
+                                prop="postcode"
+                                label="Postcode"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="dueDate"
+                                label="Due Date"
+                                width="180">
+                        </el-table-column>
+                    </el-table>
                 </el-col>
             </el-row>
         </el-main>
@@ -130,14 +169,58 @@
 
 <script>
     new Vue({
-        el: '#app'
+        el: '#app',
+        data() {
+            return {
+                options: [{
+                    value: 'Option 1',
+                    label: 'Ongoing'
+                }, {
+                    value: 'Option 2',
+                    label: 'Upcoming'
+                }, {
+                    value: 'Option 3',
+                    label: 'Completed'
+                }],
+                value: '',
+                tableData: [{
+                    date: 'July 16 2024',
+                    name: 'Cecilia',
+                    address: 'Queen St. Room 101',
+                    postcode: 'CF24 0SZ',
+                    dueDate: 'July 23 2024'
+                }, {
+                    date: 'July 18 2024',
+                    name: 'Cecilia',
+                    address: 'Queen St. Room 102',
+                    postcode: 'CF24 0SZ',
+                    dueDate: 'July 25 2024',
+                }, {
+                    date: 'July 18 2024',
+                    name: 'Sunny',
+                    address: 'Queen St. Room 103',
+                    postcode: 'CF24 0SZ',
+                    dueDate: 'July 28 2024',
+                }, {
+                    date: 'July 20 2024',
+                    name: 'Zoey',
+                    address: 'Queen St. Room 104',
+                    postcode: 'CF24 0SZ',
+                    dueDate: 'July 30 2024',
+                }]
+            };
+        },
+        methods: {
+            tableRowClassName({ row, rowIndex }) {
+                if (rowIndex === 1) {
+                    return 'warning-row';
+                } else if (rowIndex === 3) {
+                    return 'success-row';
+                }
+                return '';
+            }
+        }
     });
 </script>
 </body>
-<!--<script>-->
-<!--    new Vue({-->
-<!--        el:"#app",-->
-<!--        data:{ }-->
-<!--    })-->
-<!--</script>-->
 </html>
