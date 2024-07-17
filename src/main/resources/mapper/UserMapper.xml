@@ -18,4 +18,12 @@
     <select id="allUsers" resultType="User">
         select * from user where status = 0
     </select>
+
+    <select id="getPwd" resultType="String">
+        select password FROM user WHERE id = #{uid}
+    </select>
+
+    <update id="updatePwd">
+        update user set password = #{passWord} where id = #{uid}
+    </update>
 </mapper>

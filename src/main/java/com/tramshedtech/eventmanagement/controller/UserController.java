@@ -9,6 +9,7 @@ import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.stereotype.Controller;
@@ -39,11 +40,22 @@ public class UserController {
         // Access to user information by account number
         User result = userService.findByAccount(user.getAccount());
 
+
         // Creating Returned Objects
         ResponseResult responseResult = new ResponseResult();
 
         // Determine if it is empty
-        if (result == null || !result.getPassword().equals(user.getPassword())) {
+        if (result == null) {
+            responseResult.setCode(401);  //401 Login Failed Not logged in
+            responseResult.setMessage("Incorrect account number or password");
+            responseResult.setStatus(ResponseStatus.ACCOUNT_OR_PASSWORD_ERROR);
+            //
+            return responseResult;
+        }
+
+        user.setPassword(DigestUtils.md5Hex(user.getPassword()));
+
+        if (!result.getPassword().equals(user.getPassword())) {
             responseResult.setCode(401);  //401 Login Failed Not logged in
             responseResult.setMessage("Incorrect account number or password");
             responseResult.setStatus(ResponseStatus.ACCOUNT_OR_PASSWORD_ERROR);
@@ -91,6 +103,10 @@ public class UserController {
             }
         }
 
+        String passWord = DigestUtils.md5Hex(user.getPassword());
+        user.setPassword(passWord);
+        System.out.println(user.getPassword());
+
         boolean r = userService.regis(user);
 
         if (r) {
@@ -121,5 +137,33 @@ public class UserController {
             return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(uname);
         }
         return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    }
+
+    @GetMapping("/getPassword/{pwd}")
+    public boolean getPwd(@PathVariable("pwd") String pwd, HttpSession session){
+        boolean r = false;
+        int uid  = (int)session.getAttribute("uid");
+        String passWord = DigestUtils.md5Hex(pwd);
+
+        String confirmPassword = userService.getPwd(uid);
+        System.out.println("p1="+passWord);
+        System.out.println("p2="+confirmPassword);
+
+        if(passWord.equals(confirmPassword)){
+            r = true;
+        } else if (!passWord.equals(confirmPassword)){
+            r = false;
+        }
+        return r;
+    }
+
+    @PostMapping("/updatePwd/{pwd}")
+    public boolean updatePwd(@PathVariable("pwd") String pwd, HttpSession session){
+        System.out.println("这个方法被访问了");
+        int uid = (int) session.getAttribute("uid");
+
+        String passWord = DigestUtils.md5Hex(pwd);
+        boolean r = userService.updatePwd(passWord,uid);
+        return r;
     }
 }

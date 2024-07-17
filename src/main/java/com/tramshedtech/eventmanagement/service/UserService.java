@@ -13,4 +13,8 @@ public interface UserService {
     String findAvatar(int uid);
 
     List<User> allUsers();
+
+    String getPwd(int uid);
+
+    boolean updatePwd(String passWord, int uid);
 }
