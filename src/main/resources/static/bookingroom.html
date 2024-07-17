@@ -85,12 +85,17 @@
         }
 
         .el-table .warning-row {
-            background: oldlace;
+            background: #d5f475;
         }
 
         .el-table .success-row {
-            background: #f0f9eb;
+            background: #f9f6eb;
         }
+
+        .el-table .info-row {
+            background: #d0ebff;
+        }
+
     </style>
 
 
@@ -107,10 +112,10 @@
                     <el-button type="warning" class="custom-button">Book a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Inquiry History</el-button>
+                    <el-button type="warning" class="custom-button">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button">Inquiry History</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -166,59 +171,95 @@
     </el-container>
 </div>
 
-
 <script>
     new Vue({
         el: '#app',
         data() {
             return {
                 options: [{
-                    value: 'Option 1',
+                    value: 'Ongoing',
                     label: 'Ongoing'
                 }, {
-                    value: 'Option 2',
+                    value: 'Upcoming',
                     label: 'Upcoming'
                 }, {
-                    value: 'Option 3',
+                    value: 'Completed',
                     label: 'Completed'
                 }],
-                value: '',
-                tableData: [{
-                    date: 'July 16 2024',
-                    name: 'Cecilia',
-                    address: 'Queen St. Room 101',
-                    postcode: 'CF24 0SZ',
-                    dueDate: 'July 23 2024'
-                }, {
-                    date: 'July 18 2024',
-                    name: 'Cecilia',
-                    address: 'Queen St. Room 102',
-                    postcode: 'CF24 0SZ',
-                    dueDate: 'July 25 2024',
-                }, {
-                    date: 'July 18 2024',
-                    name: 'Sunny',
-                    address: 'Queen St. Room 103',
-                    postcode: 'CF24 0SZ',
-                    dueDate: 'July 28 2024',
-                }, {
-                    date: 'July 20 2024',
-                    name: 'Zoey',
-                    address: 'Queen St. Room 104',
-                    postcode: 'CF24 0SZ',
-                    dueDate: 'July 30 2024',
-                }]
+                selectedStatus: '',
+                tableData: [] // Initialize to an empty array and then fetch data from the back end
             };
         },
+        computed: {
+            // Filter data based on the selected status
+            filteredTableData() {
+                if (this.selectedStatus) {
+                    return this.tableData.filter(item => item.status === this.selectedStatus);
+                }
+                return this.tableData;
+            }
+        },
         methods: {
-            tableRowClassName({ row, rowIndex }) {
-                if (rowIndex === 1) {
+            tableRowClassName({ row }) {
+                if (row.status === 'Ongoing') {
                     return 'warning-row';
-                } else if (rowIndex === 3) {
+                } else if (row.status === 'Upcoming') {
+                    return 'info-row';
+                } else if (row.status === 'Completed') {
                     return 'success-row';
                 }
                 return '';
+            },
+            fetchTableData() {
+                // Simulates asynchronous requests for data from the back end
+                setTimeout(() => {
+                    this.tableData = [
+                        {
+                            date: 'July 16 2024',
+                            name: 'Lily',
+                            address: 'Queen St. Room 101',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 23 2024',
+                            status: 'Upcoming'
+                        },
+                        {
+                            date: 'July 18 2024',
+                            name: 'Cecilia',
+                            address: 'Queen St. Room 102',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 25 2024',
+                            status: 'Ongoing'
+                        },
+                        {
+                            date: 'July 18 2024',
+                            name: 'Sunny',
+                            address: 'Queen St. Room 103',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 28 2024',
+                            status: 'Completed'
+                        },
+                        {
+                            date: 'July 20 2024',
+                            name: 'Zoey',
+                            address: 'Queen St. Room 104',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 30 2024',
+                            status: 'Ongoing'
+                        },
+                        {
+                            date: 'July 21 2024',
+                            name: 'Zoey',
+                            address: 'Queen St. Room 105',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 30 2024',
+                            status: 'Upcoming'
+                        }
+                    ];
+                }, 1000);
             }
+        },
+        mounted() {
+            this.fetchTableData(); // Obtain data after the component is mounted
         }
     });
 </script>
