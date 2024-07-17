@@ -71,10 +71,10 @@
 
         .select-container {
             /*position: absolute;*/
-            /*top: 20px; !* 距离顶部20px *!*/
-            /*left: 20px; !* 距离左侧20px *!*/
+            /*top: 20px; */
+            /*left: 20px; */
 
-            margin: 0; /* 确保选择器没有额外的外边距 */
+            margin: 0; /* Make sure the selector has no extra margins */
             display: flex;
             align-items: center;
 
@@ -85,15 +85,25 @@
         }
 
         .el-table .warning-row {
-            background: #d5f475;
+            background: #f2fbd4;
         }
 
         .el-table .success-row {
-            background: #f9f6eb;
+            background: #faeab3;
         }
 
         .el-table .info-row {
             background: #d0ebff;
+        }
+
+        .custom-checkbox {
+            background-color: #F9B117;
+            font-size: 14px ;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: #f8f4f4;
+            padding: 10px ;
+            margin-right: 10px;
         }
 
     </style>
@@ -167,6 +177,54 @@
                     </el-table>
                 </el-col>
             </el-row>
+
+            <el-row>
+                <el-col :span="12">
+                    <div>
+                        <el-checkbox v-model="checked1" label="Select All" border class="custom-checkbox" @change="handleCheckAll"></el-checkbox>
+                        <el-checkbox v-model="checked2" label="Deselect All" border class="custom-checkbox" @change="handleInvertSelection"></el-checkbox>
+                    </div>
+                </el-col>
+
+                <el-col :span="12" style="text-align: right;">
+                    <div class="block">
+                        <el-pagination
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page="currentPage4"
+                                :page-sizes="[10, 20, 30, 40]"
+                                :page-size="10"
+                                layout="total, sizes, prev, pager, next, jumper"
+                                :total="40"
+                                prev-text="Previous"
+                                next-text="Next">
+                            <template slot="total">
+                                Total {{total}} items
+                            </template>
+                            <template slot="size">
+                                <el-select v-model="pageSize" @change="handleSizeChange">
+                                    <el-option
+                                            v-for="size in [10, 20, 30, 40]"
+                                            :key="size"
+                                            :label="size + ' items/page'"
+                                            :value="size">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                            <template slot="pager">
+                                <el-pager
+                                        :current-page="currentPage4"
+                                        :page-count="pageCount"
+                                        @change="handleCurrentChange">
+                                </el-pager>
+                            </template>
+                            <template slot="jumper">
+                                Go to <el-input-number v-model="currentPage4" @change="handleCurrentChange" :min="1" :max="pageCount"> </el-input-number> page
+                            </template>
+                        </el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
         </el-main>
     </el-container>
 </div>
@@ -187,7 +245,13 @@
                     label: 'Completed'
                 }],
                 selectedStatus: '',
-                tableData: [] // Initialize to an empty array and then fetch data from the back end
+                tableData: [], // Initialize to an empty array and then fetch data from the back end
+                checked1: false,
+                checked2: false,
+                currentPage4: 1,
+                pageSize: 10,
+                total: 40,
+                pageCount: 4 // Total pages
             };
         },
         computed: {
@@ -256,6 +320,26 @@
                         }
                     ];
                 }, 1000);
+            },
+            handleCheckAll(val) {
+                this.checked2 = false; // cancel deselect all
+                this.tableData.forEach(item => {
+                    item.checked = val;
+                });
+            },
+            handleInvertSelection() {
+                this.checked1 = false; // cancel select all
+                this.tableData.forEach(item => {
+                    item.checked = !item.checked;
+                });
+            },
+            handleSizeChange(val) {
+                this.pageSize = val;
+                console.log(`Items per page: ${val}`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage4 = val;
+                console.log(`Current page: ${val}`);
             }
         },
         mounted() {
