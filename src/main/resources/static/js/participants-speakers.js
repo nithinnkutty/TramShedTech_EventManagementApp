@@ -33,7 +33,7 @@ new Vue({
             axios.post('/participants-speakers', this.newParticipantSpeaker)
                 .then(response => {
                     if (response.data.status === 'SUCCESS') {
-                        this.participantSpeakers.push(response.data.data);
+                        this.participantSpeakers.push(this.newParticipantSpeaker);
                         this.newParticipantSpeaker = { name: '', email: '', company: '', role: 'Speaker', status: 'Invited' };
                     } else {
                         alert('Failed to add participant/speaker');

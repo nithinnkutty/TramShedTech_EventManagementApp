@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Participants and Speakers</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="/static/js/vue.js"></script>
-    <script src="/static/js/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/vue.js" defer></script>
+    <script src="/js/axios.min.js" defer></script>
+    <script src="/js/participants-speakers.js" defer></script>
 </head>
 <body>
 <div id="app" class="container">
@@ -44,8 +45,8 @@
             <td>{{ participantSpeaker.role }}</td>
             <td>{{ participantSpeaker.status }}</td>
             <td>
-                <button @click="editParticipantSpeaker(participantSpeaker)">Edit</button>
-                <button @click="deleteParticipantSpeaker(participantSpeaker.id)">Delete</button>
+                <button class="edit" @click="editParticipantSpeaker(participantSpeaker)">Edit</button>
+                <button class="delete" @click="deleteParticipantSpeaker(participantSpeaker.id)">Delete</button>
             </td>
         </tr>
         </tbody>
@@ -70,6 +71,5 @@
         </form>
     </div>
 </div>
-<script src="/static/js/participants-speakers.js"></script>
 </body>
 </html>

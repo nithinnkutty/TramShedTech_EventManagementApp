@@ -4,11 +4,16 @@ import com.tramshedtech.eventmanagement.entity.ParticipantSpeaker;
 import com.tramshedtech.eventmanagement.mapper.ParticipantSpeakerMapper;
 import com.tramshedtech.eventmanagement.service.ParticipantSpeakerService;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService {
+    private static final Logger logger = LoggerFactory.getLogger(ParticipantSpeakerServiceImpl.class);
+
     @Resource
     private ParticipantSpeakerMapper participantSpeakerMapper;
 
@@ -29,12 +34,15 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
 
     @Override
     public boolean update(ParticipantSpeaker participantSpeaker) {
-        return participantSpeakerMapper.update(participantSpeaker);
+        logger.debug("Updating ParticipantSpeaker with id: {}", participantSpeaker.getId());
+        boolean result = participantSpeakerMapper.update(participantSpeaker);
+        logger.debug("Update result: {}", result);
+        return result;
     }
+
 
     @Override
     public boolean delete(int id) {
         return participantSpeakerMapper.delete(id);
     }
 }
-
