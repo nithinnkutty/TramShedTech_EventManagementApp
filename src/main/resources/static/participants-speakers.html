@@ -4,14 +4,29 @@
     <meta charset="UTF-8">
     <title>Participants and Speakers</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="/js/vue.js" defer></script>
     <script src="/js/axios.min.js" defer></script>
     <script src="/js/participants-speakers.js" defer></script>
 </head>
 <body>
-<div id="app" class="container">
+<div class="sidebar">
+    <div class="logo">
+        <img src="img/logo.png" alt="Tramshed Tech">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Edit Event Page</a></li>
+            <li><a href="#">Update Speakers</a></li>
+            <li><a href="#">Export Report</a></li>
+            <li><a href="#">Get Feedback</a></li>
+        </ul>
+    </nav>
+</div>
+<div id="app" class="main-container">
     <h1>Participants and Speakers</h1>
-    <form @submit.prevent="addParticipantSpeaker">
+    <form @submit.prevent="addParticipantSpeaker" class="form-container">
         <input type="text" v-model="newParticipantSpeaker.name" placeholder="Name" required>
         <input type="email" v-model="newParticipantSpeaker.email" placeholder="Email" required>
         <input type="text" v-model="newParticipantSpeaker.company" placeholder="Company" required>
@@ -24,9 +39,9 @@
             <option value="Confirmed">Confirmed</option>
             <option value="Declined">Declined</option>
         </select>
-        <button type="submit">Add</button>
+        <button type="submit" class="btn add-btn">Add</button>
     </form>
-    <table>
+    <table class="styled-table">
         <thead>
         <tr>
             <th>Name</th>
@@ -45,14 +60,14 @@
             <td>{{ participantSpeaker.role }}</td>
             <td>{{ participantSpeaker.status }}</td>
             <td>
-                <button class="edit" @click="editParticipantSpeaker(participantSpeaker)">Edit</button>
-                <button class="delete" @click="deleteParticipantSpeaker(participantSpeaker.id)">Delete</button>
+                <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
             </td>
         </tr>
         </tbody>
     </table>
-    <div v-if="editMode">
-        <h2>Edit Participant/Speaker</h2>
+    <div v-if="editMode" class="edit-form-container">
+        <h3>Edit Participant/Speaker</h3>
         <form @submit.prevent="updateParticipantSpeaker">
             <input type="text" v-model="currentParticipantSpeaker.name" placeholder="Name" required>
             <input type="email" v-model="currentParticipantSpeaker.email" placeholder="Email" required>
@@ -66,8 +81,8 @@
                 <option value="Confirmed">Confirmed</option>
                 <option value="Declined">Declined</option>
             </select>
-            <button type="submit">Update</button>
-            <button @click="cancelEdit">Cancel</button>
+            <button type="submit" class="btn update-btn">Update</button>
+            <button type="button" class="btn cancel-btn" @click="cancelEdit">Cancel</button>
         </form>
     </div>
 </div>
