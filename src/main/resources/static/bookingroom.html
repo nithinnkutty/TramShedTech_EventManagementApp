@@ -97,7 +97,7 @@
         }
 
         .custom-checkbox {
-            background-color: #F9B117;
+            background-color: #E6A23C;
             font-size: 14px ;
             font-family: Arial, sans-serif;
             font-weight: bold;
@@ -203,10 +203,7 @@
 
             <el-row>
                 <el-col :span="12">
-                    <div>
-                        <el-checkbox v-model="checked1" label="Select All" border class="custom-checkbox" @change="handleCheckAll"></el-checkbox>
-                        <el-checkbox v-model="checked2" label="Deselect All" border class="custom-checkbox" @change="handleInvertSelection"></el-checkbox>
-                    </div>
+
                 </el-col>
 
                 <el-col :span="12" style="text-align: right;">
@@ -343,18 +340,6 @@
                         }
                     ];
                 }, 1000);
-            },
-            handleCheckAll(val) {
-                this.checked2 = false; // cancel deselect all
-                this.tableData.forEach(item => {
-                    item.checked = val;
-                });
-            },
-            handleInvertSelection() {
-                this.checked1 = false; // cancel select all
-                this.tableData.forEach(item => {
-                    item.checked = !item.checked;
-                });
             },
             handleSizeChange(val) {
                 this.pageSize = val;
