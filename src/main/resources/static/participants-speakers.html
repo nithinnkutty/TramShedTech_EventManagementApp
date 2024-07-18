@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Participants and Speakers</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+</head>
+<body>
+<div id="app" class="container">
+    <h1>Participants and Speakers</h1>
+    <form @submit.prevent="addParticipantSpeaker">
+        <input type="text" v-model="newParticipantSpeaker.name" placeholder="Name" required>
+        <input type="email" v-model="newParticipantSpeaker.email" placeholder="Email" required>
+        <input type="text" v-model="newParticipantSpeaker.company" placeholder="Company" required>
+        <select v-model="newParticipantSpeaker.role" required>
+            <option value="Speaker">Speaker</option>
+            <option value="Panelist">Panelist</option>
+        </select>
+        <select v-model="newParticipantSpeaker.status" required>
+            <option value="Invited">Invited</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Declined">Declined</option>
+        </select>
+        <button type="submit">Add</button>
+    </form>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="participantSpeaker in participantSpeakers" :key="participantSpeaker.id">
+            <td>{{ participantSpeaker.name }}</td>
+            <td>{{ participantSpeaker.email }}</td>
+            <td>{{ participantSpeaker.company }}</td>
+            <td>{{ participantSpeaker.role }}</td>
+            <td>{{ participantSpeaker.status }}</td>
+            <td>
+                <button @click="editParticipantSpeaker(participantSpeaker)">Edit</button>
+                <button @click="deleteParticipantSpeaker(participantSpeaker.id)">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div v-if="editMode">
+        <h2>Edit Participant/Speaker</h2>
+        <form @submit.prevent="updateParticipantSpeaker">
+            <input type="text" v-model="currentParticipantSpeaker.name" placeholder="Name" required>
+            <input type="email" v-model="currentParticipantSpeaker.email" placeholder="Email" required>
+            <input type="text" v-model="currentParticipantSpeaker.company" placeholder="Company" required>
+            <select v-model="currentParticipantSpeaker.role" required>
+                <option value="Speaker">Speaker</option>
+                <option value="Panelist">Panelist</option>
+            </select>
+            <select v-model="currentParticipantSpeaker.status" required>
+                <option value="Invited">Invited</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Declined">Declined</option>
+            </select>
+            <button type="submit">Update</button>
+            <button @click="cancelEdit">Cancel</button>
+        </form>
+    </div>
+</div>
+<script src="/static/js/participants-speakers.js"></script>
+</body>
+</html>
