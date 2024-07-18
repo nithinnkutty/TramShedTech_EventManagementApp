@@ -106,6 +106,16 @@
             margin-right: 10px;
         }
 
+        .custom-toggle-button {
+            background-color: #E6A23C; /* 绿色背景 */
+            color: white;
+        }
+
+        .custom-clear-button {
+            background-color: #E6A23C; /* 红色背景 */
+            color: white;
+        }
+
     </style>
 
 
@@ -125,7 +135,7 @@
                     <el-button type="warning" class="custom-button">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Inquiry History</el-button>
+                    <el-button type="warning" class="custom-button">Inquiry Resources</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -147,9 +157,18 @@
             <el-row>
                 <el-col :span="24">
                     <el-table
-                            :data="tableData"
+                            ref="multipleTable"
+                            :data="filteredTableData"
                             style="width: 100%"
+                            @selection-change="handleSelectionChange"
                             :row-class-name="tableRowClassName">
+                        <el-table-column
+                                type="selection"
+                                width="55">
+                        </el-table-column>
+<!--                            :data="tableData"-->
+<!--                            style="width: 100%"-->
+<!--                            :row-class-name="tableRowClassName">-->
                         <el-table-column
                                 prop="date"
                                 label="Application Date"
@@ -175,6 +194,10 @@
                                 width="180">
                         </el-table-column>
                     </el-table>
+                    <div style="margin-top: 20px">
+                        <el-button class="custom-toggle-button" @click="toggleSelection([filteredTableData[1], filteredTableData[2]])">Toggle selection of second and third rows</el-button>
+                        <el-button class="custom-clear-button" @click="toggleSelection()">Clear selection</el-button>
+                    </div>
                 </el-col>
             </el-row>
 
@@ -340,6 +363,18 @@
             handleCurrentChange(val) {
                 this.currentPage4 = val;
                 console.log(`Current page: ${val}`);
+            },
+            toggleSelection(rows) {
+                if (rows) {
+                    rows.forEach(row => {
+                        this.$refs.multipleTable.toggleRowSelection(row);
+                    });
+                } else {
+                    this.$refs.multipleTable.clearSelection();
+                }
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
             }
         },
         mounted() {
