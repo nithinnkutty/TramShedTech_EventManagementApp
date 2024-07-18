@@ -38,9 +38,9 @@
                     <el-menu
                             default-active="1"
                             class="el-menu-vertical-demo custom-menu">
-                        <el-menu-item index="1" @click="change('student.html')" class="custom-menu-item">
+                        <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Main Page</span>
+                            <span slot="title">Dash Board</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('teacher.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
@@ -117,7 +117,7 @@
     new Vue({
         el:"#app",
         data:{
-            currentPage:"avatar.html",
+            currentPage:"dashboard.html",
             imageUrl:'',
             token: '',
             username: '',

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <title>Dashboard</title>
+    <style>
+        .event-thumbnail {
+            width: 100%;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .event-details {
+            padding: 10px;
+        }
+        .event-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-row :gutter="20" type="flex" justify="center">
+        <el-col :span="6" v-for="event in events" :key="event.id">
+            <el-card class="event-thumbnail" @click="viewEvent(event.id)">
+                <img :src="event.thumbnail" alt="Event Image">
+                <div class="event-details">
+                    <p class="event-title">{{ event.title }}</p>
+                    <p>{{ event.date }} - {{ event.time }}</p>
+                    <p>Site: {{ event.site }}</p>
+                    <p>Room: {{ event.room }}</p>
+                </div>
+            </el-card>
+        </el-col>
+    </el-row>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            events: []
+        },
+        methods: {
+            fetchEvents() {
+                fetch('/api/events')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.events = data;
+                    });
+            },
+            viewEvent(eventId) {
+                window.location.href = `/event.html?id=${eventId}`;
+            }
+        },
+        mounted() {
+            this.fetchEvents();
+        }
+    });
+</script>
+</body>
+</html>
