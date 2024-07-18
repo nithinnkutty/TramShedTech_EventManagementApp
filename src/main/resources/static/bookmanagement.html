@@ -96,23 +96,23 @@
             background: #d0ebff;
         }
 
-        .custom-checkbox {
-            background-color: #E6A23C;
-            font-size: 14px ;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            color: #f8f4f4;
-            padding: 10px ;
-            margin-right: 10px;
-        }
-
         .custom-toggle-button {
             background-color: #E6A23C; /* 绿色背景 */
             color: white;
         }
 
         .custom-clear-button {
-            background-color: #E6A23C; /* 红色背景 */
+            background-color: #E6A23C;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li:not(.disabled) {
+            background-color: #accff6;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li.active {
+            background-color: #f44336;
             color: white;
         }
 
@@ -166,9 +166,6 @@
                                 type="selection"
                                 width="55">
                         </el-table-column>
-<!--                            :data="tableData"-->
-<!--                            style="width: 100%"-->
-<!--                            :row-class-name="tableRowClassName">-->
                         <el-table-column
                                 prop="date"
                                 label="Application Date"
@@ -193,58 +190,45 @@
                                 label="Due Date"
                                 width="180">
                         </el-table-column>
+                        <el-table-column label="Operation">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="mini"
+                                        @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                                <el-button
+                                        size="mini"
+                                        type="danger"
+                                        @click="confirmDelete(scope.$index, scope.row)">Delete</el-button>
+                            </template>
+                        </el-table-column>
                     </el-table>
                     <div style="margin-top: 20px">
                         <el-button class="custom-toggle-button" @click="toggleSelection([filteredTableData[1], filteredTableData[2]])">Toggle selection of second and third rows</el-button>
                         <el-button class="custom-clear-button" @click="toggleSelection()">Clear selection</el-button>
+                        <el-button class="custom-delete-button" type="danger" @click="deleteSelectedRows">Delete Selected</el-button>
                     </div>
                 </el-col>
             </el-row>
 
-            <el-row>
-                <el-col :span="12">
-
-                </el-col>
-
-                <el-col :span="12" style="text-align: right;">
-                    <div class="block">
-                        <el-pagination
-                                @size-change="handleSizeChange"
-                                @current-change="handleCurrentChange"
-                                :current-page="currentPage4"
-                                :page-sizes="[10, 20, 30, 40]"
-                                :page-size="10"
-                                layout="total, sizes, prev, pager, next, jumper"
-                                :total="40"
-                                prev-text="Previous"
-                                next-text="Next">
-                            <template slot="total">
-                                Total {{total}} items
-                            </template>
-                            <template slot="size">
-                                <el-select v-model="pageSize" @change="handleSizeChange">
-                                    <el-option
-                                            v-for="size in [10, 20, 30, 40]"
-                                            :key="size"
-                                            :label="size + ' items/page'"
-                                            :value="size">
-                                    </el-option>
-                                </el-select>
-                            </template>
-                            <template slot="pager">
-                                <el-pager
-                                        :current-page="currentPage4"
-                                        :page-count="pageCount"
-                                        @change="handleCurrentChange">
-                                </el-pager>
-                            </template>
-                            <template slot="jumper">
-                                Go to <el-input-number v-model="currentPage4" @change="handleCurrentChange" :min="1" :max="pageCount"> </el-input-number> page
-                            </template>
-                        </el-pagination>
-                    </div>
-                </el-col>
-            </el-row>
+                <el-row style="justify-content: flex-end;">
+                    <el-col :span="24" style="text-align: right;">
+                        <div class="block">
+                            <el-pagination
+                                    class="custom-pagination"
+                                    background
+                                    layout="prev, pager, next"
+                                    :total="total"
+                                    @size-change="handleSizeChange"
+                                    @current-change="handleCurrentChange"
+                                    :current-page="currentPage4"
+                                    :page-sizes="[10, 20, 30, 40]"
+                                    :page-size="pageSize"
+                                    prev-text="Previous"
+                                    next-text="Next">
+                            </el-pagination>
+                        </div>
+                    </el-col>
+                </el-row>
         </el-main>
     </el-container>
 </div>
@@ -266,12 +250,11 @@
                 }],
                 selectedStatus: '',
                 tableData: [], // Initialize to an empty array and then fetch data from the back end
-                checked1: false,
-                checked2: false,
                 currentPage4: 1,
                 pageSize: 10,
                 total: 40,
-                pageCount: 4 // Total pages
+                pageCount: 4, // Total pages
+                multipleSelection: []
             };
         },
         computed: {
@@ -360,6 +343,64 @@
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
+            },
+            handleEdit(index, row) {
+                console.log("Edit", index, row);
+                // Add the logic for editing
+            },
+            handleDelete(index, row) {
+                console.log("Delete", index, row);
+                // Add the logic for deleting
+                this.tableData.splice(index, 1);
+            },
+            confirmDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    this.handleDelete(index, row);
+                    this.$message({
+                        type: 'success',
+                        message: 'Deleted successfully!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+            deleteSelectedRows() {
+                if (this.multipleSelection.length === 0) {
+                    this.$message({
+                        type: 'warning',
+                        message: 'No rows selected for deletion'
+                    });
+                    return;
+                }
+                this.$confirm('This operation will delete the selected files permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    this.multipleSelection.forEach(row => {
+                        const index = this.tableData.indexOf(row);
+                        if (index !== -1) {
+                            this.tableData.splice(index, 1);
+                        }
+                    });
+                    this.multipleSelection = [];
+                    this.$message({
+                        type: 'success',
+                        message: 'Selected rows deleted successfully!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
             }
         },
         mounted() {
@@ -367,5 +408,7 @@
         }
     });
 </script>
+
+
 </body>
 </html>
