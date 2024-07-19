@@ -30,8 +30,7 @@
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="block">
                     <el-date-picker
-                            class="el-date-picker"
-                            v-model="value1"
+                            v-model="formData.date"
                             type="date"
                             placeholder="Choose Date">
                     </el-date-picker>
@@ -45,7 +44,7 @@
                 <el-time-select
                         class="el-time-select"
                         placeholder="startTime"
-                        v-model="startTime"
+                        v-model="formData.startTime"
                         :picker-options="{
                             start: '08:30',
                             step: '00:15',
@@ -55,7 +54,7 @@
                 <el-time-select
                         class="el-time-select"
                         placeholder="endTime"
-                        v-model="endTime"
+                        v-model="formData.endTime"
                         :picker-options="{
                               start: '08:30',
                               step: '00:15',
@@ -69,7 +68,7 @@
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="value" clearable placeholder="please select">
+                <el-select v-model="formData.rooms" clearable placeholder="please select">
                     <el-option
                             v-for="item in rooms"
                             :key="item.value"
@@ -83,7 +82,7 @@
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Tags</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="value" clearable placeholder="please select">
+                <el-select v-model="formData.tags" clearable placeholder="please select">
                     <el-option
                             v-for="item in tags"
                             :key="item.value"
@@ -121,7 +120,7 @@
         <el-row :gutter="20">
             <el-col :span="6"><div class="grid-content"></div></el-col>
 
-            <el-table :data="tableData" border style="width: 55%;">
+            <el-table :data="formData.tableData" border style="width: 55%;">
                 <el-table-column prop="type" label="Event Type" width="180">
                 </el-table-column>
                 <el-table-column prop="staff" label="Support Staff" width="180">
@@ -144,7 +143,7 @@
     </div>
 
     <div class="button">
-    <el-button type="success" round>Create Event</el-button>
+    <el-button type="success" round @click="goToHomePage">Create Event</el-button>
     </div>
 </div>
 </body>
@@ -189,7 +188,6 @@
                     value: 'option 5',
                     label: 'meeting room 5'
                 }],
-                value: '',
                 tags: [{
                     value: 'option 1',
                     label: 'Technology'
@@ -210,8 +208,12 @@
                     value: 'option 6',
                     label: 'Real Estate'
                 }],
-                value: ''
             };
+        },
+        methods: {
+            goToHomePage() {
+                window.location.href = '/login.html';
+            }
         }
     });
 </script>
