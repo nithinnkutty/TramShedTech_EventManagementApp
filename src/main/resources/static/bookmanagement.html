@@ -13,10 +13,9 @@
             margin: 10px;
         }
 
-        .app-container{
+        .app-container {
             margin: 20px;
         }
-
 
         .el-container {
             display: flex;
@@ -31,33 +30,15 @@
             line-height: 60px;
             height: 120px;
         }
+
         .el-main {
             background-color: #E9EEF3;
             color: #333;
-            /*text-align: center;*/
-            /*line-height: 160px;*/
             margin-top: 20px;
             padding: 30px; /* Add internal margins to adjust the position */
             flex: 1; /* Make the main part fill the remaining space */
             position: relative;
         }
-        .el-row {
-            margin-bottom: 20px;
-        }
-        .el-row:last-child {
-            margin-bottom: 0;
-        }
-        .el-col {
-            border-radius: 4px;
-        }
-        .bg-purple-dark {
-            background: #99a9bf;
-        }
-        .grid-content {
-            border-radius: 4px;
-            min-height: 36px;
-        }
-
 
         .custom-button {
             width: 80%;
@@ -69,40 +50,18 @@
             font-weight: bold;
         }
 
-        .select-container {
-            /*position: absolute;*/
-            /*top: 20px; */
-            /*left: 20px; */
-
-            margin: 0; /* Make sure the selector has no extra margins */
-            display: flex;
-            align-items: center;
-
-        }
-
-        .el-select {
-            width: 100%;
-        }
-
-        .el-table .warning-row {
-            background: #f2fbd4;
-        }
-
-        .el-table .success-row {
-            background: #faeab3;
-        }
-
-        .el-table .info-row {
-            background: #d0ebff;
-        }
-
         .custom-toggle-button {
-            background-color: #E6A23C; /* 绿色背景 */
+            background-color: #E6A23C; /* Custom background color */
             color: white;
         }
 
         .custom-clear-button {
             background-color: #E6A23C;
+            color: white;
+        }
+
+        .custom-delete-button {
+            background-color: #f56c6c;
             color: white;
         }
 
@@ -115,8 +74,8 @@
             background-color: #f44336;
             color: white;
         }
-
     </style>
+
 
 
 </head>
@@ -135,7 +94,7 @@
                     <el-button type="warning" class="custom-button">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Inquiry Resources</el-button>
+                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
                 </el-col>
             </el-row>
         </el-header>
@@ -210,25 +169,25 @@
                 </el-col>
             </el-row>
 
-                <el-row style="justify-content: flex-end;">
-                    <el-col :span="24" style="text-align: right;">
-                        <div class="block">
-                            <el-pagination
-                                    class="custom-pagination"
-                                    background
-                                    layout="prev, pager, next"
-                                    :total="total"
-                                    @size-change="handleSizeChange"
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage4"
-                                    :page-sizes="[10, 20, 30, 40]"
-                                    :page-size="pageSize"
-                                    prev-text="Previous"
-                                    next-text="Next">
-                            </el-pagination>
-                        </div>
-                    </el-col>
-                </el-row>
+            <el-row style="justify-content: flex-end;">
+                <el-col :span="24" style="text-align: right;">
+                    <div class="block">
+                        <el-pagination
+                                class="custom-pagination"
+                                background
+                                layout="prev, pager, next"
+                                :total="total"
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page="currentPage4"
+                                :page-sizes="[10, 20, 30, 40]"
+                                :page-size="pageSize"
+                                prev-text="Previous"
+                                next-text="Next">
+                        </el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
         </el-main>
     </el-container>
 </div>
@@ -254,16 +213,23 @@
                 pageSize: 10,
                 total: 40,
                 pageCount: 4, // Total pages
-                multipleSelection: []
+                multipleSelection: [],
+                searchQuery: '' // Search query for filtering data
             };
         },
         computed: {
-            // Filter data based on the selected status
+            // Filter data based on the selected status and search query
             filteredTableData() {
+                let filteredData = this.tableData;
                 if (this.selectedStatus) {
-                    return this.tableData.filter(item => item.status === this.selectedStatus);
+                    filteredData = filteredData.filter(item => item.status === this.selectedStatus);
                 }
-                return this.tableData;
+                if (this.searchQuery) {
+                    filteredData = filteredData.filter(item => {
+                        return Object.keys(item).some(key => String(item[key]).toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    });
+                }
+                return filteredData;
             }
         },
         methods: {
@@ -401,6 +367,9 @@
                         message: 'Deletion cancelled'
                     });
                 });
+            },
+            handleSearch() {
+                // Add logic to handle search
             }
         },
         mounted() {
