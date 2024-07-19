@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Booking</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/element-index.js"></script>
+    <link rel="stylesheet" href="css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 10px;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
+        }
+
+        .result-wrapper {
+            display: flex;
+            flex-wrap: wrap; /* Enable wrapping to the next line */
+            gap: 20px; /* Add spacing between the items */
+        }
+
+        .result-container {
+            display: inline-block;
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            background-color: #fff;
+            margin-bottom: 20px; /* Add some spacing between containers */
+            width: calc(33% - 20px); /* Adjust width to fit 3 items per row, considering the gap */
+            box-sizing: border-box;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-cancel-button {
+            background-color: #45b4ed; /* Custom background color */
+            color: white;
+        }
+    </style>
+
+
+
+
+
+
+
+</head>
+<body>
+<div id="app" class="app-container">
+    <el-container>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Book a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Cancel Booking</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button">Inquiry Resources</el-button>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <div class="result-wrapper">
+                <div class="result-container">
+                    <el-result title="Room 1" sub-title="Location">
+                        <template slot="icon">
+                            <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
+                        </template>
+                        <template slot="extra">
+                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                        </template>
+                    </el-result>
+                </div>
+                <div class="result-container">
+                    <el-result title="Room 2" sub-title="Location 2">
+                        <template slot="icon">
+                            <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
+                        </template>
+                        <template slot="extra">
+                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                        </template>
+                    </el-result>
+                </div>
+                <div class="result-container">
+                    <el-result title="Room 3" sub-title="Location 3">
+                        <template slot="icon">
+                            <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
+                        </template>
+                        <template slot="extra">
+                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                        </template>
+                    </el-result>
+                </div>
+            </div>
+        </el-main>
+    </el-container>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {};
+        },
+        methods: {}
+    });
+</script>
+
+
+
+</body>
+</html>
