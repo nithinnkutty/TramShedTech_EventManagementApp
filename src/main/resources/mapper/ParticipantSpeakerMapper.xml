@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tramshedtech.eventmanagement.mapper.ParticipantSpeakerMapper">
+    <select id="getAll" resultType="ParticipantSpeaker">
+        SELECT * FROM participant_speaker
+    </select>
+
+    <select id="getById" resultType="ParticipantSpeaker" parameterType="int">
+        SELECT * FROM participant_speaker WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="ParticipantSpeaker">
+        INSERT INTO participant_speaker (name, email, company, role, status) VALUES (#{name}, #{email}, #{company}, #{role}, #{status})
+    </insert>
+
+    <update id="update" parameterType="ParticipantSpeaker">
+        UPDATE participant_speaker
+        SET name = #{name}, email = #{email}, company = #{company}, role = #{role}, status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM participant_speaker WHERE id = #{id}
+    </delete>
+</mapper>
