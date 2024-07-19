@@ -79,16 +79,16 @@
         <el-header>
             <el-row :gutter="20">
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">View Resources</el-button>
+                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Inquiry Resources</el-button>
+                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
                 </el-col>
             </el-row>
         </el-header>
@@ -246,6 +246,18 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+            viewResources() {
+                // Redirect to the view resources page
+                window.location.href = 'viewresources.html';
+            },
+            bookaResource() {
+                // Redirect to the book a resource page
+                window.location.href = 'bookresource.html';
+            },
+            cancelBooking() {
+                // Redirect to the cancel booking page
+                window.location.href = 'cancel.html';
             }
         }
     });
