@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Participants and Speakers</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="/js/vue.js" defer></script>
+    <script src="/js/axios.min.js" defer></script>
+    <script src="/js/participants-speakers.js" defer></script>
+</head>
+<body>
+<div class="sidebar">
+    <div class="logo">
+        <img src="img/logo.png" alt="Tramshed Tech">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Edit Event Page</a></li>
+            <li><a href="#">Update Speakers</a></li>
+            <li><a href="#">Export Report</a></li>
+            <li><a href="#">Get Feedback</a></li>
+        </ul>
+    </nav>
+</div>
+<div id="app" class="main-container">
+    <h1>Participants and Speakers</h1>
+    <form @submit.prevent="addParticipantSpeaker" class="form-container">
+        <input type="text" v-model="newParticipantSpeaker.name" placeholder="Name" required>
+        <input type="email" v-model="newParticipantSpeaker.email" placeholder="Email" required>
+        <input type="text" v-model="newParticipantSpeaker.company" placeholder="Company" required>
+        <select v-model="newParticipantSpeaker.role" required>
+            <option value="Speaker">Speaker</option>
+            <option value="Panelist">Panelist</option>
+        </select>
+        <select v-model="newParticipantSpeaker.status" required>
+            <option value="Invited">Invited</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Declined">Declined</option>
+        </select>
+        <button type="submit" class="btn add-btn">Add</button>
+    </form>
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="participantSpeaker in participantSpeakers" :key="participantSpeaker.id">
+            <td>{{ participantSpeaker.name }}</td>
+            <td>{{ participantSpeaker.email }}</td>
+            <td>{{ participantSpeaker.company }}</td>
+            <td>{{ participantSpeaker.role }}</td>
+            <td>{{ participantSpeaker.status }}</td>
+            <td>
+                <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div v-if="editMode" class="edit-form-container">
+        <h3>Edit Participant/Speaker</h3>
+        <form @submit.prevent="updateParticipantSpeaker">
+            <input type="text" v-model="currentParticipantSpeaker.name" placeholder="Name" required>
+            <input type="email" v-model="currentParticipantSpeaker.email" placeholder="Email" required>
+            <input type="text" v-model="currentParticipantSpeaker.company" placeholder="Company" required>
+            <select v-model="currentParticipantSpeaker.role" required>
+                <option value="Speaker">Speaker</option>
+                <option value="Panelist">Panelist</option>
+            </select>
+            <select v-model="currentParticipantSpeaker.status" required>
+                <option value="Invited">Invited</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Declined">Declined</option>
+            </select>
+            <button type="submit" class="btn update-btn">Update</button>
+            <button type="button" class="btn cancel-btn" @click="cancelEdit">Cancel</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
