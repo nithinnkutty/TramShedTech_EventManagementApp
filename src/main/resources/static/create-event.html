@@ -28,8 +28,13 @@
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Date</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.date" placeholder="date"></el-input>
+                <div class="block">
+                    <el-date-picker
+                            class="el-date-picker"
+                            v-model="value1"
+                            type="date"
+                            placeholder="Choose Date">
+                    </el-date-picker>
                 </div>
             </div></el-col>
         </el-row>
@@ -37,27 +42,55 @@
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Time</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.time" placeholder="Time"></el-input>
-                </div>
+                <el-time-select
+                        class="el-time-select"
+                        placeholder="startTime"
+                        v-model="startTime"
+                        :picker-options="{
+                            start: '08:30',
+                            step: '00:15',
+                            end: '23:30'
+                        }">
+                </el-time-select>
+                <el-time-select
+                        class="el-time-select"
+                        placeholder="endTime"
+                        v-model="endTime"
+                        :picker-options="{
+                              start: '08:30',
+                              step: '00:15',
+                              end: '23:30',
+                              minTime: startTime
+                            }">
+                </el-time-select>
             </div></el-col>
         </el-row>
 
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.room" placeholder="room"></el-input>
-                </div>
+                <el-select v-model="value" clearable placeholder="please select">
+                    <el-option
+                            v-for="item in rooms"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
             </div></el-col>
         </el-row>
 
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Tags</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.tags" placeholder="tags"></el-input>
-                </div>
+                <el-select v-model="value" clearable placeholder="please select">
+                    <el-option
+                            v-for="item in tags"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
             </div></el-col>
         </el-row>
 
@@ -139,7 +172,45 @@
                     location: 'Cardiff',
                     AV: '123',
                     notes: '123'
-                }]
+                }],
+                rooms: [{
+                    value: 'option 1',
+                    label: 'meeting room 1'
+                }, {
+                    value: 'option 2',
+                    label: 'meeting room 2'
+                }, {
+                    value: 'option 3',
+                    label: 'meeting room 3'
+                }, {
+                    value: 'option 4',
+                    label: 'meeting room 4'
+                }, {
+                    value: 'option 5',
+                    label: 'meeting room 5'
+                }],
+                value: '',
+                tags: [{
+                    value: 'option 1',
+                    label: 'Technology'
+                }, {
+                    value: 'option 2',
+                    label: 'Education'
+                }, {
+                    value: 'option 3',
+                    label: 'Healthcare'
+                }, {
+                    value: 'option 4',
+                    label: 'Finance'
+                }, {
+                    value: 'option 5',
+                    label: 'Marketing'
+                },
+                {
+                    value: 'option 6',
+                    label: 'Real Estate'
+                }],
+                value: ''
             };
         }
     });

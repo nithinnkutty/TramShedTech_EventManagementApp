@@ -21,6 +21,24 @@
     height: 36px;
     line-height: 36px;
 }
+.block {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+.el-time-select {
+    margin-left: 10px;
+    width: calc(50% - 10px); /* Adjust width to account for spacing */
+    margin-right: 1px;
+}
+.el-time-select:last-child {
+    margin-right: 0; /* Make sure the last selector has no right margin */
+}
+.el-select {
+    margin-left: 10px;
+    width: 98%;
+}
 .caption {
     background: #E6A23C;
     font-size: larger;
