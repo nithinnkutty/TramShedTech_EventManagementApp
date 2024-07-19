@@ -74,11 +74,6 @@
     </style>
 
 
-
-
-
-
-
 </head>
 <body>
 <div id="app" class="app-container">
@@ -95,7 +90,7 @@
                     <el-button type="warning" class="custom-button">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button">Inquiry Resources</el-button>
+                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
                 </el-col>
             </el-row>
         </el-header>
@@ -107,7 +102,7 @@
                             <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
                         </template>
                         <template slot="extra">
-                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                            <el-button class="custom-cancel-button" type="primary" size="medium" @click="confirmCancel('Room 1')">Cancel Booking</el-button>
                         </template>
                     </el-result>
                 </div>
@@ -117,7 +112,7 @@
                             <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
                         </template>
                         <template slot="extra">
-                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                            <el-button class="custom-cancel-button" type="primary" size="medium" @click="confirmCancel('Room 2')">Cancel Booking</el-button>
                         </template>
                     </el-result>
                 </div>
@@ -127,7 +122,7 @@
                             <el-image src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"></el-image>
                         </template>
                         <template slot="extra">
-                            <el-button class="custom-cancel-button" type="primary" size="medium">Cancel Booking</el-button>
+                            <el-button class="custom-cancel-button" type="primary" size="medium" @click="confirmCancel('Room 3')">Cancel Booking</el-button>
                         </template>
                     </el-result>
                 </div>
@@ -135,13 +130,37 @@
         </el-main>
     </el-container>
 </div>
+
 <script>
     new Vue({
         el: '#app',
         data() {
-            return {};
+            return {
+                searchQuery: ''
+            };
         },
-        methods: {}
+        methods: {
+            handleSearch() {
+                // Add logic to handle search
+            },
+            confirmCancel(room) {
+                this.$confirm(`Are you sure you want to cancel booking for ${room}?`, 'Confirmation', {
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    type: 'warning'
+                }).then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: 'Booking cancelled!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Cancellation aborted'
+                    });
+                });
+            }
+        }
     });
 </script>
 
