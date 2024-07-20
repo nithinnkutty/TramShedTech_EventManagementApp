@@ -13,7 +13,6 @@
 <body>
 <div id="app">
     <div class="container">
-        <div class="content">
             <!-- Filter dropdown -->
             <el-row class="filter-row">
                 <el-select v-model="selectedFilter" placeholder="Select" @change="filterEvents">
@@ -22,6 +21,7 @@
                     <el-option label="Completed" value="completed"></el-option>
                 </el-select>
             </el-row>
+        <div class="content">
             <!-- Event tiles -->
             <el-row class="event-row">
                 <el-col class="event-col" v-for="event in filteredEvents" :key="event.id">
