@@ -12,15 +12,15 @@
 </head>
 <body>
 <div id="app">
+    <!-- Filter dropdown -->
+    <el-row class="filter-row">
+        <el-select v-model="selectedFilter" placeholder="Select" @change="filterEvents">
+            <el-option label="All Events" value="all"></el-option>
+            <el-option label="Upcoming" value="upcoming"></el-option>
+            <el-option label="Completed" value="completed"></el-option>
+        </el-select>
+    </el-row>
     <div class="container">
-            <!-- Filter dropdown -->
-            <el-row class="filter-row">
-                <el-select v-model="selectedFilter" placeholder="Select" @change="filterEvents">
-                    <el-option label="All Events" value="all"></el-option>
-                    <el-option label="Upcoming" value="upcoming"></el-option>
-                    <el-option label="Completed" value="completed"></el-option>
-                </el-select>
-            </el-row>
         <div class="content">
             <!-- Event tiles -->
             <el-row class="event-row">
