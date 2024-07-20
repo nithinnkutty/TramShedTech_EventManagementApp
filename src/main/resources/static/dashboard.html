@@ -9,15 +9,22 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-
 </head>
 <body>
 <div id="app">
     <div class="container">
         <div class="content">
+            <!-- Filter dropdown -->
+            <el-row class="filter-row">
+                <el-select v-model="selectedFilter" placeholder="Select" @change="filterEvents">
+                    <el-option label="All Events" value="all"></el-option>
+                    <el-option label="Upcoming" value="upcoming"></el-option>
+                    <el-option label="Completed" value="completed"></el-option>
+                </el-select>
+            </el-row>
+            <!-- Event tiles -->
             <el-row class="event-row">
-                <el-col class="event-col" v-for="event in events" :key="event.id">
+                <el-col class="event-col" v-for="event in filteredEvents" :key="event.id">
                     <el-card class="event-card" @click="viewEvent(event.id)">
                         <div class="event-card-img">
                             <img src="/img/Eventicon.png" alt="Event Image">
@@ -40,22 +47,34 @@
     new Vue({
         el: '#app',
         data: {
-            events: []
+            events: [],
+            filteredEvents: [],
+            selectedFilter: 'all'
         },
         methods: {
             fetchEvents() {
                 axios.get('/api/events')
                     .then(response => {
                         this.events = response.data.data;
+                        this.filterEvents();
                     })
                     .catch(error => {
                         console.error("There was an error fetching the events!", error);
                     });
             },
-            // viewEvent(eventId) {
-            //     console.log(`Redirecting to event.html?id=${eventId}`);
-            //     window.location.href = `/event.html?id=${eventId}`;
-            // }
+            filterEvents() {
+                const now = new Date();
+                if (this.selectedFilter === 'upcoming') {
+                    this.filteredEvents = this.events.filter(event => new Date(event.date) >= now);
+                } else if (this.selectedFilter === 'completed') {
+                    this.filteredEvents = this.events.filter(event => new Date(event.date) < now);
+                } else {
+                    this.filteredEvents = this.events;
+                }
+            },
+            viewEvent(eventId) {
+                window.location.href = `/event.html?id=${eventId}`;
+            }
         },
         mounted() {
             this.fetchEvents();
@@ -65,4 +84,3 @@
 
 </body>
 </html>
-
