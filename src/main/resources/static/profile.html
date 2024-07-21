@@ -113,6 +113,10 @@
                     wechat: [
                         {  type: 'string' , required: true, message: 'Please enter your WeChat account', trigger: 'blur' },
                     ],
+                    phone: [
+                        { pattern: /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/, message: 'Please enter a valid UK phone number', trigger: 'blur' }
+                    ]
+
                 },
 
             }

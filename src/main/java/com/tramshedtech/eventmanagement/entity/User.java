@@ -14,6 +14,6 @@ public class User {
     private String pid;
     private String sex;
     private String birthday;
-    private Long phone;
+    private String phone;
     private String wechat;
 }
