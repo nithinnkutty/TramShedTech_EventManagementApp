@@ -38,9 +38,9 @@
                     <el-menu
                             default-active="1"
                             class="el-menu-vertical-demo custom-menu">
-                        <el-menu-item index="1" @click="change('student.html')" class="custom-menu-item">
+                        <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Main Page</span>
+                            <span slot="title">Dash Board</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('teacher.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
@@ -57,7 +57,7 @@
                     </el-menu>
                 </div>
             </el-aside>
-            <el-main style="background-color: beige;height: 100%;">
+            <el-main style="background-color: beige;height: 100%;padding: 0px">
                 <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
                 <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;"></iframe>
             </el-main>
@@ -117,7 +117,7 @@
     new Vue({
         el:"#app",
         data:{
-            currentPage:"avatar.html",
+            currentPage:"dashboard.html",
             imageUrl:'',
             token: '',
             username: '',
@@ -161,6 +161,10 @@
                 if (command === 'logout') {
                     this.logout();
                 }
+            },
+            viewEvent(eventId) {
+                console.log(`Redirecting to event.html?id=${eventId}`);
+                window.location.href = `/event.html?id=${eventId}`;
             },
             logout() {
                 window.localStorage.removeItem('token');
