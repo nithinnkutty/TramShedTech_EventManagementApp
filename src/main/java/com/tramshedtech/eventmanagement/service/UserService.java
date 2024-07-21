@@ -17,4 +17,8 @@ public interface UserService {
     String getPwd(int uid);
 
     boolean updatePwd(String passWord, int uid);
+
+    User findbyId(int uid);
+
+    boolean updateInfo(User user, int uid);
 }

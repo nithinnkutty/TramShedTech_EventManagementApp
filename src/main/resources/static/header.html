@@ -24,7 +24,7 @@
                                 {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>Modify Information</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('profile.html')">Modify Information</el-dropdown-item>
                                 <el-dropdown-item @click.native="change('password.html')">Modify Password</el-dropdown-item>
                                 <el-dropdown-item @click.native="change('avatar.html')">Upload Avatar</el-dropdown-item>
                                 <el-dropdown-item command="logout">Logout</el-dropdown-item>

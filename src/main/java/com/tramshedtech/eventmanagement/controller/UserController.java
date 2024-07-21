@@ -159,11 +159,33 @@ public class UserController {
 
     @PostMapping("/updatePwd/{pwd}")
     public boolean updatePwd(@PathVariable("pwd") String pwd, HttpSession session){
-        System.out.println("这个方法被访问了");
+
         int uid = (int) session.getAttribute("uid");
 
         String passWord = DigestUtils.md5Hex(pwd);
         boolean r = userService.updatePwd(passWord,uid);
+        return r;
+    }
+
+    @GetMapping("/findbyId")
+    public ResponseResult findbyId(HttpSession session){
+
+        int uid  = (int)session.getAttribute("uid");
+        System.out.println(uid);
+
+        User u = userService.findbyId(uid);
+
+        return new ResponseResult()
+                .setCode(200)
+                .setStatus(ResponseStatus.SUCCESS)
+                .setData(u);
+    }
+
+    @PostMapping("/updateInfo")
+    public boolean updateInfo(@RequestBody User user, HttpSession session){
+        System.out.println(user);
+        int uid = (int) session.getAttribute("uid");
+        boolean r = userService.updateInfo(user,uid);
         return r;
     }
 }

@@ -46,7 +46,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updatePwd(String passWord, int uid) {
         boolean r = userMapper.updatePwd(passWord,uid);
-        return false;
+        return r;
+    }
+
+    @Override
+    public User findbyId(int uid) {
+        return userMapper.findbyId(uid);
+    }
+
+    @Override
+    public boolean updateInfo(User user, int uid) {
+        boolean r = userMapper.updateInfo(user,uid);
+        return r;
     }
 
 
