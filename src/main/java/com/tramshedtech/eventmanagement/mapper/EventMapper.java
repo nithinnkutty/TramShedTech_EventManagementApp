@@ -12,5 +12,5 @@ public interface EventMapper {
 
     Event getEventById(Long id);
 
+    void add(Event event);
 }
-
