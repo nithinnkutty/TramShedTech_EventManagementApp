@@ -106,51 +106,39 @@
                             <el-form-item label="Email" prop="email">
                                 <el-input v-model="ruleForm.email"></el-input>
                             </el-form-item>
-                            <el-form-item label="Location" prop="region">
-                                <el-select v-model="ruleForm.region" placeholder="Please select location">
-                                    <el-option label="Cardiff Room 1" value="shanghai"></el-option>
-                                    <el-option label="Cardiff Room 2" value="beijing"></el-option>
-                                    <el-option label="Newport Room 1" value="beijing"></el-option>
-                                    <el-option label="Newport Room 2" value="beijing"></el-option>
-                                    <el-option label="Swansea Room 1" value="beijing"></el-option>
-                                    <el-option label="Swansea Room 2" value="beijing"></el-option>
+                            <el-form-item label="Location" prop="location">
+                                <el-select v-model="ruleForm.location" placeholder="Please select location">
+                                    <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
+                                    <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
+                                    <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
+                                    <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
+                                    <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
+                                    <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
                                 </el-select>
                             </el-form-item>
-                            <el-form-item label="Book resource between" required>
-                                <el-col :span="10">
-                                    <el-form-item prop="date1">
-                                        <el-date-picker type="date" placeholder="Select start date" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :span="10">
-                                    <el-form-item prop="time1">
-                                        <el-time-picker placeholder="Select start time" v-model="ruleForm.time1" style="width: 100%;"></el-time-picker>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col class="line" :span="2">-</el-col>
-                                <el-col :span="10">
-                                    <el-form-item prop="date2">
-                                        <el-date-picker type="date" placeholder="Select end date" v-model="ruleForm.date2" style="width: 100%;"></el-date-picker>
-                                    </el-form-item>
-                                </el-col>
-                                <el-col :span="10">
-                                    <el-form-item prop="time2">
-                                        <el-time-picker placeholder="Select end time" v-model="ruleForm.time2" style="width: 100%;"></el-time-picker>
-                                    </el-form-item>
-                                </el-col>
+                            <el-form-item label="Book resource between" prop="daterange">
+                                <el-date-picker
+                                        v-model="ruleForm.daterange"
+                                        type="datetimerange"
+                                        range-separator="to"
+                                        start-placeholder="Start date"
+                                        end-placeholder="End date"
+                                        :disabled-date="disabledDate"
+                                        style="width: 100%;">
+                                </el-date-picker>
                             </el-form-item>
-                            <el-form-item label="AV Requirements" prop="type">
-                                <el-checkbox-group v-model="ruleForm.type">
-                                    <el-checkbox label="Microphones" name="type"></el-checkbox>
-                                    <el-checkbox label="Still water" name="type"></el-checkbox>
-                                    <el-checkbox label="Speakers" name="type"></el-checkbox>
-                                    <el-checkbox label="Live streaming" name="type"></el-checkbox>
-                                    <el-checkbox label="Technical support" name="type"></el-checkbox>
-                                    <el-checkbox label="No, thanks." name="type"></el-checkbox>
+                            <el-form-item label="AV Requirements" prop="av">
+                                <el-checkbox-group v-model="ruleForm.av">
+                                    <el-checkbox label="Microphones" name="Microphones"></el-checkbox>
+                                    <el-checkbox label="Still water" name="Still water"></el-checkbox>
+                                    <el-checkbox label="Speakers" name="Speakers"></el-checkbox>
+                                    <el-checkbox label="Live streaming" name="Live streaming"></el-checkbox>
+                                    <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
+                                    <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
                                 </el-checkbox-group>
                             </el-form-item>
-                            <el-form-item label="Payment method" prop="resource">
-                                <el-radio-group v-model="ruleForm.resource">
+                            <el-form-item label="Payment method" prop="payment">
+                                <el-radio-group v-model="ruleForm.payment">
                                     <el-radio label="Paypal"></el-radio>
                                     <el-radio label="Applepay"></el-radio>
                                     <el-radio label="Credit card"></el-radio>
@@ -158,7 +146,7 @@
                                 </el-radio-group>
                             </el-form-item>
                             <el-form-item label="Message">
-                                <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+                                <el-input type="textarea" v-model="ruleForm.message"></el-input>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
@@ -175,6 +163,7 @@
 
 
 
+
 <script>
     new Vue({
         el: '#app',
@@ -184,50 +173,39 @@
                     firstName: '',
                     lastName: '',
                     email: '',
-                    region: '',
-                    date1: '',
-                    time1: '',
-                    date2: '',
-                    time2: '',
-                    type: [],
-                    resource: '',
-                    desc: ''
+                    location: '',
+                    daterange: [],
+                    av: [],
+                    payment: '',
+                    message: ''
                 },
                 rules: {
                     firstName: [
-                        { required: true, message: '请输入名字', trigger: 'blur' },
-                        { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+                        { required: true, message: 'Please enter your first name', trigger: 'blur' },
+                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
                     ],
                     lastName: [
-                        { required: true, message: '请输入姓氏', trigger: 'blur' },
-                        { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
+                        { required: true, message: 'Please enter your last name', trigger: 'blur' },
+                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
                     ],
                     email: [
-                        { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-                        { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+                        { required: true, message: 'Please enter your email address', trigger: 'blur' },
+                        { type: 'email', message: 'Please enter the correct email address', trigger: 'blur' }
                     ],
-                    region: [
-                        { required: true, message: '请选择活动区域', trigger: 'change' }
+                    location: [
+                        { required: true, message: 'Please select the location', trigger: 'change' }
                     ],
-                    date1: [
-                        { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+                    daterange: [
+                        { required: true, message: 'Please select the date range', trigger: 'change' },
+                        { validator: this.validateDateRange, trigger: 'change' }
                     ],
-                    time1: [
-                        { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
+                    av: [
+                        { type: 'array', required: true, message: 'Please select at least one AV requirement', trigger: 'change' }
                     ],
-                    date2: [
-                        { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+                    payment: [
+                        { required: true, message: 'Please select a payment method', trigger: 'change' }
                     ],
-                    time2: [
-                        { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
-                    ],
-                    type: [
-                        { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
-                    ],
-                    resource: [
-                        { required: true, message: '请选择活动资源', trigger: 'change' }
-                    ],
-                    desc: [
+                    message: [
                         { required: false }
                     ]
                 }
@@ -258,10 +236,24 @@
             cancelBooking() {
                 // Redirect to the cancel booking page
                 window.location.href = 'cancel.html';
+            },
+            disabledDate(time) {
+                return time.getTime() < Date.now() - 86400000; // Disable dates before today
+            },
+            validateDateRange(rule, value, callback) {
+                const [start, end] = value;
+                if (new Date(start).getTime() < Date.now() - 86400000) {
+                    callback(new Error('This date is not optional'));
+                } else if (new Date(end).getTime() < new Date(start).getTime()) {
+                    callback(new Error('The start time cannot be after the end time'));
+                } else {
+                    callback();
+                }
             }
         }
     });
 </script>
+
 
 
 
