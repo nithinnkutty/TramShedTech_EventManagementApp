@@ -6,6 +6,7 @@
     <script src="js/vue.js"></script>
     <script src="js/create-event.js"></script>
     <script src="js/element-index.js"></script>
+    <script src="js/axios.min.js"></script>
     <title>Create Event Page</title>
 </head>
 <body>
@@ -17,10 +18,19 @@
     </div>
     <el-row class="input-field">
         <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event ID</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.id" placeholder="event ID"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Event Name</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="grid-content input">
-                    <el-input v-model="formData.eventName" placeholder="event name"></el-input>
+                    <el-input v-model="formData.title" placeholder="event name"></el-input>
                 </div>
             </div></el-col>
         </el-row>
@@ -59,7 +69,7 @@
                               start: '08:30',
                               step: '00:15',
                               end: '23:30',
-                              minTime: startTime
+                              minTime: formData.startTime
                             }">
                 </el-time-select>
             </div></el-col>
@@ -68,26 +78,26 @@
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="formData.rooms" clearable placeholder="please select">
+                <el-select v-model="formData.room" clearable placeholder="please select">
                     <el-option
-                            v-for="item in rooms"
+                            v-for="item in room"
                             :key="item.value"
                             :label="item.label"
-                            :value="item.value">
+                            :value="item.label">
                     </el-option>
                 </el-select>
             </div></el-col>
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Tags</div></el-col>
+            <el-col :span="4" :offset="6"><div class="grid-content information">Tag</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="formData.tags" clearable placeholder="please select">
+                <el-select v-model="formData.tag" clearable placeholder="please select">
                     <el-option
-                            v-for="item in tags"
+                            v-for="item in tag"
                             :key="item.value"
                             :label="item.label"
-                            :value="item.value">
+                            :value="item.label">
                     </el-option>
                 </el-select>
             </div></el-col>
@@ -122,20 +132,44 @@
 
             <el-table :data="formData.tableData" border style="width: 55%;">
                 <el-table-column prop="type" label="Event Type" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.type" placeholder="Event type" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="staff" label="Support Staff" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.staff" placeholder="Support Staff" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="company" label="Company" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.company" placeholder="Company" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="contact" label="Contact" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.contact" placeholder="Contact" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="email" label="Contact Email" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.email" placeholder="Contact Email" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="location" label="Location" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.site" placeholder="Location" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="AV" label="AV" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.av" placeholder="AV" class="table"></el-input>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="notes" label="AV Notes" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.note" placeholder="AV Notes" class="table"></el-input>
+                    </template>
                 </el-table-column>
             </el-table>
 
@@ -143,7 +177,7 @@
     </div>
 
     <div class="button">
-    <el-button type="success" round @click="goToHomePage">Create Event</el-button>
+    <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
     </div>
 </div>
 </body>
@@ -154,25 +188,24 @@
         data() {
             return {
                 formData: {
-                    eventName: '',
+                    id: '',
+                    title: '',
                     date: '',
                     time: '',
-                    room: '',
-                    tags: '',
                     speaker: '',
-                    responsible: ''
+                    responsible: '',
+                    tableData: [{
+                        type: '',
+                        staff: '',
+                        company: '',
+                        contact: '',
+                        email: '',
+                        location: '',
+                        av: '',
+                        note: ' '
+                    }],
                 },
-                tableData: [{
-                    type: 'meeting',
-                    staff: 'Jerry',
-                    company: 'ABC',
-                    contact: '123',
-                    email: '123@outlook.com',
-                    location: 'Cardiff',
-                    AV: '123',
-                    notes: '123'
-                }],
-                rooms: [{
+                room: [{
                     value: 'option 1',
                     label: 'meeting room 1'
                 }, {
@@ -188,7 +221,7 @@
                     value: 'option 5',
                     label: 'meeting room 5'
                 }],
-                tags: [{
+                tag: [{
                     value: 'option 1',
                     label: 'Technology'
                 }, {
@@ -211,8 +244,46 @@
             };
         },
         methods: {
+            /*Converts the obtained date data into the desired date YYYY-MM-DD*/
+            getFormattedDate(date) {
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            },
+            handleButtonClick() {
+                // this.goToHomePage();
+                this.getFormData();
+            },
             goToHomePage() {
-                window.location.href = '/login.html';
+                window.location.href = '/main.html';
+            },
+            getFormData() {
+                const formattedDate = this.getFormattedDate(this.formData.date);
+                const eventData = {
+                    id: this.formData.id,
+                    title: this.formData.title,
+                    date: formattedDate,
+                    time: this.formData.startTime + '-' + this.formData.endTime,
+                    room: this.formData.room,
+                    tag: this.formData.tag,
+                    speaker: this.formData.speaker,
+                    responsible: this.formData.responsible,
+                    staff: this.formData.tableData[0].staff,
+                    company: this.formData.tableData[0].company,
+                    contact: this.formData.tableData[0].contact,
+                    email: this.formData.tableData[0].email,
+                    site: this.formData.tableData[0].site,
+                    av: this.formData.tableData[0].av,
+                    note: this.formData.tableData[0].note
+                };
+                console.log(eventData);
+                axios.post('/api/event/create', eventData).then(response => {
+                    console.log('Event created successfully', response);
+                })
+                    .catch(error => {
+                        console.log('Error creating event', error);
+                    });
             }
         }
     });
