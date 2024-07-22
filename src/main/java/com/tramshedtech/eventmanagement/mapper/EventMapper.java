@@ -2,6 +2,7 @@ package com.tramshedtech.eventmanagement.mapper;
 
 import com.tramshedtech.eventmanagement.entity.Event;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ public interface EventMapper {
 
     Event getEventById(Long id);
 
-    void add(Event event);
+    boolean add(Event event);
 }

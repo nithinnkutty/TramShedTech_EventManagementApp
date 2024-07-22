@@ -61,12 +61,12 @@ public class EventController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createEvent(@RequestBody Event event) {
+    public ResponseResult createEvent(@RequestBody Event event) {
         try{
-            eventService.addEvent(event);
-            return ResponseEntity.ok("Event created successfully");
+            Long eventCreatedId = eventService.addEvent(event);
+            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(eventCreatedId);
         }catch (Exception e){
-            return ResponseEntity.badRequest().body("Failed to create event: " + e.getMessage());
+            return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
         }
     }
 }
