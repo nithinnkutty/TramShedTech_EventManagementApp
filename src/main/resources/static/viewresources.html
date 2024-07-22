@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Resources</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/element-index.js"></script>
+    <link rel="stylesheet" href="css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 10px;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
+        }
+
+        .el-row {
+            margin-bottom: 20px;
+        }
+
+        .el-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .el-col {
+            border-radius: 4px;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .carousel-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .el-carousel__item h3 {
+            color: #475669;
+            font-size: 18px;
+            opacity: 0.75;
+            line-height: 300px;
+            margin: 0;
+        }
+
+        .el-carousel__item:nth-child(2n) {
+            background-color: #99a9bf;
+        }
+
+        .el-carousel__item:nth-child(2n+1) {
+            background-color: #d3dce6;
+        }
+
+        .book-resource-button {
+            background-color: #E6A23C; /* Custom background color */
+            color: white;
+            margin-left: auto;
+            display: block;
+        }
+    </style>
+
+
+
+
+
+</head>
+<body>
+<div id="app" class="app-container">
+    <el-container>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookaResources">Book a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <el-row>
+                <el-col :span="24" v-for="(item, index) in 3" :key="index">
+                    <div class="carousel-container">
+                        <el-carousel :interval="5000" arrow="always">
+                            <el-carousel-item v-for="carouselItem in 4" :key="carouselItem">
+                                <h3>{{ carouselItem }}</h3>
+                            </el-carousel-item>
+                        </el-carousel>
+                        <el-descriptions :title="'Room ' + (index + 1)">
+                            <el-descriptions-item label="Cardiff - Queen Street">CF24 0SO</el-descriptions-item>
+                            <el-descriptions-item label="">
+                                <el-button class="book-resource-button" @click="bookResource">BOOK RESOURCE</el-button>
+                            </el-descriptions-item>
+                        </el-descriptions>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {};
+        },
+        methods: {
+            bookResource() {
+                // Redirect to the booking page
+                window.location.href = 'bookresource.html';
+            },
+            viewResources() {
+                // Redirect to the view resources page
+                window.location.href = 'viewresources.html';
+            },
+            bookaResources() {
+                // Redirect to the book a resource page
+                window.location.href = 'bookresource.html';
+            },
+            cancelBooking() {
+                // Redirect to the cancel booking page
+                window.location.href = 'cancel.html';
+            }
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

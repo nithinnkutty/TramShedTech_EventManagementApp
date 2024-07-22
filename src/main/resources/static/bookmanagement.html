@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Room Management</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 10px;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-toggle-button {
+            background-color: #E6A23C; /* Custom background color */
+            color: white;
+        }
+
+        .custom-clear-button {
+            background-color: #E6A23C;
+            color: white;
+        }
+
+        .custom-delete-button {
+            background-color: #f56c6c;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li:not(.disabled) {
+            background-color: #accff6;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li.active {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .book-resource-button {
+            background-color: #E6A23C; /* Custom background color */
+            color: white;
+            margin-left: auto;
+            display: block;
+        }
+    </style>
+
+
+
+</head>
+<body>
+<div id="app" class="app-container">
+    <el-container>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <div class="select-container">
+                        <el-select v-model="value" clearable placeholder="Please select">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <el-table
+                            ref="multipleTable"
+                            :data="filteredTableData"
+                            style="width: 100%"
+                            @selection-change="handleSelectionChange"
+                            :row-class-name="tableRowClassName">
+                        <el-table-column
+                                type="selection"
+                                width="55">
+                        </el-table-column>
+                        <el-table-column
+                                prop="date"
+                                label="Application Date"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="Applicant Name"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="address"
+                                label="Address">
+                        </el-table-column>
+                        <el-table-column
+                                prop="postcode"
+                                label="Postcode"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="dueDate"
+                                label="Due Date"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column label="Operation">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="mini"
+                                        @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                                <el-button
+                                        size="mini"
+                                        type="danger"
+                                        @click="confirmDelete(scope.$index, scope.row)">Delete</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div style="margin-top: 20px">
+                        <el-button class="custom-toggle-button" @click="toggleSelection([filteredTableData[1], filteredTableData[2]])">Toggle selection of second and third rows</el-button>
+                        <el-button class="custom-clear-button" @click="toggleSelection()">Clear selection</el-button>
+                        <el-button class="custom-delete-button" type="danger" @click="deleteSelectedRows">Delete Selected</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+
+            <el-row style="justify-content: flex-end;">
+                <el-col :span="24" style="text-align: right;">
+                    <div class="block">
+                        <el-pagination
+                                class="custom-pagination"
+                                background
+                                layout="prev, pager, next"
+                                :total="total"
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page="currentPage4"
+                                :page-sizes="[10, 20, 30, 40]"
+                                :page-size="pageSize"
+                                prev-text="Previous"
+                                next-text="Next">
+                        </el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                options: [{
+                    value: 'Ongoing',
+                    label: 'Ongoing'
+                }, {
+                    value: 'Upcoming',
+                    label: 'Upcoming'
+                }, {
+                    value: 'Completed',
+                    label: 'Completed'
+                }],
+                selectedStatus: '',
+                tableData: [], // Initialize to an empty array and then fetch data from the back end
+                currentPage4: 1,
+                pageSize: 10,
+                total: 40,
+                pageCount: 4, // Total pages
+                multipleSelection: [],
+                searchQuery: '' // Search query for filtering data
+            };
+        },
+        computed: {
+            // Filter data based on the selected status and search query
+            filteredTableData() {
+                let filteredData = this.tableData;
+                if (this.selectedStatus) {
+                    filteredData = filteredData.filter(item => item.status === this.selectedStatus);
+                }
+                if (this.searchQuery) {
+                    filteredData = filteredData.filter(item => {
+                        return Object.keys(item).some(key => String(item[key]).toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    });
+                }
+                return filteredData;
+            }
+        },
+        methods: {
+            tableRowClassName({ row }) {
+                if (row.status === 'Ongoing') {
+                    return 'warning-row';
+                } else if (row.status === 'Upcoming') {
+                    return 'info-row';
+                } else if (row.status === 'Completed') {
+                    return 'success-row';
+                }
+                return '';
+            },
+            fetchTableData() {
+                // Simulates asynchronous requests for data from the back end
+                setTimeout(() => {
+                    this.tableData = [
+                        {
+                            date: 'July 16 2024',
+                            name: 'Lily',
+                            address: 'Queen St. Room 101',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 23 2024',
+                            status: 'Upcoming'
+                        },
+                        {
+                            date: 'July 18 2024',
+                            name: 'Cecilia',
+                            address: 'Queen St. Room 102',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 25 2024',
+                            status: 'Ongoing'
+                        },
+                        {
+                            date: 'July 18 2024',
+                            name: 'Sunny',
+                            address: 'Queen St. Room 103',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 28 2024',
+                            status: 'Completed'
+                        },
+                        {
+                            date: 'July 20 2024',
+                            name: 'Zoey',
+                            address: 'Queen St. Room 104',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 30 2024',
+                            status: 'Ongoing'
+                        },
+                        {
+                            date: 'July 21 2024',
+                            name: 'Zoey',
+                            address: 'Queen St. Room 105',
+                            postcode: 'CF24 0SZ',
+                            dueDate: 'July 30 2024',
+                            status: 'Upcoming'
+                        }
+                    ];
+                }, 1000);
+            },
+            handleSizeChange(val) {
+                this.pageSize = val;
+                console.log(`Items per page: ${val}`);
+            },
+            handleCurrentChange(val) {
+                this.currentPage4 = val;
+                console.log(`Current page: ${val}`);
+            },
+            toggleSelection(rows) {
+                if (rows) {
+                    rows.forEach(row => {
+                        this.$refs.multipleTable.toggleRowSelection(row);
+                    });
+                } else {
+                    this.$refs.multipleTable.clearSelection();
+                }
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            handleEdit(index, row) {
+                console.log("Edit", index, row);
+                // Add the logic for editing
+            },
+            handleDelete(index, row) {
+                console.log("Delete", index, row);
+                // Add the logic for deleting
+                this.tableData.splice(index, 1);
+            },
+            confirmDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    this.handleDelete(index, row);
+                    this.$message({
+                        type: 'success',
+                        message: 'Deleted successfully!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+            deleteSelectedRows() {
+                if (this.multipleSelection.length === 0) {
+                    this.$message({
+                        type: 'warning',
+                        message: 'No rows selected for deletion'
+                    });
+                    return;
+                }
+                this.$confirm('This operation will delete the selected files permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    this.multipleSelection.forEach(row => {
+                        const index = this.tableData.indexOf(row);
+                        if (index !== -1) {
+                            this.tableData.splice(index, 1);
+                        }
+                    });
+                    this.multipleSelection = [];
+                    this.$message({
+                        type: 'success',
+                        message: 'Selected rows deleted successfully!'
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+            handleSearch() {
+                // Add logic to handle search
+            },
+            viewResources() {
+                // Redirect to the view resources page
+                window.location.href = 'viewresources.html';
+            },
+            bookaResource() {
+                // Redirect to the booking page
+                window.location.href = 'bookresource.html';
+            },
+            cancelBooking() {
+                // Redirect to the cancel booking page
+                window.location.href = 'cancel.html';
+            }
+        },
+        mounted() {
+            this.fetchTableData(); // Obtain data after the component is mounted
+        }
+    });
+</script>
+
+
+</body>
+</html>
