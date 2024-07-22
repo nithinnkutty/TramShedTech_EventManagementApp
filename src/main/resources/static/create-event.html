@@ -278,7 +278,7 @@
                     note: this.formData.tableData[0].note
                 };
                 console.log(eventData);
-                axios.post('/api/event/create', eventData).then(response => {
+                axios.post('/api/events/create', eventData).then(response => {
                     console.log('Event created successfully', response);
                 })
                     .catch(error => {
