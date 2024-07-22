@@ -18,4 +18,34 @@
     <select id="allUsers" resultType="User">
         select * from user where status = 0
     </select>
+
+    <select id="getPwd" resultType="String">
+        select password FROM user WHERE id = #{uid}
+    </select>
+
+    <update id="updatePwd">
+        update user set password = #{passWord} where id = #{uid}
+    </update>
+
+    <select id="findbyId" resultMap="findbyIdMap">
+        select u.id, u.account, d.name department, p.name position, u.sex, u.birthday, u.email, u.phone, u.wechat, u.avatar
+        FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id AND u.id = #{uid}
+    </select>
+
+    <resultMap id="findbyIdMap" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="birthday" property="birthday" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+        <result column="avatar" property="avatar" />
+    </resultMap>
+
+    <update id="updateInfo">
+        update user set account=#{user.account}, birthday=#{user.birthday}, sex=#{user.sex}, email=#{user.email}, wechat=#{user.wechat}, phone=#{user.phone} where id = #{uid}
+    </update>
 </mapper>

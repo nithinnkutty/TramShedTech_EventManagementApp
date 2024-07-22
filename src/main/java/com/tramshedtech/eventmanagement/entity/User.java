@@ -8,6 +8,12 @@ public class User {
     private String account;
     private String password;
     private String email;
+    private String avatar;
     private int status;
-    private int identity;
+    private String did;
+    private String pid;
+    private String sex;
+    private String birthday;
+    private String phone;
+    private String wechat;
 }

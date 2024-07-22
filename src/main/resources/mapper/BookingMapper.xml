@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tramshedtech.eventmanagement.mapper.BookingMapper">
+    <insert id="addBooking">
+        INSERT INTO bookings(first_name,last_name,email,location,message,payment,av,start_date,start_time,end_date,end_time,postcode,status) VALUES (#{firstName}, #{lastName},#{email},#{location},#{message},#{payment},#{av},#{startDate},#{startTime},#{endDate},#{endTime},#{postcode,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR})
+    </insert>
+
+</mapper>
