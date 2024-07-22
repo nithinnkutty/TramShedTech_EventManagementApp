@@ -120,7 +120,7 @@
     new Vue({
         el:"#app",
         data:{
-            currentPage:'',
+            currentPage:"dashboard.html",
             imageUrl:'',
             token: '',
             username: '',
@@ -165,6 +165,10 @@
                     this.logout();
                 }
             },
+            viewEvent(eventId) {
+                console.log(`Redirecting to event.html?id=${eventId}`);
+                window.location.href = `/event.html?id=${eventId}`;
+            },
             logout() {
                 window.localStorage.removeItem('token');
                 this.token = '';
@@ -173,7 +177,7 @@
                     message: 'Logged out successfully',
                     type: 'success'
                 });
-            },
+            }
         }
     })
 </script>
