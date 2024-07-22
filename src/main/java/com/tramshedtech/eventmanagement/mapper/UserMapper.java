@@ -2,6 +2,7 @@ package com.tramshedtech.eventmanagement.mapper;
 
 import com.tramshedtech.eventmanagement.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,4 +15,12 @@ public interface UserMapper {
     String findAvatar(int uid);
 
     List<User> allUsers();
+
+    String getPwd(int uid);
+
+    boolean updatePwd(String passWord, int uid);
+
+    User findbyId(int uid);
+
+    boolean updateInfo(@Param("user")User user, @Param("uid")int uid);
 }
