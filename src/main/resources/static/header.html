@@ -24,6 +24,9 @@
                                 {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item @click.native="change('profile.html')">Modify Information</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('password.html')">Modify Password</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('avatar.html')">Upload Avatar</el-dropdown-item>
                                 <el-dropdown-item command="logout">Logout</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
@@ -38,9 +41,9 @@
                     <el-menu
                             default-active="1"
                             class="el-menu-vertical-demo custom-menu">
-                        <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
+                        <el-menu-item index="1" @click="change('student.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Dash Board</span>
+                            <span slot="title">Main Page</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('teacher.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
@@ -57,7 +60,7 @@
                     </el-menu>
                 </div>
             </el-aside>
-            <el-main style="background-color: beige;height: 100%;padding: 0px">
+            <el-main style="background-color: beige;height: 100%;">
                 <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
                 <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;"></iframe>
             </el-main>
