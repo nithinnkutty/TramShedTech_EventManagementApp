@@ -10,28 +10,27 @@
 </head>
 <body>
     <div id="view-event">
-        <el-col :span="24"><div class="title">Event Name</div></el-col>
+        <el-col :span="24"><div class="title">{{eventForm.title}}</div></el-col>
         <div class="information">
                 <el-col :span="8" :offset="4"><div class="grid-content left"></div>
                     <el-card  :body-style="{ padding: '0px' }" shadow="hover">
                         <img src="img/roomtype.png" class="image">
                         <div class="image-caption">
-                            <span>small meeting rooms</span>
+                            <span>{{eventForm.room}}</span>
                         </div>
                     </el-card>
                 </el-col>
                 <el-col :span="8" :offset="1"><div class="grid-content right"></div>
                     <el-card :body-style="{ padding: '0px' }" shadow="hover">
                         <div style="padding: 14px;">
-                            <div class="event-id">Event ID:(get ID from here)</div>
+                            <div class="event-id">Event ID:{{eventForm.id}}</div>
                             <i class="el-icon-user-solid"></i>
                             <div class="speaker-info">
                                 <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Jeffery</a><br>
                                 <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Tommy</a>
                             </div>
                             <div class="time-display">
-                                <span>Start: {{ eventForm.startTime }}</span><br>
-                                <span>End  : {{ eventForm.endTime }}</span>
+                                <span>Time: {{eventForm.date}} {{ eventForm.time }}</span>
                             </div>
                         </div>
                     </el-card>
@@ -58,19 +57,36 @@
         data() {
             return {
                 eventForm: {
-                    startTime: '2024-07-18 10:00:00', // Example data，accept from the form
-                    endTime: '2024-07-18 12:00:00',    // same
-                    responsible: 'Dyson',
-                    staff: 'Celia',
-                    company: 'Cardiff University',
-                    email: 'dyson@example.com'
+                    id: '',
+                    title: '',
+                    room: '',
+                    time: '',
+                    responsible: '',
+                    staff: '',
+                    company: '',
+                    email: ''
                 }
             };
+        },
+        mounted() {
+            this.fetchEventData();
         },
         methods: {
             handleSpeakerClick(name) {
                 console.log("Speaker clicked:", name);
                 this.$router.push({name: 'speakerProfile', params: {speakerName: name}});
+            },
+            fetchEventData() {
+                const eventId = localStorage.getItem("eventId");
+                console.log(eventId);
+                axios.get(`/api/events/${eventId}`)
+                    .then(response => {
+                        this.eventForm = response.data.data;
+                        localStorage.removeItem('eventId');
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the event data!", error);
+                    });
             }
         }
     });

@@ -25,7 +25,7 @@
             <!-- Event tiles -->
             <el-row class="event-row">
                 <el-col class="event-col" v-for="event in filteredEvents" :key="event.id">
-                    <el-card class="event-card" @click="viewEvent(event.id)">
+                    <el-card class="event-card" @click.native="viewEvent(event.id)">
                         <div class="event-card-img">
                             <img src="/img/Eventicon.png" alt="Event Image">
                         </div>
@@ -73,7 +73,8 @@
                 }
             },
             viewEvent(eventId) {
-                window.location.href = `/event.html?id=${eventId}`;
+                localStorage.setItem("eventId", eventId);
+                window.location.href = `/view-event.html`;
             }
         },
         mounted() {

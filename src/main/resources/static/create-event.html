@@ -18,15 +18,6 @@
     </div>
     <el-row class="input-field">
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Event ID</div></el-col>
-            <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.id" placeholder="event ID"></el-input>
-                </div>
-            </div></el-col>
-        </el-row>
-
-        <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Event Name</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="grid-content input">
@@ -188,7 +179,6 @@
         data() {
             return {
                 formData: {
-                    id: '',
                     title: '',
                     date: '',
                     time: '',
@@ -252,16 +242,12 @@
                 return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             },
             handleButtonClick() {
-                // this.goToHomePage();
                 this.getFormData();
             },
-            goToHomePage() {
-                window.location.href = '/main.html';
-            },
+
             getFormData() {
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
-                    id: this.formData.id,
                     title: this.formData.title,
                     date: formattedDate,
                     time: this.formData.startTime + '-' + this.formData.endTime,
@@ -270,6 +256,7 @@
                     speaker: this.formData.speaker,
                     responsible: this.formData.responsible,
                     staff: this.formData.tableData[0].staff,
+                    type: this.formData.tableData[0].type,
                     company: this.formData.tableData[0].company,
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
@@ -279,7 +266,13 @@
                 };
                 console.log(eventData);
                 axios.post('/api/events/create', eventData).then(response => {
-                    console.log('Event created successfully', response);
+                    console.log(response.data.data);
+                    if (response.data.data > 0) {
+                        console.log('Event created successfully', response);
+                        localStorage.setItem("eventId", response.data.data);
+                        window.location.href = '/view-event.html';
+                    }
+
                 })
                     .catch(error => {
                         console.log('Error creating event', error);

@@ -25,7 +25,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void addEvent(Event event) {
-        eventMapper.add(event);
+    public Long addEvent(Event event) {
+        boolean r = eventMapper.add(event);
+        return event.getId();
+
     }
 }
