@@ -17,7 +17,7 @@ public class Event {
     private String speaker;
     private String responsible;
     // Table data fields
-    private String eventType;
+    private String type;
     private String staff;
     private String company;
     private String contact;

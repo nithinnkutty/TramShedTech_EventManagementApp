@@ -9,5 +9,5 @@ public interface EventService {
 
     Event getEventById(Long id);
 
-    void addEvent(Event event);
+    Long addEvent(Event event);
 }
