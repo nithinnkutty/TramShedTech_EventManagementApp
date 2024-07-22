@@ -23,6 +23,9 @@ public class EventServiceImpl implements EventService {
     public Event getEventById(Long id) {
         return eventMapper.getEventById(id);
     }
+
+    @Override
+    public void addEvent(Event event) {
+        eventMapper.add(event);
+    }
 }
-
-
