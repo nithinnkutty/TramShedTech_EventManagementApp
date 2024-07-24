@@ -74,91 +74,85 @@
 
 
 <body>
-<div id="app" class="app-container">
-    <el-container>
-        <el-header>
-            <el-row :gutter="20">
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
-                </el-col>
-            </el-row>
-        </el-header>
-        <el-main>
-            <el-row>
-                <el-col :span="24">
-                    <div class="form-container">
-                        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-                            <el-form-item label="First Name" prop="firstName">
-                                <el-input v-model="ruleForm.firstName"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Last Name" prop="lastName">
-                                <el-input v-model="ruleForm.lastName"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Email" prop="email">
-                                <el-input v-model="ruleForm.email"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Location" prop="location">
-                                <el-select v-model="ruleForm.location" placeholder="Please select location">
-                                    <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
-                                    <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
-                                    <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
-                                    <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
-                                    <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
-                                    <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="Book resource between" prop="daterange">
-                                <el-date-picker
-                                        v-model="ruleForm.daterange"
-                                        type="datetimerange"
-                                        range-separator="to"
-                                        start-placeholder="Start date"
-                                        end-placeholder="End date"
-                                        :disabled-date="disabledDate"
-                                        style="width: 100%;">
-                                </el-date-picker>
-                            </el-form-item>
-                            <el-form-item label="AV Requirements" prop="av">
-                                <el-checkbox-group v-model="ruleForm.av">
-                                    <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
-                                    <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
-                                    <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
-                                    <el-checkbox label="Projector" name="Projector"></el-checkbox>
-                                    <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
-                                    <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
-                                </el-checkbox-group>
-                            </el-form-item>
-                            <el-form-item label="Payment method" prop="payment">
-                                <el-radio-group v-model="ruleForm.payment">
-                                    <el-radio label="Paypal"></el-radio>
-                                    <el-radio label="Applepay"></el-radio>
-                                    <el-radio label="Credit card"></el-radio>
-                                    <el-radio label="Debit card"></el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="Message">
-                                <el-input type="textarea" v-model="ruleForm.message"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
-                                <el-button @click="resetForm('ruleForm')">Reset</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                </el-col>
-            </el-row>
-            <!-- add other function here -->
-        </el-main>
-    </el-container>
+<div id="app">
+    <el-row :gutter="20">
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+        </el-col>
+    </el-row>
+
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="180px" class="demo-ruleForm">
+        <el-form-item label="First Name" prop="firstName">
+            <el-input v-model="ruleForm.firstName"></el-input>
+        </el-form-item>
+        <el-form-item label="Last Name" prop="lastName">
+            <el-input v-model="ruleForm.lastName"></el-input>
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+            <el-input v-model="ruleForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="Location" prop="location">
+            <el-select v-model="ruleForm.location" placeholder="Please select location">
+                <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
+                <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
+                <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
+                <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
+                <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
+                <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="Book resource between" prop="daterange">
+            <el-date-picker
+                    v-model="ruleForm.daterange"
+                    type="datetimerange"
+                    range-separator="to"
+                    start-placeholder="Start date"
+                    end-placeholder="End date"
+                    :disabled-date="disabledDate"
+                    style="width: 100%;">
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="AV Requirements" prop="av">
+            <el-checkbox-group v-model="ruleForm.av">
+                <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
+                <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
+                <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
+                <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
+                <el-checkbox label="Projector" name="Projector"></el-checkbox>
+                <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+        <!-- Add a warning prompt and set closable to false -->
+        <el-alert
+                title="Basic equipments we already have: one SCREEN, multi DESKS, multi CHAIRS."
+                type="warning"
+                :closable="false">
+        </el-alert>
+        <el-form-item label="Payment method" prop="payment">
+            <el-radio-group v-model="ruleForm.payment">
+                <el-radio label="Paypal"></el-radio>
+                <el-radio label="Applepay"></el-radio>
+                <el-radio label="Credit card"></el-radio>
+                <el-radio label="Debit card"></el-radio>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Message">
+            <el-input type="textarea" v-model="ruleForm.message"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
+            <el-button @click="resetForm('ruleForm')">Reset</el-button>
+        </el-form-item>
+    </el-form>
 </div>
 
 
@@ -169,6 +163,7 @@
         el: '#app',
         data() {
             return {
+                searchQuery: '',
                 ruleForm: {
                     firstName: '',
                     lastName: '',
@@ -250,19 +245,20 @@
                 this.$refs[formName].resetFields();
             },
             viewResources() {
-                // Redirect to the view resources page
                 window.location.href = 'viewresources.html';
             },
             bookaResource() {
-                // Redirect to the book a resource page
                 window.location.href = 'bookresource.html';
             },
             cancelBooking() {
-                // Redirect to the cancel booking page
                 window.location.href = 'cancel.html';
             },
+            handleSearch() {
+                // 实现搜索功能
+                console.log(this.searchQuery);
+            },
             disabledDate(time) {
-                return time.getTime() < Date.now() - 86400000; // Disable dates before today
+                return time.getTime() < Date.now() - 86400000;
             },
             validateDateRange(rule, value, callback) {
                 const [start, end] = value;
@@ -277,6 +273,9 @@
         }
     });
 </script>
+
+
+
 
 
 
