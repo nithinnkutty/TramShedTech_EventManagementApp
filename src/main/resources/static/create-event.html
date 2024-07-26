@@ -242,12 +242,9 @@
                 return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             },
             handleButtonClick() {
-                // this.goToHomePage();
                 this.getFormData();
             },
-            goToHomePage() {
-                window.location.href = '/main.html';
-            },
+
             getFormData() {
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
@@ -259,6 +256,7 @@
                     speaker: this.formData.speaker,
                     responsible: this.formData.responsible,
                     staff: this.formData.tableData[0].staff,
+                    type: this.formData.tableData[0].type,
                     company: this.formData.tableData[0].company,
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
@@ -268,7 +266,15 @@
                 };
                 console.log(eventData);
                 axios.post('/api/events/create', eventData).then(response => {
-                    console.log('Event created successfully', response);
+                    console.log(response.data.data);
+                    if (response.data.data > 0) {
+                        console.log('Event created successfully', response);
+                        localStorage.setItem("eventId", response.data.data);
+                        window.location.href = '/view-event.html';
+                    } else {
+                        alert('Event not created');
+                    }
+
                 })
                     .catch(error => {
                         console.log('Error creating event', error);

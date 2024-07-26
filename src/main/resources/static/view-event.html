@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link  rel="stylesheet" href="css/element-index.css">
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/element-index.js"></script>
+    <title>View Event</title>
+</head>
+<body>
+    <div id="view-event">
+        <el-col :span="24"><div class="title">{{eventForm.title}}</div></el-col>
+        <div class="information">
+                <el-col :span="8" :offset="4"><div class="grid-content left"></div>
+                    <el-card  :body-style="{ padding: '0px' }" shadow="hover">
+                        <img src="img/roomtype.png" class="image">
+                        <div class="image-caption">
+                            <span>{{eventForm.room}}</span>
+                        </div>
+                    </el-card>
+                </el-col>
+                <el-col :span="8" :offset="1"><div class="grid-content right"></div>
+                    <el-card :body-style="{ padding: '0px' }" shadow="hover">
+                        <div style="padding: 14px;">
+                            <div class="event-id">Event ID:{{eventForm.id}}</div>
+                            <i class="el-icon-user-solid"></i>
+                            <div class="speaker-info">
+                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Jeffery</a><br>
+                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Tommy</a>
+                            </div>
+                            <div class="time-display">
+                                <span>Time: {{eventForm.date}} {{ eventForm.time }}</span>
+                            </div>
+                        </div>
+                    </el-card>
+                </el-col>
+                    <el-col :span="17" :offset="4"><div class="grid-content bottom"></div>
+                        <div class="event-display">
+                            <span>Responsible: {{eventForm.responsible}} </span>
+                            <el-divider></el-divider>
+                            <span>Support Staff: {{eventForm.staff}}</span>
+                            <el-divider></el-divider>
+                            <div class="company-contact">
+                                <span>Company: {{eventForm.company}}</span>
+                                <span class="contact-email">Contact Email: {{eventForm.email}}</span>
+                            </div>
+                        </div>
+                    </el-col>
+        </div>
+    </div>
+
+</body>
+<script>
+    new Vue({
+        el: '#view-event',
+        data() {
+            return {
+                eventForm: {
+                    id: '',
+                    title: '',
+                    room: '',
+                    time: '',
+                    responsible: '',
+                    staff: '',
+                    company: '',
+                    email: ''
+                }
+            };
+        },
+        mounted() {
+            this.fetchEventData();
+        },
+        methods: {
+            handleSpeakerClick(name) {
+                console.log("Speaker clicked:", name);
+                this.$router.push({name: 'speakerProfile', params: {speakerName: name}});
+            },
+            fetchEventData() {
+                const eventId = localStorage.getItem("eventId");
+                console.log(eventId);
+                axios.get(`/api/events/${eventId}`)
+                    .then(response => {
+                        this.eventForm = response.data.data;
+                        localStorage.removeItem('eventId');
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the event data!", error);
+                    });
+            }
+        }
+    });
+</script>
+
+<style>
+    body, html, #view-event {
+        height: 100%;
+        margin: 0;
+    }
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+        text-align: center;
+    }
+    .information {
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    .el-card {
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px;
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+        border-radius: 4px;
+        height: 250px;
+    }
+    .grid-content {
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+    .image {
+        width: 100%;
+        display: block;
+        flex: 1;
+    }
+    .image-caption {
+        padding: 14px;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .event-id {
+        font-size: 16px;
+        padding: 10px 0;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+        width: 100%;
+        text-align: center;
+    }
+    a {
+        font-size: 14px;
+        display: block;
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    a:hover {
+        color: blue;
+        text-decoration: underline;
+    }
+    .speaker-info {
+        margin-bottom: auto;
+    }
+
+    .time-display {
+        padding-top: 40px;
+        border-top: 1px solid #ebebeb;
+    }
+    .speaker-info, .time-display {
+        margin-top: 10px; /* Increase spacing from other elements */
+    }
+
+    .bottom{
+        padding-top: 20px;
+    }
+    .company-contact {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .contact-email {
+        text-align: right;
+    }
+</style>
+
+</html>
