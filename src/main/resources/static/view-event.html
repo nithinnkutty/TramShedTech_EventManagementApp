@@ -26,8 +26,7 @@
                             <div class="event-id">Event ID:{{eventForm.id}}</div>
                             <i class="el-icon-user-solid"></i>
                             <div class="speaker-info">
-                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Jeffery</a><br>
-                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Tommy</a>
+                                <a href="javascript:void(0);" @click="handleSpeakerClick('eventForm.speaker')">Speaker: {{eventForm.speaker}}</a>
                             </div>
                             <div class="time-display">
                                 <span>Time: {{eventForm.date}} {{ eventForm.time }}</span>
@@ -64,7 +63,8 @@
                     responsible: '',
                     staff: '',
                     company: '',
-                    email: ''
+                    email: '',
+                    speaker: ''
                 }
             };
         },

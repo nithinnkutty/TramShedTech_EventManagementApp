@@ -104,10 +104,10 @@
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Responsible</div></el-col>
+            <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="grid-content input">
-                    <el-input v-model="formData.responsible" placeholder="responsible"></el-input>
+                    <el-input v-model="formData.site" placeholder="location"></el-input>
                 </div>
             </div></el-col>
         </el-row>
@@ -125,6 +125,11 @@
                 <el-table-column prop="type" label="Event Type" width="180">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.type" placeholder="Event type" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="responsible" label="Responsible" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.responsible" placeholder="Responsible" class="table"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="staff" label="Support Staff" width="180">
@@ -145,11 +150,6 @@
                 <el-table-column prop="email" label="Contact Email" width="180">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.email" placeholder="Contact Email" class="table"></el-input>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="Location" width="180">
-                    <template slot-scope="scope">
-                        <el-input v-model="scope.row.site" placeholder="Location" class="table"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="AV" label="AV" width="180">
@@ -183,7 +183,7 @@
                     date: '',
                     time: '',
                     speaker: '',
-                    responsible: '',
+                    site: '',
                     tableData: [{
                         type: '',
                         staff: '',
@@ -242,6 +242,11 @@
                 return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             },
             handleButtonClick() {
+                if (!this.formData.title || !this.formData.date || !this.formData.startTime || !this.formData.endTime || !this.formData.site || !this.formData.room) {
+                    // Alert user all fields are required
+                    alert('Please fill in all required fields: Event Name, Date, Time, Location, and Room.');
+                    return;  // Stop the function if validation fails
+                }
                 this.getFormData();
             },
 
@@ -254,13 +259,13 @@
                     room: this.formData.room,
                     tag: this.formData.tag,
                     speaker: this.formData.speaker,
-                    responsible: this.formData.responsible,
+                    site: this.formData.site,
                     staff: this.formData.tableData[0].staff,
                     type: this.formData.tableData[0].type,
                     company: this.formData.tableData[0].company,
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
-                    site: this.formData.tableData[0].site,
+                    responsible: this.formData.tableData[0].responsible,
                     av: this.formData.tableData[0].av,
                     note: this.formData.tableData[0].note
                 };
