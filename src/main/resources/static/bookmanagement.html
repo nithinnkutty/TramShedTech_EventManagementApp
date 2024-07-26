@@ -198,9 +198,9 @@
         </el-main>
     </el-container>
 
-    <!-- 编辑表单的Dialog -->
+    <!-- Dialog of edit form -->
     <el-dialog title="Edit Booking" :visible.sync="dialogFormVisible">
-        <el-form :model="editForm" ref="editForm" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form :model="editForm" ref="editForm" :rules="rules" label-width="180px" class="demo-ruleForm">
             <el-form-item label="First Name" prop="firstName">
                 <el-input v-model="editForm.firstName"></el-input>
             </el-form-item>
@@ -241,6 +241,11 @@
                     <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
+            <el-alert
+                    title="Basic equipments we already have: one SCREEN, multi DESKS, multi CHAIRS."
+                    type="warning"
+                    :closable="false">
+            </el-alert>
             <el-form-item label="Payment method" prop="payment">
                 <el-radio-group v-model="editForm.payment">
                     <el-radio label="Paypal"></el-radio>
@@ -341,51 +346,60 @@
                 return '';
             },
             fetchTableData() {
-                setTimeout(() => {
-                    this.tableData = [
-                        {
-                            startDate: 'July 16 2024',
-                            firstName: 'Lily',
-                            location: 'Queen St. Room 101',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 23 2024',
-                            status: 'Upcoming'
-                        },
-                        {
-                            startDate: 'July 18 2024',
-                            firstName: 'Cecilia',
-                            location: 'Queen St. Room 102',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 25 2024',
-                            status: 'Ongoing'
-                        },
-                        {
-                            startDate: 'July 18 2024',
-                            firstName: 'Sunny',
-                            location: 'Queen St. Room 103',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 28 2024',
-                            status: 'Completed'
-                        },
-                        {
-                            startDate: 'July 20 2024',
-                            firstName: 'Zoey',
-                            location: 'Queen St. Room 104',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 30 2024',
-                            status: 'Ongoing'
-                        },
-                        {
-                            startDate: 'July 21 2024',
-                            firstName: 'Zoey',
-                            location: 'Queen St. Room 105',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 30 2024',
-                            status: 'Upcoming'
-                        }
-                    ];
-                }, 1000);
+                axios.get('/booking/searchAll')
+                    .then(res => {
+                        this.tableData = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting booking data!", error);
+                    });
             },
+            // fetchTableData() {
+            //     setTimeout(() => {
+            //         this.tableData = [
+            //             {
+            //                 startDate: 'July 16 2024',
+            //                 firstName: 'Lily',
+            //                 location: 'Queen St. Room 101',
+            //                 postcode: 'CF24 0SZ',
+            //                 endDate: 'July 23 2024',
+            //                 status: 'Upcoming'
+            //             },
+            //             {
+            //                 startDate: 'July 18 2024',
+            //                 firstName: 'Cecilia',
+            //                 location: 'Queen St. Room 102',
+            //                 postcode: 'CF24 0SZ',
+            //                 endDate: 'July 25 2024',
+            //                 status: 'Ongoing'
+            //             },
+            //             {
+            //                 startDate: 'July 18 2024',
+            //                 firstName: 'Sunny',
+            //                 location: 'Queen St. Room 103',
+            //                 postcode: 'CF24 0SZ',
+            //                 endDate: 'July 28 2024',
+            //                 status: 'Completed'
+            //             },
+            //             {
+            //                 startDate: 'July 20 2024',
+            //                 firstName: 'Zoey',
+            //                 location: 'Queen St. Room 104',
+            //                 postcode: 'CF24 0SZ',
+            //                 endDate: 'July 30 2024',
+            //                 status: 'Ongoing'
+            //             },
+            //             {
+            //                 startDate: 'July 21 2024',
+            //                 firstName: 'Zoey',
+            //                 location: 'Queen St. Room 105',
+            //                 postcode: 'CF24 0SZ',
+            //                 endDate: 'July 30 2024',
+            //                 status: 'Upcoming'
+            //             }
+            //         ];
+            //     }, 1000);
+            // },
             handleSizeChange(val) {
                 this.pageSize = val;
                 console.log(`Items per page: ${val}`);

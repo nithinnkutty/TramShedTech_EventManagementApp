@@ -1,14 +1,12 @@
 package com.tramshedtech.eventmanagement.controller;
 
+import com.tramshedtech.eventmanagement.Vo.BookingsVo;
 import com.tramshedtech.eventmanagement.entity.Bookings;
 import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,6 +57,7 @@ public class BookingController {
         booking.setAv(av);
         booking.setPayment(payment);
         booking.setMessage(message);
+        booking.setDel(0);
 
         boolean r = bookingService.addBooking(booking);
         ResponseResult responseResult = new ResponseResult();
@@ -71,5 +70,12 @@ public class BookingController {
             responseResult.setMessage("Booking failed");
         }
         return responseResult;
+    }
+
+    @GetMapping("/searchAll")
+    public List<BookingsVo> searchAll () throws ParseException {
+        List<BookingsVo> bookings = bookingService.searchAll();
+//        System.out.println(bookings);
+        return bookings;
     }
 }

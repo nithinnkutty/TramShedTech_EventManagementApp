@@ -208,23 +208,30 @@
         },
         methods: {
             submitForm(formName) {
-                console.log(this.ruleForm);
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         const formData = {
                             ...this.ruleForm,
+                            startDate: this.ruleForm.daterange[0],
+                            endDate: this.ruleForm.daterange[1]
                         };
-                        formData.startDate = this.ruleForm.daterange[0];
-                        formData.endDate = this.ruleForm.daterange[1];
                         console.log(formData);
                         axios.post('/booking/add', formData)
                             .then(response => {
                                 console.log(response);
-                                if (response.status === 200) {
+                                if (response.status === 200 && response.data.data) {
+                                    // 假设后端返回的数据结构是 { data: { id: newBookingId } }
+                                    const newBookingId = response.data.data.id;
                                     this.$message({
                                         message: 'Resource booked successfully',
                                         type: 'success'
                                     });
+                                    // 将ID存储在localStorage
+                                    localStorage.setItem("bookingId", newBookingId);
+                                    // 跳转到bookmanagement页面
+                                    window.location.href = '/bookmanagement.html';
+                                } else {
+                                    alert('Resource booking failed');
                                 }
                             })
                             .catch(error => {
@@ -241,6 +248,41 @@
                     }
                 });
             },
+
+            // submitForm(formName) {
+            //     console.log(this.ruleForm);
+            //     this.$refs[formName].validate((valid) => {
+            //         if (valid) {
+            //             const formData = {
+            //                 ...this.ruleForm,
+            //             };
+            //             formData.startDate = this.ruleForm.daterange[0];
+            //             formData.endDate = this.ruleForm.daterange[1];
+            //             console.log(formData);
+            //             axios.post('/booking/add', formData)
+            //                 .then(response => {
+            //                     console.log(response);
+            //                     if (response.status === 200) {
+            //                         this.$message({
+            //                             message: 'Resource booked successfully',
+            //                             type: 'success'
+            //                         });
+            //                     }
+            //                 })
+            //                 .catch(error => {
+            //                     console.log(error);
+            //                     this.$message({
+            //                         message: 'Resource booking failed',
+            //                         type: 'error'
+            //                     });
+            //                 });
+            //             alert('submit!');
+            //         } else {
+            //             console.log('error submit!!');
+            //             return false;
+            //         }
+            //     });
+            // },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
