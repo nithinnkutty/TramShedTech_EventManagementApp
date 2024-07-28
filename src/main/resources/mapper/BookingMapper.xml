@@ -3,6 +3,30 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tramshedtech.eventmanagement.mapper.BookingMapper">
+
+    <select id="getBookingById" resultType="com.tramshedtech.eventmanagement.entity.Bookings">
+        SELECT * FROM bookings WHERE id = #{id}
+    </select>
+
+    <update id="updateBooking">
+        UPDATE bookings
+        SET first_name = #{firstName},
+            last_name = #{lastName},
+            email = #{email},
+            location = #{location},
+            start_date = #{startDate},
+            start_time = #{startTime},
+            end_date = #{endDate},
+            end_time = #{endTime},
+            postcode = #{postcode,jdbcType=VARCHAR},
+            status = #{status,jdbcType=VARCHAR},
+            message = #{message},
+            av = #{av},
+            payment = #{payment},
+            del = #{del,jdbcType=INTEGER}
+        WHERE id = #{id}
+    </update>
+
     <insert id="addBooking">
         INSERT INTO bookings(first_name,last_name,email,location,message,payment,av,start_date,start_time,end_date,end_time,postcode,status,del) VALUES (#{firstName}, #{lastName},#{email},#{location},#{message},#{payment},#{av},#{startDate},#{startTime},#{endDate},#{endTime},#{postcode,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},#{del,jdbcType=INTEGER})
     </insert>

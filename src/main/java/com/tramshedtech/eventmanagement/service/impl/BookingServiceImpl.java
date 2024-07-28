@@ -27,6 +27,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public boolean updateBooking(Bookings book) {
+        return bookingMapper.updateBooking(book);
+    }
+
+    @Override
+    public Bookings getBookingById(Integer id) {
+        return bookingMapper.getBookingById(id);
+    }
+
+    @Override
     public List<BookingsVo> searchAll(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         List<Bookings> bookings = bookingMapper.searchAll();

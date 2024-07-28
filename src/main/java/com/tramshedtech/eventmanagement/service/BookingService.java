@@ -9,5 +9,9 @@ import java.util.List;
 public interface BookingService {
     boolean addBooking(Bookings book);
 
+    boolean updateBooking(Bookings book);
+
+    Bookings getBookingById(Integer id);
+
     List<BookingsVo> searchAll() throws ParseException;
 }

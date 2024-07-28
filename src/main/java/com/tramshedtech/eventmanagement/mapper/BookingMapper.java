@@ -9,5 +9,9 @@ import java.util.List;
 public interface BookingMapper {
     boolean addBooking(Bookings book);
 
+    boolean updateBooking(Bookings book);
+
+    Bookings getBookingById(Integer id);
+
     List<Bookings> searchAll();
 }

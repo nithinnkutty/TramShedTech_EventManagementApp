@@ -146,11 +146,11 @@
                                 prop="location"
                                 label="Location">
                         </el-table-column>
-                        <el-table-column
-                                prop="postcode"
-                                label="Postcode"
-                                width="180">
-                        </el-table-column>
+<!--                        <el-table-column-->
+<!--                                prop="postcode"-->
+<!--                                label="Postcode"-->
+<!--                                width="180">-->
+<!--                        </el-table-column>-->
                         <el-table-column
                                 prop="endDate"
                                 label="End Date"
@@ -302,6 +302,7 @@
                 searchQuery: '',
                 dialogFormVisible: false,
                 editForm: {
+                    id: '',
                     firstName: '',
                     lastName: '',
                     email: '',
@@ -354,52 +355,6 @@
                         console.error("There was an error when getting booking data!", error);
                     });
             },
-            // fetchTableData() {
-            //     setTimeout(() => {
-            //         this.tableData = [
-            //             {
-            //                 startDate: 'July 16 2024',
-            //                 firstName: 'Lily',
-            //                 location: 'Queen St. Room 101',
-            //                 postcode: 'CF24 0SZ',
-            //                 endDate: 'July 23 2024',
-            //                 status: 'Upcoming'
-            //             },
-            //             {
-            //                 startDate: 'July 18 2024',
-            //                 firstName: 'Cecilia',
-            //                 location: 'Queen St. Room 102',
-            //                 postcode: 'CF24 0SZ',
-            //                 endDate: 'July 25 2024',
-            //                 status: 'Ongoing'
-            //             },
-            //             {
-            //                 startDate: 'July 18 2024',
-            //                 firstName: 'Sunny',
-            //                 location: 'Queen St. Room 103',
-            //                 postcode: 'CF24 0SZ',
-            //                 endDate: 'July 28 2024',
-            //                 status: 'Completed'
-            //             },
-            //             {
-            //                 startDate: 'July 20 2024',
-            //                 firstName: 'Zoey',
-            //                 location: 'Queen St. Room 104',
-            //                 postcode: 'CF24 0SZ',
-            //                 endDate: 'July 30 2024',
-            //                 status: 'Ongoing'
-            //             },
-            //             {
-            //                 startDate: 'July 21 2024',
-            //                 firstName: 'Zoey',
-            //                 location: 'Queen St. Room 105',
-            //                 postcode: 'CF24 0SZ',
-            //                 endDate: 'July 30 2024',
-            //                 status: 'Upcoming'
-            //             }
-            //         ];
-            //     }, 1000);
-            // },
             handleSizeChange(val) {
                 this.pageSize = val;
                 console.log(`Items per page: ${val}`);
@@ -421,19 +376,69 @@
                 this.multipleSelection = val;
             },
             handleEdit(index, row) {
-                console.log("Edit", index, row);
-                this.editForm = {
-                    ...row,
-                    daterange: [row.startDate, row.endDate],
-                    av: Array.isArray(row.av) ? row.av : [], // 确保av是数组
-                    firstName: row.firstName || '',
-                    lastName: row.lastName || '',
-                    email: row.email || '',
-                    location: row.location || '',
-                    payment: row.payment || '',
-                    message: row.message || ''
-                };
-                this.dialogFormVisible = true; // 显示编辑表单
+                console.log("Edit button clicked", index, row);
+                axios.get(`/booking/${row.id}`)
+                    .then(response => {
+                        const data = response.data.data;
+                        this.editForm = {
+                            id: data.id, // save the current id
+                            firstName: data.firstName || '',
+                            lastName: data.lastName || '',
+                            email: data.email || '',
+                            location: data.location || '',
+                            daterange: [data.startDate, data.endDate],
+                            av: Array.isArray(data.av) ? data.av : [],
+                            payment: data.payment || '',
+                            message: data.message || ''
+                        };
+                        console.log('Edit form data', this.editForm);
+                        this.dialogFormVisible = true; // display the edit form
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the booking data!", error);
+                    });
+            },
+            // handleEdit(index, row) {
+            //     axios.get(`/booking/${row.id}`)
+            //         .then(response => {
+            //             const data = response.data;
+            //             this.editForm = {
+            //                 id: data.id, // save the id
+            //                 firstName: data.firstName || '',
+            //                 lastName: data.lastName || '',
+            //                 email: data.email || '',
+            //                 location: data.location || '',
+            //                 daterange: [data.startDate, data.endDate],
+            //                 av: Array.isArray(data.av) ? data.av : [],
+            //                 payment: data.payment || '',
+            //                 message: data.message || ''
+            //             };
+            //             this.dialogFormVisible = true; // display the edit form
+            //         })
+            //         .catch(error => {
+            //             console.error("There was an error fetching the booking data!", error);
+            //         });
+            // },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios.post(`/booking/update`, this.editForm)
+                            .then(response => {
+                                this.$message({
+                                    message: 'Successfully updated!',
+                                    type: 'success'
+                                });
+                                this.dialogFormVisible = false; // close the dialog
+                                this.fetchTableData(); // refresh the table data
+                            })
+                            .catch(error => {
+                                console.error("There was an error updating the booking data!", error);
+                            });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
             },
             handleDelete(index, row) {
                 console.log("Delete", index, row);
@@ -500,20 +505,6 @@
             cancelBooking() {
                 window.location.href = 'cancel.html';
             },
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$message({
-                            message: 'Successfully updated!',
-                            type: 'success'
-                        });
-                        this.dialogFormVisible = false; // 关闭表单
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
@@ -521,6 +512,7 @@
         mounted() {
             this.fetchTableData();
         }
+
     });
 </script>
 
