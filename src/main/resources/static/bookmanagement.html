@@ -336,6 +336,8 @@
             disabledDate(time) {
                 return time.getTime() < Date.now() - 86400000;
             },
+
+
             tableRowClassName({ row }) {
                 if (row.status === 'Ongoing') {
                     return 'warning-row';
@@ -346,23 +348,31 @@
                 }
                 return '';
             },
+
+
             fetchTableData() {
                 axios.get('/booking/searchAll')
                     .then(res => {
-                        this.tableData = res.data;
+                        this.tableData = res.data.filter(item => item.del === 0); // Filter out deleted records
                     })
                     .catch(error => {
                         console.error("There was an error when getting booking data!", error);
                     });
             },
+
+
             handleSizeChange(val) {
                 this.pageSize = val;
                 console.log(`Items per page: ${val}`);
             },
+
+
             handleCurrentChange(val) {
                 this.currentPage4 = val;
                 console.log(`Current page: ${val}`);
             },
+
+
             toggleSelection(rows) {
                 if (rows) {
                     rows.forEach(row => {
@@ -372,9 +382,13 @@
                     this.$refs.multipleTable.clearSelection();
                 }
             },
+
+
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
+
+
             handleEdit(index, row) {
                 console.log("Edit button clicked", index, row);
                 axios.get(`/booking/${row.id}`)
@@ -398,27 +412,8 @@
                         console.error("There was an error fetching the booking data!", error);
                     });
             },
-            // handleEdit(index, row) {
-            //     axios.get(`/booking/${row.id}`)
-            //         .then(response => {
-            //             const data = response.data;
-            //             this.editForm = {
-            //                 id: data.id, // save the id
-            //                 firstName: data.firstName || '',
-            //                 lastName: data.lastName || '',
-            //                 email: data.email || '',
-            //                 location: data.location || '',
-            //                 daterange: [data.startDate, data.endDate],
-            //                 av: Array.isArray(data.av) ? data.av : [],
-            //                 payment: data.payment || '',
-            //                 message: data.message || ''
-            //             };
-            //             this.dialogFormVisible = true; // display the edit form
-            //         })
-            //         .catch(error => {
-            //             console.error("There was an error fetching the booking data!", error);
-            //         });
-            // },
+
+
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
@@ -440,21 +435,25 @@
                     }
                 });
             },
+
+
             handleDelete(index, row) {
-                console.log("Delete", index, row);
-                this.tableData.splice(index, 1);
-            },
-            confirmDelete(index, row) {
                 this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
                     confirmButtonText: 'Confirm',
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    this.handleDelete(index, row);
-                    this.$message({
-                        type: 'success',
-                        message: 'Deleted successfully!'
-                    });
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -462,6 +461,34 @@
                     });
                 });
             },
+
+
+            confirmDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+
+
             deleteSelectedRows() {
                 if (this.multipleSelection.length === 0) {
                     this.$message({
@@ -475,17 +502,19 @@
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    this.multipleSelection.forEach(row => {
-                        const index = this.tableData.indexOf(row);
-                        if (index !== -1) {
-                            this.tableData.splice(index, 1);
-                        }
-                    });
-                    this.multipleSelection = [];
-                    this.$message({
-                        type: 'success',
-                        message: 'Selected rows deleted successfully!'
-                    });
+                    const deletePromises = this.multipleSelection.map(row => axios.post('/booking/delete', { id: row.id }));
+
+                    Promise.all(deletePromises)
+                        .then(() => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Selected rows deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -493,22 +522,34 @@
                     });
                 });
             },
+
+
             handleSearch() {
                 // Add logic to handle search
             },
+
+
             viewResources() {
                 window.location.href = 'viewresources.html';
             },
+
+
             bookaResource() {
                 window.location.href = 'bookresource.html';
             },
+
+
             cancelBooking() {
                 window.location.href = 'cancel.html';
             },
+
+
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
         },
+
+
         mounted() {
             this.fetchTableData();
         }

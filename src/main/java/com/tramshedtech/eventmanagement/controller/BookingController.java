@@ -72,6 +72,22 @@ public class BookingController {
         return responseResult;
     }
 
+    @PostMapping("/delete")
+    public ResponseResult deleteBooking(@RequestBody Map<String, Integer> requestData) {
+        Integer id = requestData.get("id");
+        boolean result = bookingService.softDeleteBooking(id);
+        ResponseResult responseResult = new ResponseResult();
+        if (result) {
+            responseResult.setCode(200);
+            responseResult.setMessage("Booking deleted successfully");
+        } else {
+            responseResult.setCode(400);
+            responseResult.setMessage("Booking deletion failed");
+        }
+        return responseResult;
+    }
+
+
     @GetMapping("/searchAll")
     public List<BookingsVo> searchAll () throws ParseException {
         List<BookingsVo> bookings = bookingService.searchAll();

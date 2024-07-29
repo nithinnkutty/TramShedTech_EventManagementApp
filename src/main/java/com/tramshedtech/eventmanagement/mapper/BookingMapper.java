@@ -11,6 +11,8 @@ public interface BookingMapper {
 
     boolean updateBooking(Bookings book);
 
+    boolean softDeleteBooking(Integer id);
+
     Bookings getBookingById(Integer id);
 
     List<Bookings> searchAll();

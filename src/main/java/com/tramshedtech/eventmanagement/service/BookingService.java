@@ -11,6 +11,8 @@ public interface BookingService {
 
     boolean updateBooking(Bookings book);
 
+    boolean softDeleteBooking(Integer id);
+
     Bookings getBookingById(Integer id);
 
     List<BookingsVo> searchAll() throws ParseException;

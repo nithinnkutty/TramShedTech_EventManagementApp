@@ -27,6 +27,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public boolean softDeleteBooking(Integer id) {
+        return bookingMapper.softDeleteBooking(id);
+    }
+
+    @Override
     public boolean updateBooking(Bookings book) {
         return bookingMapper.updateBooking(book);
     }
