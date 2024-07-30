@@ -48,4 +48,31 @@
     <update id="updateInfo">
         update user set account=#{user.account}, birthday=#{user.birthday}, sex=#{user.sex}, email=#{user.email}, wechat=#{user.wechat}, phone=#{user.phone} where id = #{uid}
     </update>
+
+    <select id="findPositionDepartment" resultMap="PositionDepartmentMap">
+        select did, pid
+        FROM user WHERE id = #{uid}
+    </select>
+
+    <resultMap id="PositionDepartmentMap" type="com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo">
+        <result property="position" column="pid"/>
+        <result property="department" column="did"/>
+    </resultMap>
+
+    <select id="findAllUser" resultMap="user_map">
+        select u.id, u.account, d.name department, p.name position, u.sex, u.birthday, u.email, u.phone, u.wechat
+        FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id
+    </select>
+
+    <resultMap id="user_map" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="birthday" property="birthday" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+    </resultMap>
 </mapper>

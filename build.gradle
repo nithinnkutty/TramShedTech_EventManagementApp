@@ -27,6 +27,7 @@ dependencies {
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'io.minio:minio:8.5.4'
+	implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:2.1.0'
 
 	implementation 'commons-codec:commons-codec:1.15'
 }

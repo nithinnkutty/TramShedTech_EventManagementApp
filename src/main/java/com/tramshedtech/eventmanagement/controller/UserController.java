@@ -2,8 +2,10 @@ package com.tramshedtech.eventmanagement.controller;
 
 
 
+import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
 import com.tramshedtech.eventmanagement.entity.User;
 import com.tramshedtech.eventmanagement.service.UserService;
+import com.tramshedtech.eventmanagement.entity.CustomPage;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.annotation.Resource;
@@ -16,10 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -131,8 +130,7 @@ public class UserController {
     @GetMapping("/getUsername")
     public ResponseResult getUsername(HttpSession session) {
         String uname = (String) session.getAttribute("uname");
-//        System.out.println("方法调用成功");
-//        System.out.println(uname);
+
         if(uname != null) {
             return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(uname);
         }
@@ -187,5 +185,29 @@ public class UserController {
         int uid = (int) session.getAttribute("uid");
         boolean r = userService.updateInfo(user,uid);
         return r;
+    }
+
+    @GetMapping("/findPositionDepartment")
+    public ResponseResult findPosition(HttpSession session) {
+
+        int uid = (int) session.getAttribute("uid");
+        System.out.println(uid);
+
+        UserPositionAndDepartmentVo positionAndDepartment = userService.findPositionDepartment(uid);
+
+        System.out.println(positionAndDepartment);
+
+        if(positionAndDepartment != null) {
+            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(positionAndDepartment);
+        }
+        return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    }
+
+    @GetMapping("/findAllUser/{page}/{size}")
+    public ResponseResult<CustomPage> findAll(@PathVariable("page") int page, @PathVariable("size") int size){
+
+        CustomPage customPage = userService.findAllUser(page, size);
+
+        return new ResponseResult<CustomPage>().setCode(200).setData(customPage);
     }
 }

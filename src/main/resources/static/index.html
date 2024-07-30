@@ -57,6 +57,15 @@
                             <i class="el-icon-setting"></i>
                             <span slot="title">Booking Management</span>
                         </el-menu-item>
+                        <el-menu-item index="5" @click="change('userManagement.html')" v-if="position >= 4" class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">User Management</span>
+                        </el-menu-item>
+                        <el-menu-item index="5" disabled v-else class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">User Management</span>
+                        </el-menu-item>
+
                     </el-menu>
                 </div>
             </el-aside>
@@ -78,23 +87,22 @@
         height: 100%;
     }
     .custom-menu {
-        padding: 10px; /* 调整菜单周围的空隙 */
-        background-color: #F9B117; /* 设置周围空隙的背景颜色 */
+        padding: 10px;
+        background-color: #F9B117;
     }
 
     .custom-menu-item {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 10px 0; /* 调整菜单项上下的空隙 */
-        border-radius: 8px; /* 调整菜单项的圆角 */
-        background-color: white; /* 调整菜单项的背景颜色 */
+        margin: 10px 0;
+        border-radius: 8px;
+        background-color: white;
     }
 
-    /* 重写 Element UI 的样式 */
     .custom-menu-item > .el-menu-item {
-        width: 100%; /* 确保菜单项占满父容器的宽度 */
-        text-align: center; /* 菜单项内容居中 */
+        width: 100%;
+        text-align: center;
     }
     .underline-button {
         text-decoration: underline;
@@ -113,7 +121,7 @@
     }
 
     .user-avatar {
-        margin-right: 10px; /* 调整头像与按钮之间的间距 */
+        margin-right: 10px;
     }
 </style>
 <script>
@@ -124,14 +132,17 @@
             imageUrl:'',
             token: '',
             username: '',
+            position: 3,
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
+            console.log(this.token);
             if (!this.token) {
-                return; // 如果没有token，结束方法
+                return; // If there is no token, end the method
             } else {
                 this.fetchAvatar();
                 this.getUsername();
+                this.getUserPosition();
             }
 
         },
@@ -139,13 +150,22 @@
             change: function (uri) {
                 this.currentPage = uri
             },
+            getUserPosition() {
+                axios.get('/user/findPositionDepartment', {
+                })
+                    .then(response => {
+                        this.position = response.data.data.position;
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch position:', error);
+                    });
+            },
             fetchAvatar() {
-                console.log("方法调用成功")
                 axios.get('/user/findAvatar', {
                 })
                     .then(response => {
                         console.log(response.data);
-                        this.imageUrl = response.data.data; // 假设返回的数据中包含avatarUrl
+                        this.imageUrl = response.data.data; // Assuming the returned data contains avatarUrl
                     })
                     .catch(error => {
                         console.error('Failed to fetch avatar:', error);

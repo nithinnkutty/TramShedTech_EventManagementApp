@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-//@ConfigurationProperties可以将指定前缀开始的yml中配置信息自动赋值给对应的属性
+// @ConfigurationProperties Configuration information in the yml starting with the specified prefix can be automatically assigned to the corresponding attribute.
 @ConfigurationProperties(prefix = "minio")
 public class MinioConfiguration {
     //
-    private String endpoint;    //连接url
-    private String accesskey;   //用户名
-    private String secretKey;   //密码
+    private String endpoint;    // Connection url
+    private String accesskey;   // user ID
+    private String secretKey;   // cryptographic
 
     @Bean
     public MinioClient minioClient(){

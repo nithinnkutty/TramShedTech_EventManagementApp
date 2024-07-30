@@ -1,10 +1,16 @@
 package com.tramshedtech.eventmanagement.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.entity.CustomPage;
 import com.tramshedtech.eventmanagement.entity.User;
 import com.tramshedtech.eventmanagement.mapper.UserMapper;
 import com.tramshedtech.eventmanagement.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+
 
 import java.util.List;
 
@@ -58,6 +64,33 @@ public class UserServiceImpl implements UserService {
     public boolean updateInfo(User user, int uid) {
         boolean r = userMapper.updateInfo(user,uid);
         return r;
+    }
+
+    @Override
+    public UserPositionAndDepartmentVo findPositionDepartment(int uid) {
+        UserPositionAndDepartmentVo positionAndDepartment = userMapper.findPositionDepartment(uid);
+        return positionAndDepartment;
+    }
+
+    @Override
+    public CustomPage findAllUser(int page, int size) {
+
+        PageHelper.startPage(page, size);
+
+        List<User> officeleavesList = userMapper.findAllUser();
+
+        // 得到分页信息
+        PageInfo<User> pageInfo = new PageInfo<>(officeleavesList);
+
+        // 封装数据
+        CustomPage customPage = new CustomPage()
+                .setCurrentPage(page)
+                .setSize(size)
+                .setTotal(pageInfo.getTotal())
+                .setTotalPage(pageInfo.getPages())
+                .setPageData(officeleavesList);
+
+        return customPage;
     }
 
 
