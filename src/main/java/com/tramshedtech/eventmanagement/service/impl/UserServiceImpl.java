@@ -4,6 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
 import com.tramshedtech.eventmanagement.entity.CustomPage;
+import com.tramshedtech.eventmanagement.entity.Department;
+import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
 import com.tramshedtech.eventmanagement.mapper.UserMapper;
 import com.tramshedtech.eventmanagement.service.UserService;
@@ -91,6 +93,38 @@ public class UserServiceImpl implements UserService {
                 .setPageData(officeleavesList);
 
         return customPage;
+    }
+
+    @Override
+    public List<Department> findAllDepartment() {
+
+        return userMapper.findAllDepartment();
+    }
+
+    @Override
+    public List<Position> findAllPosition() {
+
+        return userMapper.findAllPosition();
+
+    }
+
+    @Override
+    public CustomPage search(CustomPage pages, User users) {
+
+        PageHelper.startPage(pages.getCurrentPage(), pages.getSize());
+
+        List<User> userList = userMapper.search(users);
+
+        PageInfo<User> pageInfo = new PageInfo<>(userList);
+
+
+        return new CustomPage(
+                pages.getCurrentPage(),
+                pages.getSize(),
+                pageInfo.getTotal(),
+                pageInfo.getPages(),
+                pageInfo.getList()
+        );
     }
 
 

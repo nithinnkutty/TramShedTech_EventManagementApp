@@ -1,6 +1,8 @@
 package com.tramshedtech.eventmanagement.mapper;
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.entity.Department;
+import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +30,10 @@ public interface UserMapper {
     UserPositionAndDepartmentVo findPositionDepartment(int uid);
 
     List<User> findAllUser();
+
+    List<Department> findAllDepartment();
+
+    List<Position> findAllPosition();
+
+    List<User> search(User users);
 }

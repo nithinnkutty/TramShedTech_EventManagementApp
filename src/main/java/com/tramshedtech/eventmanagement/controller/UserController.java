@@ -3,6 +3,8 @@ package com.tramshedtech.eventmanagement.controller;
 
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.entity.Department;
+import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
 import com.tramshedtech.eventmanagement.service.UserService;
 import com.tramshedtech.eventmanagement.entity.CustomPage;
@@ -11,6 +13,7 @@ import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
@@ -209,5 +212,64 @@ public class UserController {
         CustomPage customPage = userService.findAllUser(page, size);
 
         return new ResponseResult<CustomPage>().setCode(200).setData(customPage);
+    }
+
+    @GetMapping("/findAllDepartments")
+    public ResponseResult<Department> findAllDepartment(){
+
+        ResponseResult responseResult = new ResponseResult();
+        responseResult.setCode(200);
+        responseResult.setStatus(ResponseStatus.SUCCESS);
+        responseResult.setData(userService.findAllDepartment());
+        return responseResult;
+    }
+
+    @GetMapping("/findAllPositions")
+    public ResponseResult<Position> findAllPosition(){
+
+        ResponseResult responseResult = new ResponseResult();
+        responseResult.setCode(200);
+        responseResult.setStatus(ResponseStatus.SUCCESS);
+        responseResult.setData(userService.findAllPosition());
+        return responseResult;
+    }
+
+    @GetMapping("/search")
+    public ResponseResult<CustomPage> search(HttpServletRequest request){
+
+        User users = new User();
+        users.setAccount(request.getParameter("account"));
+        users.setDid(request.getParameter("did"));
+        users.setPid(request.getParameter("pid"));
+        users.setSex(request.getParameter("sex"));
+        users.setBirthday(request.getParameter("birthday"));
+
+        System.out.println(users);
+
+        int page = Integer.parseInt(request.getParameter("page"));
+        int size = Integer.parseInt(request.getParameter("size"));
+        System.out.println(page);
+        System.out.println(size);
+
+        CustomPage pages = new CustomPage().setCurrentPage(page).setSize(size);
+
+        if (users.getBirthday().length()>10){
+            String s = users.getBirthday().substring(0,10);
+            System.out.println(s);
+            users.setBirthday(s);
+        } else {
+            int a = users.getBirthday().length();
+            String s = users.getBirthday().substring(0,a);
+            users.setBirthday(s);
+        }
+
+        System.out.println(users);
+
+        ResponseResult responseResult = new ResponseResult();
+        responseResult.setCode(200);
+        responseResult.setStatus(ResponseStatus.SUCCESS);
+        responseResult.setData(userService.search(pages,users));
+        return responseResult;
+
     }
 }

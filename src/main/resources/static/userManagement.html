@@ -14,24 +14,24 @@
         <el-col :span="24">
             <div class="grid-content bg-purple-light" style="display: flex; justify-content: center; align-items: center;">
                 <el-col :span="3" style="margin-right: 20px;">
-                    <el-input size="medium" v-model="reason" placeholder="Search by account"></el-input>
+                    <el-input size="medium" v-model="account" placeholder="Search by account"></el-input>
                 </el-col>
                 <el-col :span="3" style="margin-right: 20px;">
-                    <el-select size="medium" v-model="orderStatus" placeholder="Search by department">
+                    <el-select size="medium" v-model="did" placeholder="Search by department">
                         <el-option
                                 v-for="item in options"
                                 :key="item.id"
-                                :label="item.status"
+                                :label="item.name"
                                 :value="item.id">
                         </el-option>
                     </el-select>
                 </el-col>
                 <el-col :span="3" style="margin-right: 20px;">
-                    <el-select size="medium" v-model="type" placeholder="Search by Position">
+                    <el-select size="medium" v-model="pid" placeholder="Search by Position">
                         <el-option
                                 v-for="item in options2"
                                 :key="item.id"
-                                :label="item.type"
+                                :label="item.name"
                                 :value="item.id">
                         </el-option>
                     </el-select>
@@ -41,13 +41,13 @@
                             size="medium"
                             placeholder="Search by gender"
                             suffix-icon="el-icon-user"
-                            v-model="submitter">
+                            v-model="sex">
                     </el-input>
                 </el-col>
                 <el-col :span="3" style="margin-right: 20px;">
                     <el-date-picker
                             size="medium"
-                            v-model="summitDate"
+                            v-model="birthday"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="Search by birtyday">
@@ -222,11 +222,11 @@
                 }],
                 value: '',
                 id: '',
-                reason: "",
-                type: "",
-                orderStatus: "",
-                summitDate: "",
-                submitter: "",
+                account: "",
+                did: "",
+                pid: "",
+                sex: "",
+                birthday: "",
                 outerVisible: false,
                 innerVisible1: false,
                 innerVisible2: false,
@@ -391,7 +391,9 @@
             }
         },
         mounted: function() {
-            this.showpage()
+            this.showpage();
+            this.showDepartments();
+            this.showOptions();
         },
         methods: {
             handleSizeChange: function (size) {
@@ -412,6 +414,46 @@
                     this.userList = res.data.data.pageData;
                     this.total = res.data.data.total;
                 })
+            },
+            showDepartments:function () {
+                axios.get("/user/findAllDepartments").then(res => {
+                    console.log(res.data)
+                    this.options = res.data.data;
+                })
+            },
+            showOptions:function () {
+                axios.get("/user/findAllPositions").then(res => {
+                    console.log(res.data)
+                    this.options2 = res.data.data;
+                })
+            },
+            search:function (params) {
+                axios.get("/user/search",{
+                    params: {
+                        page: this.currentPage,
+                        size: this.pagesize,
+                        account: this.account,
+                        did: this.did,
+                        pid: this.pid,
+                        sex: this.sex,
+                        birthday: this.birthday
+                    }}).then(res => {
+                    console.log(res.data)
+                    console.log(this.birthday)
+                    this.userList = res.data.data.pageData;
+                    this.total = res.data.data.total;
+                })
+            },
+            handleSelectionChange: function(val) {
+                this.multipleSelection = val;
+                console.log(this.multipleSelection)
+            },
+            reset:function () {
+                this.account = "";
+                this.pid = "",
+                this.did = "",
+                this.sex = "",
+                this.birthday = "";
             },
         }
     });
