@@ -55,9 +55,9 @@ public class BookingServiceImpl implements BookingService {
             BookingsVo bookingsVo = new BookingsVo();
 
             bookingsVo.setId(booking.getId());
-            bookingsVo.setFirstName(booking.getFirstName());
-            bookingsVo.setLastName(booking.getLastName());
-            bookingsVo.setEmail(booking.getEmail());
+            bookingsVo.setRoomNumber(booking.getRoomNumber());
+            bookingsVo.setRoomName(booking.getRoomName());
+            bookingsVo.setPostcode(booking.getPostcode());
             bookingsVo.setLocation(booking.getLocation());
             bookingsVo.setStartDate(startDateString);
             bookingsVo.setStartTime(booking.getStartTime());
@@ -66,6 +66,7 @@ public class BookingServiceImpl implements BookingService {
             bookingsVo.setStatus(booking.getStatus());
             bookingsVo.setPostcode(booking.getPostcode());
             bookingsVo.setMessage(booking.getMessage());
+            bookingsVo.setImg(booking.getImg());
             bookingsVo.setAv(booking.getAv());
             bookingsVo.setPayment(booking.getPayment());
             bookingsVo.setDel(booking.getDel());

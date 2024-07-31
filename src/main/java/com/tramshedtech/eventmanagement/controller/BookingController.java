@@ -26,9 +26,9 @@ public class BookingController {
     @PostMapping("/add")
     public ResponseResult addBooking (@RequestBody Map<String, Object> bookingData) throws ParseException {
 
-        String firstName = (String) bookingData.get("firstName");
-        String lastName = (String) bookingData.get("lastName");
-        String email = (String) bookingData.get("email");
+        String roomNumber = (String) bookingData.get("roomNumber");
+        String roomName = (String) bookingData.get("roomName");
+        String postcode = (String) bookingData.get("postcode");
         String location = (String) bookingData.get("location");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
@@ -44,11 +44,12 @@ public class BookingController {
         String av = String.join(",", (List<String>) bookingData.get("av"));
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
+        String img = (String) bookingData.get("img");
 
         Bookings booking = new Bookings();
-        booking.setFirstName(firstName);
-        booking.setLastName(lastName);
-        booking.setEmail(email);
+        booking.setRoomNumber(roomNumber);
+        booking.setRoomName(roomName);
+        booking.setPostcode(postcode);
         booking.setLocation(location);
         booking.setStartDate(startDate);
         booking.setStartTime(startTime);
@@ -57,6 +58,7 @@ public class BookingController {
         booking.setAv(av);
         booking.setPayment(payment);
         booking.setMessage(message);
+        booking.setImg(img);
         booking.setDel(0);
 
         boolean r = bookingService.addBooking(booking);
@@ -116,9 +118,9 @@ public class BookingController {
     public ResponseResult updateBooking(@RequestBody Map<String, Object> bookingData) throws ParseException {
 
         Integer id = (Integer) bookingData.get("id");
-        String firstName = (String) bookingData.get("firstName");
-        String lastName = (String) bookingData.get("lastName");
-        String email = (String) bookingData.get("email");
+        String roomNumber = (String) bookingData.get("roomNumber");
+        String roomName = (String) bookingData.get("roomName");
+        String postcode = (String) bookingData.get("postcode");
         String location = (String) bookingData.get("location");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
@@ -134,12 +136,13 @@ public class BookingController {
         String av = String.join(",", (List<String>) bookingData.get("av"));
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
+        String img = (String) bookingData.get("img");
 
         Bookings booking = new Bookings();
         booking.setId(id);
-        booking.setFirstName(firstName);
-        booking.setLastName(lastName);
-        booking.setEmail(email);
+        booking.setRoomNumber(roomNumber);
+        booking.setRoomName(roomName);
+        booking.setPostcode(postcode);
         booking.setLocation(location);
         booking.setStartDate(startDate);
         booking.setStartTime(startTime);
@@ -148,6 +151,7 @@ public class BookingController {
         booking.setAv(av);
         booking.setPayment(payment);
         booking.setMessage(message);
+        booking.setImg(img);
         booking.setDel(0);
 
         boolean r = bookingService.updateBooking(booking);

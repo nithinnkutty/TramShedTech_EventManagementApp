@@ -12,17 +12,18 @@ public class BookingsVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String roomNumber;
+    private String roomName;
+    private String postcode;
     private String location;
     private String startDate;
     private Time startTime;
     private String endDate;
     private Time endTime;
-    private String postcode;
+//    private String postcode;
     private String status;
     private String message;
+    private String img;
     private String av;
     private String payment;
     private Integer del;

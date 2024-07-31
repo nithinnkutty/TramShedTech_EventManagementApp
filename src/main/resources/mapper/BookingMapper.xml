@@ -10,23 +10,42 @@
         WHERE id = #{id}
     </update>
 
-    <select id="getBookingById" resultType="com.tramshedtech.eventmanagement.entity.Bookings">
+    <select id="getBookingById" resultMap="bookingMapById">
         SELECT * FROM bookings WHERE id = #{id}
     </select>
 
+    <resultMap id="bookingMapById" type="com.tramshedtech.eventmanagement.entity.Bookings">
+        <id column="id" property="id" />
+        <result column="room_number" property="roomNumber" />
+        <result column="room_name" property="roomName" />
+        <result column="postcode" property="postcode" />
+        <result column="location" property="location" />
+        <result column="start_date" property="startDate" />
+        <result column="start_time" property="startTime" />
+        <result column="end_date" property="endDate" />
+        <result column="end_time" property="endTime" />
+        <result column="img" property="img" />
+        <result column="message" property="message" />
+        <result column="av" property="av" />
+        <result column="payment" property="payment" />
+        <result column="status" property="status" />
+        <result column="del" property="del" />
+    </resultMap>
+
     <update id="updateBooking">
         UPDATE bookings
-        SET first_name = #{firstName},
-            last_name = #{lastName},
-            email = #{email},
+        SET room_number = #{roomNumber},
+            room_name = #{roomName},
+            postcode = #{postcode},
             location = #{location},
             start_date = #{startDate},
             start_time = #{startTime},
             end_date = #{endDate},
             end_time = #{endTime},
-            postcode = #{postcode,jdbcType=VARCHAR},
+--             postcode = #{postcode,jdbcType=VARCHAR},
             status = #{status,jdbcType=VARCHAR},
             message = #{message},
+            img = #{img},
             av = #{av},
             payment = #{payment},
             del = #{del,jdbcType=INTEGER}
@@ -34,8 +53,10 @@
     </update>
 
     <insert id="addBooking">
-        INSERT INTO bookings(first_name,last_name,email,location,message,payment,av,start_date,start_time,end_date,end_time,postcode,status,del) VALUES (#{firstName}, #{lastName},#{email},#{location},#{message},#{payment},#{av},#{startDate},#{startTime},#{endDate},#{endTime},#{postcode,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},#{del,jdbcType=INTEGER})
+        INSERT INTO bookings(room_number, room_name, postcode, location, message, payment, av, start_date, start_time, end_date, end_time, img, status, del)
+        VALUES (#{roomNumber}, #{roomName}, #{postcode}, #{location}, #{message}, #{payment}, #{av}, #{startDate}, #{startTime}, #{endDate}, #{endTime}, #{img}, #{status}, #{del})
     </insert>
+
 
     <select id="searchAll"  resultMap="bookingsMap">
         SELECT * FROM bookings WHERE del = 0
@@ -43,20 +64,21 @@
 
     <resultMap id="bookingsMap" type="com.tramshedtech.eventmanagement.entity.Bookings">
         <id column="id" property="id" />
-        <result column="first_name" property="firstName" />
-        <result column="last_name" property="lastName" />
-        <result column="email" property="email" />
+        <result column="room_number" property="roomNumber" />
+        <result column="room_name" property="roomName" />
+        <result column="postcode" property="postcode" />
         <result column="location" property="location" />
         <result column="start_date" property="startDate" />
         <result column="start_time" property="startTime" />
         <result column="end_date" property="endDate" />
         <result column="end_time" property="endTime" />
-        <result column="postcode" property="postcode" />
-        <result column="status" property="status" />
+        <result column="img" property="img" />
         <result column="message" property="message" />
         <result column="av" property="av" />
         <result column="payment" property="payment" />
+        <result column="status" property="status" />
         <result column="del" property="del" />
     </resultMap>
+
 
 </mapper>

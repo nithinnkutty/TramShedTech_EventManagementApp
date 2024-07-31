@@ -8,17 +8,18 @@ import java.util.Date;
 @Data
 public class Bookings {
     private Integer id;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String roomNumber;
+    private String roomName;
+    private String postcode;
     private String location;
     private Date startDate;
     private Time startTime;
     private Date endDate;
     private Time endTime;
-    private String postcode;
+//    private String postcode;
     private String status;
     private String message;
+    private String img;
     private String av;
     private String payment;
     private Integer del;
