@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone') {
+            steps {
+                script {
+                    // Clone commands
+                    sh 'echo "ssh into newly created instance"'
+                    sh 'echo "Clone Repo"'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    // build commands
+                    sh 'echo "Build Project"'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    // test and test report commands
+                    sh 'echo "Test Project"'
+                }
+            }
+        }
+        stage('Run Project') {
+            steps {
+                script {
+                    // Run project
+                    sh 'echo "Run Project"'
+                }
+            }
+        }
+    }
+}
