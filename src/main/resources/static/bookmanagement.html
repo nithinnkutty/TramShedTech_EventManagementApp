@@ -138,19 +138,19 @@
                                 width="180">
                         </el-table-column>
                         <el-table-column
-                                prop="firstName"
-                                label="Applicant Name"
+                                prop="roomName"
+                                label="Room Name"
                                 width="180">
-                        </el-table-column>
-                        <el-table-column
-                                prop="location"
-                                label="Location">
                         </el-table-column>
 <!--                        <el-table-column-->
 <!--                                prop="postcode"-->
 <!--                                label="Postcode"-->
 <!--                                width="180">-->
 <!--                        </el-table-column>-->
+                        <el-table-column
+                                prop="location"
+                                label="Location">
+                        </el-table-column>
                         <el-table-column
                                 prop="endDate"
                                 label="End Date"
@@ -201,23 +201,23 @@
     <!-- Dialog of edit form -->
     <el-dialog title="Edit Booking" :visible.sync="dialogFormVisible">
         <el-form :model="editForm" ref="editForm" :rules="rules" label-width="180px" class="demo-ruleForm">
-            <el-form-item label="First Name" prop="firstName">
-                <el-input v-model="editForm.firstName"></el-input>
+            <el-form-item label="Room Number" prop="roomNumber">
+                <el-input v-model="editForm.roomNumber"></el-input>
             </el-form-item>
-            <el-form-item label="Last Name" prop="lastName">
-                <el-input v-model="editForm.lastName"></el-input>
+            <el-form-item label="Room Name" prop="roomName">
+                <el-input v-model="editForm.roomName"></el-input>
             </el-form-item>
-            <el-form-item label="Email" prop="email">
-                <el-input v-model="editForm.email"></el-input>
+            <el-form-item label="Postcode" prop="postcode">
+                <el-input v-model="editForm.postcode"></el-input>
             </el-form-item>
             <el-form-item label="Location" prop="location">
                 <el-select v-model="editForm.location" placeholder="Please select location">
-                    <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
-                    <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
-                    <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
-                    <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
-                    <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
-                    <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
+                    <el-option label="Cardiff" value="Cardiff"></el-option>
+                    <el-option label="Barry Island" value="Barry Island"></el-option>
+                    <el-option label="Newport" value="Newport"></el-option>
+                    <el-option label="Main Hall" value="Main Hall"></el-option>
+                    <el-option label="Swansea" value="Swansea"></el-option>
+                    <el-option label="Bristol" value="Bristol"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="Book resource between" prop="daterange">
@@ -246,6 +246,22 @@
                     type="warning"
                     :closable="false">
             </el-alert>
+            <!-- New upload image form item -->
+            <el-form-item label="Upload Image" prop="img">
+                <el-upload
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        list-type="picture-card"
+                        :on-preview="handlePictureCardPreview"
+                        :on-remove="handleRemove"
+                        :file-list="editForm.img"
+                        :before-upload="beforeUpload"
+                        accept="image/*">
+                    <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+            </el-form-item>
             <el-form-item label="Payment method" prop="payment">
                 <el-radio-group v-model="editForm.payment">
                     <el-radio label="Paypal"></el-radio>
@@ -264,6 +280,7 @@
         </el-form>
     </el-dialog>
 </div>
+
 
 
 
@@ -303,18 +320,24 @@
                 dialogFormVisible: false,
                 editForm: {
                     id: '',
-                    firstName: '',
-                    lastName: '',
-                    email: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
                     location: '',
                     daterange: [],
                     av: [],
                     payment: '',
-                    message: ''
+                    message: '',
+                    img: [] // Add this line to store uploaded images
                 },
                 rules: {
-                    daterange: [{ validator: validateDateRange, trigger: 'change' }]
+                    daterange: [{ validator: validateDateRange, trigger: 'change' }],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ]
                 },
+                dialogImageUrl: '',
+                dialogVisible: false,
                 formLabelWidth: '100px'
             };
         },
@@ -337,7 +360,6 @@
                 return time.getTime() < Date.now() - 86400000;
             },
 
-
             tableRowClassName({ row }) {
                 if (row.status === 'Ongoing') {
                     return 'warning-row';
@@ -349,7 +371,6 @@
                 return '';
             },
 
-
             fetchTableData() {
                 axios.get('/booking/searchAll')
                     .then(res => {
@@ -360,18 +381,15 @@
                     });
             },
 
-
             handleSizeChange(val) {
                 this.pageSize = val;
                 console.log(`Items per page: ${val}`);
             },
 
-
             handleCurrentChange(val) {
                 this.currentPage4 = val;
                 console.log(`Current page: ${val}`);
             },
-
 
             toggleSelection(rows) {
                 if (rows) {
@@ -383,11 +401,9 @@
                 }
             },
 
-
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-
 
             handleEdit(index, row) {
                 console.log("Edit button clicked", index, row);
@@ -396,14 +412,15 @@
                         const data = response.data.data;
                         this.editForm = {
                             id: data.id, // save the current id
-                            firstName: data.firstName || '',
-                            lastName: data.lastName || '',
-                            email: data.email || '',
+                            roomNumber: data.roomNumber || '',
+                            roomName: data.roomName || '',
+                            postcode: data.postcode || '',
                             location: data.location || '',
                             daterange: [data.startDate, data.endDate],
                             av: Array.isArray(data.av) ? data.av : [],
                             payment: data.payment || '',
-                            message: data.message || ''
+                            message: data.message || '',
+                            img: data.img || []
                         };
                         console.log('Edit form data', this.editForm);
                         this.dialogFormVisible = true; // display the edit form
@@ -412,7 +429,6 @@
                         console.error("There was an error fetching the booking data!", error);
                     });
             },
-
 
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -435,7 +451,6 @@
                     }
                 });
             },
-
 
             handleDelete(index, row) {
                 this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
@@ -462,7 +477,6 @@
                 });
             },
 
-
             confirmDelete(index, row) {
                 this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
                     confirmButtonText: 'Confirm',
@@ -487,7 +501,6 @@
                     });
                 });
             },
-
 
             deleteSelectedRows() {
                 if (this.multipleSelection.length === 0) {
@@ -523,39 +536,54 @@
                 });
             },
 
-
             bookingRecord() {
                 window.location.href = 'bookmanagement.html';
             },
-
 
             viewResources() {
                 window.location.href = 'viewresources.html';
             },
 
-
             bookaResource() {
                 window.location.href = 'bookresource.html';
             },
-
 
             cancelBooking() {
                 window.location.href = 'cancel.html';
             },
 
-
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
             }
         },
-
 
         mounted() {
             this.fetchTableData();
         }
-
     });
 </script>
+
 
 </body>
 </html>

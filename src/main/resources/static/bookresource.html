@@ -138,13 +138,13 @@
                 :closable="false">
         </el-alert>
         <!-- New upload image form item -->
-        <el-form-item label="Upload Image" prop="uploadImage">
+        <el-form-item label="Upload Image" prop="img">
             <el-upload
                     action="https://jsonplaceholder.typicode.com/posts/"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleRemove"
-                    :file-list="ruleForm.uploadImage"
+                    :file-list="ruleForm.img"
                     :before-upload="beforeUpload"
                     accept="image/*">
                 <i class="el-icon-plus"></i>
@@ -190,7 +190,7 @@
                     av: [],
                     payment: '',
                     message: '',
-                    uploadImage: []
+                    img: []
                 },
                 rules: {
                     roomNumber: [
