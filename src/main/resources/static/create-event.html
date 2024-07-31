@@ -152,11 +152,6 @@
                         <el-input v-model="scope.row.email" placeholder="Contact Email" class="table"></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="AV" label="AV" width="180">
-                    <template slot-scope="scope">
-                        <el-input v-model="scope.row.av" placeholder="AV" class="table"></el-input>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="notes" label="AV Notes" width="180">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.note" placeholder="AV Notes" class="table"></el-input>
@@ -191,25 +186,12 @@
                         contact: '',
                         email: '',
                         location: '',
-                        av: '',
                         note: ' '
                     }],
                 },
                 room: [{
-                    value: 'option 1',
-                    label: 'meeting room 1'
-                }, {
-                    value: 'option 2',
-                    label: 'meeting room 2'
-                }, {
-                    value: 'option 3',
-                    label: 'meeting room 3'
-                }, {
-                    value: 'option 4',
-                    label: 'meeting room 4'
-                }, {
-                    value: 'option 5',
-                    label: 'meeting room 5'
+                    value: '',
+                    label: ''
                 }],
                 tag: [{
                     value: 'option 1',
@@ -233,7 +215,33 @@
                 }],
             };
         },
+        created(){
+            this.fecthRooms();
+        },
         methods: {
+            fecthRooms() {
+                axios.get('/booking/getRoom')
+                    .then(response => {
+                        if (!response.data || !Array.isArray(response.data)) {
+                            console.error('No data or data is not an array');
+                            return;
+                        }
+                        this.room = response.data.map((fullAddress, index) => {
+                            console.log(fullAddress);
+                            if (!fullAddress) {
+                                console.error('Invalid full address encountered', fullAddress);
+                                return { value: `option ${index}`, label: 'Invalid address' };
+                            }
+                            return {
+                                value: `option ${index}`,
+                                label: fullAddress
+                            };
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch rooms:', error);
+                    });
+            },
             /*Converts the obtained date data into the desired date YYYY-MM-DD*/
             getFormattedDate(date) {
                 const year = date.getFullYear();
@@ -249,7 +257,6 @@
                 }
                 this.getFormData();
             },
-
             getFormData() {
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
@@ -266,7 +273,6 @@
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
                     responsible: this.formData.tableData[0].responsible,
-                    av: this.formData.tableData[0].av,
                     note: this.formData.tableData[0].note
                 };
                 console.log(eventData);

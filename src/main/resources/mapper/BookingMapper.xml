@@ -7,4 +7,9 @@
         INSERT INTO bookings(first_name,last_name,email,location,message,payment,av,start_date,start_time,end_date,end_time,postcode,status) VALUES (#{firstName}, #{lastName},#{email},#{location},#{message},#{payment},#{av},#{startDate},#{startTime},#{endDate},#{endTime},#{postcode,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR})
     </insert>
 
+    <!-- Select room name in DB -->
+    <select id="getAllRoomName" resultType="string">
+        SELECT DISTINCT CONCAT(room_name, ' ', location, ' ', postcode) AS fullAddress From bookings;
+    </select>
+
 </mapper>

@@ -7,6 +7,8 @@ import com.tramshedtech.eventmanagement.service.BookingService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookingServiceImpl implements BookingService {
 
@@ -17,4 +19,7 @@ public class BookingServiceImpl implements BookingService {
     public boolean addBooking(Bookings book) {
         return bookingMapper.addBooking(book);
     }
+
+    @Override
+    public List<String> getAllRoomName(){return bookingMapper.getAllRoomName();}
 }
