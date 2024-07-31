@@ -86,19 +86,19 @@
             <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
         </el-col>
         <el-col :span="6">
-            <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+            <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
         </el-col>
     </el-row>
 
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="180px" class="demo-ruleForm">
-        <el-form-item label="First Name" prop="firstName">
-            <el-input v-model="ruleForm.firstName"></el-input>
+        <el-form-item label="Room Number" prop="roomNumber">
+            <el-input v-model="ruleForm.roomNumber"></el-input>
         </el-form-item>
-        <el-form-item label="Last Name" prop="lastName">
-            <el-input v-model="ruleForm.lastName"></el-input>
+        <el-form-item label="Room Name" prop="roomName">
+            <el-input v-model="ruleForm.roomName"></el-input>
         </el-form-item>
-        <el-form-item label="Email" prop="email">
-            <el-input v-model="ruleForm.email"></el-input>
+        <el-form-item label="Postcode" prop="postcode">
+            <el-input v-model="ruleForm.postcode"></el-input>
         </el-form-item>
         <el-form-item label="Location" prop="location">
             <el-select v-model="ruleForm.location" placeholder="Please select location">
@@ -137,6 +137,22 @@
                 type="warning"
                 :closable="false">
         </el-alert>
+        <!-- New upload image form item -->
+        <el-form-item label="Upload Image" prop="uploadImage">
+            <el-upload
+                    action="https://jsonplaceholder.typicode.com/posts/"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove"
+                    :file-list="ruleForm.uploadImage"
+                    :before-upload="beforeUpload"
+                    accept="image/*">
+                <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+        </el-form-item>
         <el-form-item label="Payment method" prop="payment">
             <el-radio-group v-model="ruleForm.payment">
                 <el-radio label="Paypal"></el-radio>
@@ -158,6 +174,7 @@
 
 
 
+
 <script>
     new Vue({
         el: '#app',
@@ -165,27 +182,27 @@
             return {
                 searchQuery: '',
                 ruleForm: {
-                    firstName: '',
-                    lastName: '',
-                    email: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
                     location: '',
                     daterange: [],
                     av: [],
                     payment: '',
-                    message: ''
+                    message: '',
+                    uploadImage: []
                 },
                 rules: {
-                    firstName: [
-                        { required: true, message: 'Please enter your first name', trigger: 'blur' },
-                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
+                    roomNumber: [
+                        { required: true, message: 'Please enter the room number', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
                     ],
-                    lastName: [
-                        { required: true, message: 'Please enter your last name', trigger: 'blur' },
-                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
+                    roomName: [
+                        { required: true, message: 'Please enter the room name', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
                     ],
-                    email: [
-                        { required: true, message: 'Please enter your email address', trigger: 'blur' },
-                        { type: 'email', message: 'Please enter the correct email address', trigger: 'blur' }
+                    postcode: [
+                        { required: true, message: 'Please enter the postcode info', trigger: 'blur' },
                     ],
                     location: [
                         { required: true, message: 'Please select the location', trigger: 'change' }
@@ -200,10 +217,15 @@
                     payment: [
                         { required: true, message: 'Please select a payment method', trigger: 'change' }
                     ],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ],
                     message: [
                         { required: false }
                     ]
-                }
+                },
+                dialogImageUrl: '',
+                dialogVisible: false
             };
         },
         methods: {
@@ -220,15 +242,15 @@
                             .then(response => {
                                 console.log(response);
                                 if (response.status === 200 && response.data.data) {
-                                    // 假设后端返回的数据结构是 { data: { id: newBookingId } }
+                                    // get the booking id
                                     const newBookingId = response.data.data.id;
                                     this.$message({
                                         message: 'Resource booked successfully',
                                         type: 'success'
                                     });
-                                    // 将ID存储在localStorage
+                                    // save the booking id to localStorage
                                     localStorage.setItem("bookingId", newBookingId);
-                                    // 跳转到bookmanagement页面
+                                    // jump to the booking management page
                                     window.location.href = '/bookmanagement.html';
                                 } else {
                                     alert('Resource booking failed');
@@ -248,41 +270,6 @@
                     }
                 });
             },
-
-            // submitForm(formName) {
-            //     console.log(this.ruleForm);
-            //     this.$refs[formName].validate((valid) => {
-            //         if (valid) {
-            //             const formData = {
-            //                 ...this.ruleForm,
-            //             };
-            //             formData.startDate = this.ruleForm.daterange[0];
-            //             formData.endDate = this.ruleForm.daterange[1];
-            //             console.log(formData);
-            //             axios.post('/booking/add', formData)
-            //                 .then(response => {
-            //                     console.log(response);
-            //                     if (response.status === 200) {
-            //                         this.$message({
-            //                             message: 'Resource booked successfully',
-            //                             type: 'success'
-            //                         });
-            //                     }
-            //                 })
-            //                 .catch(error => {
-            //                     console.log(error);
-            //                     this.$message({
-            //                         message: 'Resource booking failed',
-            //                         type: 'error'
-            //                     });
-            //                 });
-            //             alert('submit!');
-            //         } else {
-            //             console.log('error submit!!');
-            //             return false;
-            //         }
-            //     });
-            // },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
@@ -295,9 +282,8 @@
             cancelBooking() {
                 window.location.href = 'cancel.html';
             },
-            handleSearch() {
-                // 实现搜索功能
-                console.log(this.searchQuery);
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
             },
             disabledDate(time) {
                 return time.getTime() < Date.now() - 86400000;
@@ -311,19 +297,30 @@
                 } else {
                     callback();
                 }
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
             }
         }
     });
 </script>
-
-
-
-
-
-
-
-
-
 
 </body>
 </html>
