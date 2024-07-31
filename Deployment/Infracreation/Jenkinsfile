@@ -2,17 +2,24 @@ pipeline {
     agent any
 
 
-
     stages {
         stage('Terraform Apply') {
             steps {
                 script {
 
 //                     sh 'source openrc.sh'
-//                     // Initialize and apply Terraform
+//                     Initialize and apply Terraform
 //                     sh 'terraform init -input=false'
 //                     sh 'terraform apply -auto-approve'
+                    sh 'echo Building in ${WORKSPACE}'
                     sh 'echo "This is working"'
+                }
+            }
+        }
+        stage('Install java and gradle'){
+            steps{
+                script {
+                    sh 'echo "Install Java and Gradle after infra creation"'
                 }
             }
         }
@@ -20,8 +27,8 @@ pipeline {
     post {
         success {
             script {
-                // Trigger the Build and Run Project pipeline
-//                 build job: 'BuildAndRunProject', wait: false
+//                 Trigger the Build and Run Project pipeline
+                build job: 'TramshedTechProject_Deployment', wait: false
                 sh  'echo "This too"'
             }
         }
