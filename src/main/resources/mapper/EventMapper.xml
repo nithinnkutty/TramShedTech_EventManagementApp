@@ -14,8 +14,16 @@
         SELECT * FROM events WHERE id = #{id}
     </select>
 
+    <!--Insert data into DB -->
     <insert id="add" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO events(title,date,time,site,room,speaker,responsible,type,staff,company,contact,email,av,note,tag)
-            VALUES (#{title},#{date},#{time},#{site},#{room},#{speaker},#{responsible},#{type},#{staff},#{company},#{contact},#{email},#{av},#{note},#{tag})
+        INSERT INTO events(title,date,time,site,room,speaker,responsible,type,staff,company,contact,email,note,tag)
+            VALUES (#{title},#{date},#{time},#{site},#{room},#{speaker},#{responsible},#{type},#{staff},#{company},#{contact},#{email},#{note},#{tag})
     </insert>
+
+    <!-- Select room name in DB -->
+    <select id="getRoomById" resultType="string">
+        SELECT CONCAT(b.room_name, ' ', b.location, ' ', b.postcode) AS fullAddress From events e
+        JOIN bookings b ON e.room = b.id
+        WHERE e.id = #{eventId}
+    </select>
 </mapper>

@@ -14,4 +14,6 @@ public interface EventMapper {
     Event getEventById(Long id);
 
     boolean add(Event event);
+
+    String getRoomById(int eventId);
 }

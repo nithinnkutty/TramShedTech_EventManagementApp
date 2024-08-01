@@ -34,4 +34,7 @@ public class EventServiceImpl implements EventService {
         }
 
     }
+
+    @Override
+    public String getAllRoomName(int eventId){return eventMapper.getRoomById(eventId);}
 }

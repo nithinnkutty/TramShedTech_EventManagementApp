@@ -3,6 +3,7 @@ package com.tramshedtech.eventmanagement.controller;
 import com.tramshedtech.eventmanagement.service.EventService;
 import com.tramshedtech.eventmanagement.entity.Event;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,6 +68,17 @@ public class EventController {
             return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(eventCreatedId);
         }catch (Exception e){
             return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+        }
+    }
+
+    @GetMapping("/getRoom/{eventId}")
+    public ResponseEntity<String> getAllRoomName(@PathVariable int eventId) {
+        try {
+            String roomName = eventService.getAllRoomName(eventId);
+            return ResponseEntity.ok(roomName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving room name");
         }
     }
 }

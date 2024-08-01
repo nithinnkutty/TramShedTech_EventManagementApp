@@ -10,4 +10,6 @@ public interface EventService {
     Event getEventById(Long id);
 
     Long addEvent(Event event);
+
+    String getAllRoomName(int eventId);
 }
