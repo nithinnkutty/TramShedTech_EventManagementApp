@@ -140,12 +140,13 @@
         <!-- New upload image form item -->
         <el-form-item label="Upload Image" prop="img">
             <el-upload
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="/booking/upload"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleRemove"
                     :file-list="ruleForm.img"
                     :before-upload="beforeUpload"
+                    :on-success="handleUploadSuccess"
                     accept="image/*">
                 <i class="el-icon-plus"></i>
             </el-upload>
@@ -176,6 +177,151 @@
 
 
 <script>
+    // new Vue({
+    //     el: '#app',
+    //     data() {
+    //         return {
+    //             searchQuery: '',
+    //             ruleForm: {
+    //                 roomNumber: '',
+    //                 roomName: '',
+    //                 postcode: '',
+    //                 location: '',
+    //                 daterange: [],
+    //                 av: [],
+    //                 payment: '',
+    //                 message: '',
+    //                 img: []
+    //             },
+    //             rules: {
+    //                 roomNumber: [
+    //                     { required: true, message: 'Please enter the room number', trigger: 'blur' },
+    //                     { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
+    //                 ],
+    //                 roomName: [
+    //                     { required: true, message: 'Please enter the room name', trigger: 'blur' },
+    //                     { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
+    //                 ],
+    //                 postcode: [
+    //                     { required: true, message: 'Please enter the postcode info', trigger: 'blur' },
+    //                 ],
+    //                 location: [
+    //                     { required: true, message: 'Please select the location', trigger: 'change' }
+    //                 ],
+    //                 daterange: [
+    //                     { required: true, message: 'Please select the date range', trigger: 'change' },
+    //                     { validator: this.validateDateRange, trigger: 'change' }
+    //                 ],
+    //                 av: [
+    //                     { type: 'array', required: true, message: 'Please select at least one AV requirement', trigger: 'change' }
+    //                 ],
+    //                 payment: [
+    //                     { required: true, message: 'Please select a payment method', trigger: 'change' }
+    //                 ],
+    //                 uploadImage: [
+    //                     { required: true, message: 'Please upload an image', trigger: 'change' }
+    //                 ],
+    //                 message: [
+    //                     { required: false }
+    //                 ]
+    //             },
+    //             dialogImageUrl: '',
+    //             dialogVisible: false
+    //         };
+    //     },
+    //     methods: {
+    //         submitForm(formName) {
+    //             this.$refs[formName].validate((valid) => {
+    //                 if (valid) {
+    //                     const formData = {
+    //                         ...this.ruleForm,
+    //                         startDate: this.ruleForm.daterange[0],
+    //                         endDate: this.ruleForm.daterange[1]
+    //                     };
+    //                     console.log(formData);
+    //                     axios.post('/booking/add', formData)
+    //                         .then(response => {
+    //                             console.log(response);
+    //                             if (response.status === 200 && response.data.data) {
+    //                                 // get the booking id
+    //                                 const newBookingId = response.data.data.id;
+    //                                 this.$message({
+    //                                     message: 'Resource booked successfully',
+    //                                     type: 'success'
+    //                                 });
+    //                                 // save the booking id to localStorage
+    //                                 localStorage.setItem("bookingId", newBookingId);
+    //                                 // jump to the booking management page
+    //                                 window.location.href = '/bookmanagement.html';
+    //                             } else {
+    //                                 alert('Resource booking failed');
+    //                             }
+    //                         })
+    //                         .catch(error => {
+    //                             console.log(error);
+    //                             this.$message({
+    //                                 message: 'Resource booking failed',
+    //                                 type: 'error'
+    //                             });
+    //                         });
+    //                     alert('submit!');
+    //                 } else {
+    //                     console.log('error submit!!');
+    //                     return false;
+    //                 }
+    //             });
+    //         },
+    //         resetForm(formName) {
+    //             this.$refs[formName].resetFields();
+    //         },
+    //         viewResources() {
+    //             window.location.href = 'viewresources.html';
+    //         },
+    //         bookaResource() {
+    //             window.location.href = 'bookresource.html';
+    //         },
+    //         cancelBooking() {
+    //             window.location.href = 'cancel.html';
+    //         },
+    //         bookingRecord() {
+    //             window.location.href = 'bookmanagement.html';
+    //         },
+    //         disabledDate(time) {
+    //             return time.getTime() < Date.now() - 86400000;
+    //         },
+    //         validateDateRange(rule, value, callback) {
+    //             const [start, end] = value;
+    //             if (new Date(start).getTime() < Date.now() - 86400000) {
+    //                 callback(new Error('This date is not optional'));
+    //             } else if (new Date(end).getTime() < new Date(start).getTime()) {
+    //                 callback(new Error('The start time cannot be after the end time'));
+    //             } else {
+    //                 callback();
+    //             }
+    //         },
+    //         handleRemove(file, fileList) {
+    //             console.log(file, fileList);
+    //         },
+    //         handlePictureCardPreview(file) {
+    //             this.dialogImageUrl = file.url;
+    //             this.dialogVisible = true;
+    //         },
+    //         beforeUpload(file) {
+    //             const isJPG = file.type === 'image/jpeg';
+    //             const isPNG = file.type === 'image/png';
+    //             const isLt2M = file.size / 1024 / 1024 < 2;
+    //
+    //             if (!isJPG && !isPNG) {
+    //                 this.$message.error('Upload image must be JPG or PNG format!');
+    //             }
+    //             if (!isLt2M) {
+    //                 this.$message.error('Upload image size must be less than 2MB!');
+    //             }
+    //             return (isJPG || isPNG) && isLt2M;
+    //         }
+    //     }
+    // });
+
     new Vue({
         el: '#app',
         data() {
@@ -242,15 +388,12 @@
                             .then(response => {
                                 console.log(response);
                                 if (response.status === 200 && response.data.data) {
-                                    // get the booking id
                                     const newBookingId = response.data.data.id;
                                     this.$message({
                                         message: 'Resource booked successfully',
                                         type: 'success'
                                     });
-                                    // save the booking id to localStorage
                                     localStorage.setItem("bookingId", newBookingId);
-                                    // jump to the booking management page
                                     window.location.href = '/bookmanagement.html';
                                 } else {
                                     alert('Resource booking failed');
@@ -305,6 +448,9 @@
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
             },
+            handleUploadSuccess(response, file, fileList) {
+                this.ruleForm.img.push(response.url); // 假设返回的响应中包含图片URL
+            },
             beforeUpload(file) {
                 const isJPG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
@@ -320,6 +466,9 @@
             }
         }
     });
+
+
+
 </script>
 
 </body>

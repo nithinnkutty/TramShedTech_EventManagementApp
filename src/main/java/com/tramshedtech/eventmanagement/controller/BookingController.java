@@ -6,22 +6,59 @@ import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.sql.Time;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.*;
+import java.io.IOException;
+import java.util.Map;
+
 
 @Controller
 @RequestMapping("/booking")
 @ResponseBody
 public class BookingController {
 
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
     @Resource
     private BookingService bookingService;
+
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            // Obtain the original file name of the uploaded file and clear the path
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            // Create the path to the target file
+            Path path = Paths.get(uploadDir + "/" + fileName);
+            Files.createDirectories(path.getParent()); // 确保目录存在
+            // Saves the file to the specified path
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+//            // Build file URL
+//            String fileUrl = path.toString();
+            String fileUrl = "/uploads/" + fileName; // 返回相对路径
+            // Create a response object
+            Map<String, String> response = new HashMap<>();
+            response.put("url", fileUrl);
+            // Return the response object
+            return ResponseEntity.ok(response);
+        } catch (IOException ex) {
+            // Processing file upload error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PostMapping("/add")
     public ResponseResult addBooking (@RequestBody Map<String, Object> bookingData) throws ParseException {
@@ -44,7 +81,9 @@ public class BookingController {
         String av = String.join(",", (List<String>) bookingData.get("av"));
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
-        String img = (String) bookingData.get("img");
+//        String img = (String) bookingData.get("img");
+        List<String> imgList = (List<String>) bookingData.get("img");
+        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
 
         Bookings booking = new Bookings();
         booking.setRoomNumber(roomNumber);
@@ -114,6 +153,7 @@ public class BookingController {
         }
     }
 
+
     @PostMapping("/update")
     public ResponseResult updateBooking(@RequestBody Map<String, Object> bookingData) throws ParseException {
 
@@ -136,7 +176,9 @@ public class BookingController {
         String av = String.join(",", (List<String>) bookingData.get("av"));
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
-        String img = (String) bookingData.get("img");
+//        String img = (String) bookingData.get("img");
+        List<String> imgList = (List<String>) bookingData.get("img");
+        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
 
         Bookings booking = new Bookings();
         booking.setId(id);

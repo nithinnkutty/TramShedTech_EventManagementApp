@@ -28,7 +28,7 @@
         <result column="message" property="message" />
         <result column="av" property="av" />
         <result column="payment" property="payment" />
-        <result column="status" property="status" />
+<!--        <result column="status" property="status" />-->
         <result column="del" property="del" />
     </resultMap>
 
@@ -43,7 +43,7 @@
             end_date = #{endDate},
             end_time = #{endTime},
 --             postcode = #{postcode,jdbcType=VARCHAR},
-            status = #{status,jdbcType=VARCHAR},
+--             status = #{status,jdbcType=VARCHAR},
             message = #{message},
             img = #{img},
             av = #{av},
@@ -52,9 +52,9 @@
         WHERE id = #{id}
     </update>
 
-    <insert id="addBooking">
-        INSERT INTO bookings(room_number, room_name, postcode, location, message, payment, av, start_date, start_time, end_date, end_time, img, status, del)
-        VALUES (#{roomNumber}, #{roomName}, #{postcode}, #{location}, #{message}, #{payment}, #{av}, #{startDate}, #{startTime}, #{endDate}, #{endTime}, #{img}, #{status}, #{del})
+    <insert id="addBooking" >
+        INSERT INTO bookings(room_number, room_name, postcode, location, message, payment, av, start_date, start_time, end_date, end_time, img, del)
+        VALUES (#{roomNumber}, #{roomName}, #{postcode}, #{location}, #{message}, #{payment}, #{av}, #{startDate}, #{startTime}, #{endDate}, #{endTime}, #{img}, #{del})
     </insert>
 
 
@@ -76,7 +76,7 @@
         <result column="message" property="message" />
         <result column="av" property="av" />
         <result column="payment" property="payment" />
-        <result column="status" property="status" />
+<!--        <result column="status" property="status" />-->
         <result column="del" property="del" />
     </resultMap>
 
