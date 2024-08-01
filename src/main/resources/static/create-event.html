@@ -74,7 +74,7 @@
                             v-for="item in room"
                             :key="item.value"
                             :label="item.label"
-                            :value="item.label">
+                            :value="item.value">
                     </el-option>
                 </el-select>
             </div></el-col>
@@ -200,7 +200,7 @@
                     value: 'option 2',
                     label: 'Education'
                 }, {
-                    value: 'option 3',
+                    value: '3',
                     label: 'Healthcare'
                 }, {
                     value: 'option 4',
@@ -230,10 +230,10 @@
                             console.log(fullAddress);
                             if (!fullAddress) {
                                 console.error('Invalid full address encountered', fullAddress);
-                                return { value: `option ${index}`, label: 'Invalid address' };
+                                return { value: `${index}`, label: 'Invalid address' };
                             }
                             return {
-                                value: `option ${index}`,
+                                value: `${index}`,
                                 label: fullAddress
                             };
                         });
