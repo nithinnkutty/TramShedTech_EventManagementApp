@@ -375,13 +375,24 @@
             };
         },
         methods: {
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.ruleForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         const formData = {
                             ...this.ruleForm,
                             startDate: this.ruleForm.daterange[0],
-                            endDate: this.ruleForm.daterange[1]
+                            endDate: this.ruleForm.daterange[1],
+                            img: this.ruleForm.img.join(",") // 将img数组转换为逗号分隔的字符串
                         };
                         console.log(formData);
                         axios.post('/booking/add', formData)
@@ -416,6 +427,7 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
+
             viewResources() {
                 window.location.href = 'viewresources.html';
             },
@@ -447,9 +459,6 @@
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
-            },
-            handleUploadSuccess(response, file, fileList) {
-                this.ruleForm.img.push(response.url); // 假设返回的响应中包含图片URL
             },
             beforeUpload(file) {
                 const isJPG = file.type === 'image/jpeg';

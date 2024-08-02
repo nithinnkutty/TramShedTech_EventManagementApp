@@ -249,7 +249,7 @@
             <!-- New upload image form item -->
             <el-form-item label="Upload Image" prop="img">
                 <el-upload
-                        action="https://jsonplaceholder.typicode.com/posts/"
+                        action="/booking/upload"
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview"
                         :on-remove="handleRemove"
@@ -262,6 +262,7 @@
                     <img width="100%" :src="dialogImageUrl" alt="">
                 </el-dialog>
             </el-form-item>
+
             <el-form-item label="Payment method" prop="payment">
                 <el-radio-group v-model="editForm.payment">
                     <el-radio label="Paypal"></el-radio>
@@ -328,7 +329,7 @@
                     av: [],
                     payment: '',
                     message: '',
-                    img: [] // Add this line to store uploaded images
+                    img: [] // make sure it's an array
                 },
                 rules: {
                     daterange: [{ validator: validateDateRange, trigger: 'change' }],
@@ -410,37 +411,44 @@
                 axios.get(`/booking/${row.id}`)
                     .then(response => {
                         const data = response.data.data;
+                        // 确保img字段是数组
+                        const imgList = data.img ? data.img.split(",").map(url => ({
+                            name: url.split("/").pop(), // 提取文件名
+                            url: url, // 文件URL
+                            uid: url, // 使用URL作为唯一ID
+                        })) : [];
                         this.editForm = {
-                            id: data.id, // save the current id
+                            id: data.id,
                             roomNumber: data.roomNumber || '',
                             roomName: data.roomName || '',
                             postcode: data.postcode || '',
                             location: data.location || '',
                             daterange: [data.startDate, data.endDate],
-                            av: Array.isArray(data.av) ? data.av : [],
+                            av: Array.isArray(data.av) ? data.av : data.av.split(","), // 确保av是数组
                             payment: data.payment || '',
                             message: data.message || '',
-                            img: data.img || []
+                            img: imgList // 设置img字段为数组
                         };
-                        console.log('Edit form data', this.editForm);
-                        this.dialogFormVisible = true; // display the edit form
+                        this.dialogFormVisible = true; // 显示编辑表单
                     })
                     .catch(error => {
                         console.error("There was an error fetching the booking data!", error);
                     });
             },
-
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        axios.post(`/booking/update`, this.editForm)
+                        // 在提交之前，将img字段转换为逗号分隔的字符串
+                        const imgString = this.editForm.img.map(file => file.url).join(",");
+                        const updatedForm = { ...this.editForm, img: imgString };
+                        axios.post(`/booking/update`, updatedForm)
                             .then(response => {
                                 this.$message({
                                     message: 'Successfully updated!',
                                     type: 'success'
                                 });
-                                this.dialogFormVisible = false; // close the dialog
-                                this.fetchTableData(); // refresh the table data
+                                this.dialogFormVisible = false; // 关闭对话框
+                                this.fetchTableData(); // 刷新表格数据
                             })
                             .catch(error => {
                                 console.error("There was an error updating the booking data!", error);

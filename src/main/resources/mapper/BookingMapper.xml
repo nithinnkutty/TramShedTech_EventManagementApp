@@ -28,7 +28,6 @@
         <result column="message" property="message" />
         <result column="av" property="av" />
         <result column="payment" property="payment" />
-<!--        <result column="status" property="status" />-->
         <result column="del" property="del" />
     </resultMap>
 

@@ -39,26 +39,30 @@ public class BookingController {
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            // Obtain the original file name of the uploaded file and clear the path
+            System.out.println("Received file: " + file.getOriginalFilename()); // 添加调试信息
+            // 获取原始文件名并清理路径
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            // Create the path to the target file
+            // 构建目标文件路径
             Path path = Paths.get(uploadDir + "/" + fileName);
-            Files.createDirectories(path.getParent()); // 确保目录存在
-            // Saves the file to the specified path
+            // 确保目录存在
+            Files.createDirectories(path.getParent());
+            // 保存文件到指定路径
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-//            // Build file URL
-//            String fileUrl = path.toString();
-            String fileUrl = "/uploads/" + fileName; // 返回相对路径
-            // Create a response object
+            // 构建文件URL
+            String fileUrl = "/uploads/" + fileName; // 使用相对URL
+            // 创建响应对象
             Map<String, String> response = new HashMap<>();
             response.put("url", fileUrl);
-            // Return the response object
+            // 返回响应对象
             return ResponseEntity.ok(response);
         } catch (IOException ex) {
-            // Processing file upload error
+            // 处理文件上传错误
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+
 
     @PostMapping("/add")
     public ResponseResult addBooking (@RequestBody Map<String, Object> bookingData) throws ParseException {
@@ -82,8 +86,19 @@ public class BookingController {
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
 //        String img = (String) bookingData.get("img");
-        List<String> imgList = (List<String>) bookingData.get("img");
-        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+
+
+//        List<String> imgList = (List<String>) bookingData.get("img");
+//        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+
+        // 处理 img 字段，可以是字符串或者列表
+        Object imgObj = bookingData.get("img");
+        String img;
+        if (imgObj instanceof List) {
+            img = String.join(",", (List<String>) imgObj);
+        } else {
+            img = (String) imgObj;
+        }
 
         Bookings booking = new Bookings();
         booking.setRoomNumber(roomNumber);
@@ -136,10 +151,34 @@ public class BookingController {
         return bookings;
     }
 
+//    @GetMapping("/{id}")
+//    public ResponseResult getBooking(@PathVariable Integer id) {
+//        Bookings booking = bookingService.getBookingById(id);
+//        if (booking != null) {
+//            ResponseResult responseResult = new ResponseResult();
+//            responseResult.setCode(200);
+//            responseResult.setMessage("Booking fetched successfully");
+//            responseResult.setData(booking);
+//            return responseResult;
+//        } else {
+//            ResponseResult responseResult = new ResponseResult();
+//            responseResult.setCode(404);
+//            responseResult.setMessage("Booking not found");
+//            return responseResult;
+//        }
+//    }
+
     @GetMapping("/{id}")
     public ResponseResult getBooking(@PathVariable Integer id) {
         Bookings booking = bookingService.getBookingById(id);
         if (booking != null) {
+            List<String> imgUrls = new ArrayList<>();
+            for (String img : booking.getImg().split(",")) {
+                imgUrls.add("/uploads/" + img); // 根据实际路径调整
+            }
+            booking.setImg(String.join(",", imgUrls));
+            System.out.println("Booking imgUrls: " + imgUrls); // 添加调试信息
+
             ResponseResult responseResult = new ResponseResult();
             responseResult.setCode(200);
             responseResult.setMessage("Booking fetched successfully");
@@ -177,8 +216,18 @@ public class BookingController {
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
 //        String img = (String) bookingData.get("img");
-        List<String> imgList = (List<String>) bookingData.get("img");
-        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+
+
+//        List<String> imgList = (List<String>) bookingData.get("img");
+//        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+
+        Object imgObj = bookingData.get("img");
+        String img = "";
+        if (imgObj instanceof List) {
+            img = String.join(",", (List<String>) imgObj);
+        } else if (imgObj instanceof String) {
+            img = (String) imgObj;
+        }
 
         Bookings booking = new Bookings();
         booking.setId(id);

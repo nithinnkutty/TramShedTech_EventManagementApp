@@ -17,7 +17,7 @@ public class Bookings {
     private Date endDate;
     private Time endTime;
 //    private String postcode;
-    private String status;
+//    private String status;
     private String message;
     private String img;
     private String av;

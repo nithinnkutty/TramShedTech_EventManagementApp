@@ -63,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
             bookingsVo.setStartTime(booking.getStartTime());
             bookingsVo.setEndDate(endDateString);
             bookingsVo.setEndTime(booking.getEndTime());
-            bookingsVo.setStatus(booking.getStatus());
+//            bookingsVo.setStatus(booking.getStatus());
             bookingsVo.setPostcode(booking.getPostcode());
             bookingsVo.setMessage(booking.getMessage());
             bookingsVo.setImg(booking.getImg());
