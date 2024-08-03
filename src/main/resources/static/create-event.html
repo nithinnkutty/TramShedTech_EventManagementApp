@@ -81,11 +81,11 @@
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Tag</div></el-col>
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event Type</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="formData.tag" clearable placeholder="please select">
+                <el-select v-model="formData.type" clearable placeholder="please select">
                     <el-option
-                            v-for="item in tag"
+                            v-for="item in type"
                             :key="item.value"
                             :label="item.label"
                             :value="item.label">
@@ -122,9 +122,9 @@
             <el-col :span="6"><div class="grid-content"></div></el-col>
 
             <el-table :data="formData.tableData" border style="width: 55%;">
-                <el-table-column prop="type" label="Event Type" width="180">
+                <el-table-column prop="tag" label="Tag" width="180">
                     <template slot-scope="scope">
-                        <el-input v-model="scope.row.type" placeholder="Event type" class="table"></el-input>
+                        <el-input v-model="scope.row.tag" placeholder="Tag" class="table"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="responsible" label="Responsible" width="180">
@@ -193,26 +193,39 @@
                     value: '',
                     label: ''
                 }],
-                tag: [{
+                type: [{
                     value: 'option 1',
-                    label: 'Technology'
+                    label: 'Networking'
                 }, {
                     value: 'option 2',
-                    label: 'Education'
+                    label: 'Panels'
                 }, {
                     value: '3',
-                    label: 'Healthcare'
+                    label: 'Speakers'
                 }, {
                     value: 'option 4',
-                    label: 'Finance'
+                    label: 'Q&A’s'
                 }, {
                     value: 'option 5',
-                    label: 'Marketing'
+                    label: 'Presentations'
                 },
                 {
                     value: 'option 6',
-                    label: 'Real Estate'
-                }],
+                    label: 'Social Gatherings'
+                }, {
+                    value: 'option 7',
+                    label: 'Markets'
+                },{
+                    value: 'option 8',
+                    label: 'Miscellaneous'
+                },{
+                    value: 'option 9',
+                    label: 'Festival'
+                },{
+                    value: 'option 10',
+                    label: 'Conference '
+                }
+                ],
             };
         },
         created(){
@@ -264,11 +277,11 @@
                     date: formattedDate,
                     time: this.formData.startTime + '-' + this.formData.endTime,
                     room: this.formData.room,
-                    tag: this.formData.tag,
+                    type: this.formData.type,
                     speaker: this.formData.speaker,
                     site: this.formData.site,
                     staff: this.formData.tableData[0].staff,
-                    type: this.formData.tableData[0].type,
+                    tag: this.formData.tableData[0].tag,
                     company: this.formData.tableData[0].company,
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
