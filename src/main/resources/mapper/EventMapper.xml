@@ -14,8 +14,10 @@
         SELECT * FROM events WHERE id = #{id}
     </select>
 
+    <!-- Insert a new event -->
     <insert id="add" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO events(title,date,time,site,room,speaker,responsible,type,staff,company,contact,email,av,note,tag)
-            VALUES (#{title},#{date},#{time},#{site},#{room},#{speaker},#{responsible},#{type},#{staff},#{company},#{contact},#{email},#{av},#{note},#{tag})
+        INSERT INTO events(title, date, time, site, room, speaker, responsible, type, staff, company, contact, email, av, note, tag, cateringType, cateringCount, beverageType, dietaryRequirements, cateringServingTime)
+        VALUES (#{title}, #{date}, #{time}, #{site}, #{room}, #{speaker}, #{responsible}, #{type}, #{staff}, #{company}, #{contact}, #{email}, #{av}, #{note}, #{tag}, #{cateringType}, #{cateringCount}, #{beverageType}, #{dietaryRequirements}, #{cateringServingTime})
     </insert>
+
 </mapper>

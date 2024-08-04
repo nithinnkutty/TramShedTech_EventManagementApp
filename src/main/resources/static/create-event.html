@@ -10,7 +10,7 @@
     <title>Create Event Page</title>
 </head>
 <body>
-<div  id="event">
+<div id="event">
     <div class="title">
         <el-col :span="24" style="padding-bottom: 20px">
             <div class="grid-content caption">CREATE EVENT</div>
@@ -47,21 +47,21 @@
                         placeholder="startTime"
                         v-model="formData.startTime"
                         :picker-options="{
-                            start: '08:30',
-                            step: '00:15',
-                            end: '23:30'
-                        }">
+                        start: '08:30',
+                        step: '00:15',
+                        end: '23:30'
+                    }">
                 </el-time-select>
                 <el-time-select
                         class="el-time-select"
                         placeholder="endTime"
                         v-model="formData.endTime"
                         :picker-options="{
-                              start: '08:30',
-                              step: '00:15',
-                              end: '23:30',
-                              minTime: formData.startTime
-                            }">
+                        start: '08:30',
+                        step: '00:15',
+                        end: '23:30',
+                        minTime: formData.startTime
+                    }">
                 </el-time-select>
             </div></el-col>
         </el-row>
@@ -71,10 +71,10 @@
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <el-select v-model="formData.room" clearable placeholder="please select">
                     <el-option
-                            v-for="item in room"
+                            v-for="item in roomOptions"
                             :key="item.value"
                             :label="item.label"
-                            :value="item.label">
+                            :value="item.value">
                     </el-option>
                 </el-select>
             </div></el-col>
@@ -109,6 +109,57 @@
                 <div class="grid-content input">
                     <el-input v-model="formData.responsible" placeholder="responsible"></el-input>
                 </div>
+            </div></el-col>
+        </el-row>
+
+        <!-- Form fields for catering -->
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.cateringType" clearable placeholder="Select Catering Type">
+                    <el-option label="Cold Finger Buffet" value="Cold Finger Buffet"></el-option>
+                    <el-option label="Sandwich Buffet" value="Sandwich Buffet"></el-option>
+                    <el-option label="Grazeboards" value="Grazeboards"></el-option>
+                    <el-option label="Breakfast Catering" value="Breakfast Catering"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Count</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.cateringCount" placeholder="Number of People"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Beverage Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.beverageType" clearable placeholder="Select Beverage Type">
+                    <el-option label="Soft Drinks" value="Soft Drinks"></el-option>
+                    <el-option label="Juices" value="Juices"></el-option>
+                    <el-option label="Tea and Coffee" value="Tea and Coffee"></el-option>
+                    <el-option label="Alcoholic Beverages" value="Alcoholic Beverages"></el-option>
+                    <el-option label="Non-Alcoholic Beverages" value="Non-Alcoholic Beverages"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Dietary Requirements</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.dietaryRequirements" placeholder="Specify Dietary Requirements"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Serving Time</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-time-select
+                        v-model="formData.cateringServingTime"
+                        placeholder="Select Serving Time"
+                        :picker-options="{
+                        start: '08:00',
+                        step: '00:15',
+                        end: '23:00'
+                    }">
+                </el-time-select>
             </div></el-col>
         </el-row>
     </el-row>
@@ -163,12 +214,11 @@
                     </template>
                 </el-table-column>
             </el-table>
-
         </el-row>
     </div>
 
     <div class="button">
-    <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
+        <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
     </div>
 </div>
 </body>
@@ -181,36 +231,38 @@
                 formData: {
                     title: '',
                     date: '',
-                    time: '',
+                    startTime: '',
+                    endTime: '',
+                    room: null,
+                    tag: '',
                     speaker: '',
                     responsible: '',
-                    tableData: [{
-                        type: '',
-                        staff: '',
-                        company: '',
-                        contact: '',
-                        email: '',
-                        location: '',
-                        av: '',
-                        note: ' '
-                    }],
+                    type: '',
+                    staff: '',
+                    company: '',
+                    contact: '',
+                    email: '',
+                    site: '',
+                    av: '',
+                    note: '',
+                    // catering fields
+                    cateringType: '',
+                    cateringCount: 0,
+                    beverageType: '',
+                    dietaryRequirements: '',
+                    cateringServingTime: '',
+                     // Initialize table data
+                tableData: [
+                    { type: '', staff: '', company: '', contact: '', email: '', site: '', av: '', note: '' }
+                ]
                 },
-                room: [{
-                    value: 'option 1',
-                    label: 'meeting room 1'
-                }, {
-                    value: 'option 2',
-                    label: 'meeting room 2'
-                }, {
-                    value: 'option 3',
-                    label: 'meeting room 3'
-                }, {
-                    value: 'option 4',
-                    label: 'meeting room 4'
-                }, {
-                    value: 'option 5',
-                    label: 'meeting room 5'
-                }],
+                roomOptions: [
+                    { value: 1, label: 'Meeting Room 1' },
+                    { value: 2, label: 'Meeting Room 2' },
+                    { value: 3, label: 'Meeting Room 3' },
+                    { value: 4, label: 'Meeting Room 4' },
+                    { value: 5, label: 'Meeting Room 5' }
+                ],
                 tag: [{
                     value: 'option 1',
                     label: 'Technology'
@@ -226,8 +278,7 @@
                 }, {
                     value: 'option 5',
                     label: 'Marketing'
-                },
-                {
+                }, {
                     value: 'option 6',
                     label: 'Real Estate'
                 }],
@@ -244,7 +295,6 @@
             handleButtonClick() {
                 this.getFormData();
             },
-
             getFormData() {
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
@@ -255,14 +305,22 @@
                     tag: this.formData.tag,
                     speaker: this.formData.speaker,
                     responsible: this.formData.responsible,
-                    staff: this.formData.tableData[0].staff,
-                    type: this.formData.tableData[0].type,
-                    company: this.formData.tableData[0].company,
-                    contact: this.formData.tableData[0].contact,
-                    email: this.formData.tableData[0].email,
-                    site: this.formData.tableData[0].site,
-                    av: this.formData.tableData[0].av,
-                    note: this.formData.tableData[0].note
+                    staff: this.formData.staff,
+                    type: this.formData.type,
+                    company: this.formData.company,
+                    contact: this.formData.contact,
+                    email: this.formData.email,
+                    site: this.formData.site,
+                    av: this.formData.av,
+                    note: this.formData.note,
+                    // Catering fields
+                    cateringType: this.formData.cateringType,
+                    cateringCount: this.formData.cateringCount,
+                    beverageType: this.formData.beverageType,
+                    dietaryRequirements: this.formData.dietaryRequirements,
+                    cateringServingTime: this.formData.cateringServingTime,
+                    // Include table data
+                    tableData: this.formData.tableData
                 };
                 console.log(eventData);
                 axios.post('/api/events/create', eventData).then(response => {
@@ -274,11 +332,10 @@
                     } else {
                         alert('Event not created');
                     }
-
                 })
-                    .catch(error => {
-                        console.log('Error creating event', error);
-                    });
+                .catch(error => {
+                    console.log('Error creating event', error);
+                });
             }
         }
     });
