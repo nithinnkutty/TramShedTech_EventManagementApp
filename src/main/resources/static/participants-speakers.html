@@ -48,6 +48,8 @@
             <td>
                 <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
+                <!-- Add email button -->
+                <button class="btn email-btn" @click="sendEmail(participantSpeaker.email)"><i class="fas fa-envelope"></i> Email</button>
             </td>
         </tr>
         </tbody>

@@ -79,6 +79,9 @@ new Vue({
         cancelEdit() {
             this.editMode = false;
             this.currentParticipantSpeaker = {};
+        },
+        sendEmail(email) {
+            window.location.href = `mailto:${email}`;
         }
     }
 });
