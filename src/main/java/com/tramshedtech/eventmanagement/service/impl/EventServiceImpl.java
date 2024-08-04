@@ -5,12 +5,10 @@ import com.tramshedtech.eventmanagement.mapper.EventMapper;
 import com.tramshedtech.eventmanagement.service.EventService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
-
     @Resource
     private EventMapper eventMapper;
 
@@ -27,11 +25,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public Long addEvent(Event event) {
         boolean r = eventMapper.add(event);
-        if (r == true){
+        if (r) {
             return event.getId();
         } else {
+            // Add logging to capture the event object being inserted
+            System.out.println("Failed to insert event: " + event);
             return 0L;
         }
-
     }
 }
