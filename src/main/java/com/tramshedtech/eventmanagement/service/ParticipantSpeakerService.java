@@ -10,4 +10,5 @@ public interface ParticipantSpeakerService {
     boolean insert(ParticipantSpeaker participantSpeaker);
     boolean update(ParticipantSpeaker participantSpeaker);
     boolean delete(int id);
+    String publish(int id);
 }
