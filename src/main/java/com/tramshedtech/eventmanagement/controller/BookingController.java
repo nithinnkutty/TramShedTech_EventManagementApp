@@ -85,20 +85,20 @@ public class BookingController {
         String av = String.join(",", (List<String>) bookingData.get("av"));
         String payment = (String) bookingData.get("payment");
         String message = (String) bookingData.get("message");
-//        String img = (String) bookingData.get("img");
+        String img = (String) bookingData.get("img");
 
-
-//        List<String> imgList = (List<String>) bookingData.get("img");
-//        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
-
-        // 处理 img 字段，可以是字符串或者列表
-        Object imgObj = bookingData.get("img");
-        String img;
-        if (imgObj instanceof List) {
-            img = String.join(",", (List<String>) imgObj);
-        } else {
-            img = (String) imgObj;
-        }
+//
+// //        List<String> imgList = (List<String>) bookingData.get("img");
+// //        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+//
+//         // 处理 img 字段，可以是字符串或者列表
+//         Object imgObj = bookingData.get("img");
+//         String img;
+//         if (imgObj instanceof List) {
+//             img = String.join(",", (List<String>) imgObj);
+//         } else {
+//             img = (String) imgObj;
+//         }
 
         Bookings booking = new Bookings();
         booking.setRoomNumber(roomNumber);
@@ -191,6 +191,8 @@ public class BookingController {
             return responseResult;
         }
     }
+
+
 
 
     @PostMapping("/update")
