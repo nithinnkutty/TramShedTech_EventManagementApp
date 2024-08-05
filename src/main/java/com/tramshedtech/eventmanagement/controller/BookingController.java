@@ -39,24 +39,24 @@ public class BookingController {
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            System.out.println("Received file: " + file.getOriginalFilename()); // 添加调试信息
-            // 获取原始文件名并清理路径
+            System.out.println("Received file: " + file.getOriginalFilename()); // add debug info
+            // get the original file name
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            // 构建目标文件路径
+            // create a Path object
             Path path = Paths.get(uploadDir + "/" + fileName);
-            // 确保目录存在
+            // create directories if they don't exist
             Files.createDirectories(path.getParent());
-            // 保存文件到指定路径
+            // copy the file to the target location
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            // 构建文件URL
-            String fileUrl = "/uploads/" + fileName; // 使用相对URL
-            // 创建响应对象
+            // create the file URL
+            String fileUrl = "/uploads/" + fileName; // use relative URL
+            // create a response object
             Map<String, String> response = new HashMap<>();
             response.put("url", fileUrl);
-            // 返回响应对象
+            // return the response object
             return ResponseEntity.ok(response);
         } catch (IOException ex) {
-            // 处理文件上传错误
+            // log the error
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -89,9 +89,9 @@ public class BookingController {
 
 //
 // //        List<String> imgList = (List<String>) bookingData.get("img");
-// //        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+// //        String img = String.join(",", imgList); // Converts imgList to a comma-separated string
 //
-//         // 处理 img 字段，可以是字符串或者列表
+//         // Work with img fields, which can be strings or lists
 //         Object imgObj = bookingData.get("img");
 //         String img;
 //         if (imgObj instanceof List) {
@@ -174,10 +174,10 @@ public class BookingController {
         if (booking != null) {
             List<String> imgUrls = new ArrayList<>();
             for (String img : booking.getImg().split(",")) {
-                imgUrls.add("/uploads/" + img); // 根据实际路径调整
+                imgUrls.add("/uploads/" + img);
             }
             booking.setImg(String.join(",", imgUrls));
-            System.out.println("Booking imgUrls: " + imgUrls); // 添加调试信息
+            System.out.println("Booking imgUrls: " + imgUrls); // add debug info
 
             ResponseResult responseResult = new ResponseResult();
             responseResult.setCode(200);
@@ -221,7 +221,7 @@ public class BookingController {
 
 
 //        List<String> imgList = (List<String>) bookingData.get("img");
-//        String img = String.join(",", imgList); // 将 imgList 转换为逗号分隔的字符串
+//        String img = String.join(",", imgList); // Converts imgList to a comma-separated string
 
         Object imgObj = bookingData.get("img");
         String img = "";

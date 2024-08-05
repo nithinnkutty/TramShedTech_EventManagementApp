@@ -411,11 +411,11 @@
                 axios.get(`/booking/${row.id}`)
                     .then(response => {
                         const data = response.data.data;
-                        // 确保img字段是数组
+                        // Make sure the img field is an array
                         const imgList = data.img ? data.img.split(",").map(url => ({
-                            name: url.split("/").pop(), // 提取文件名
-                            url: url, // 文件URL
-                            uid: url, // 使用URL作为唯一ID
+                            name: url.split("/").pop(), // Extract file name
+                            url: url,
+                            uid: url, // Use the URL as the unique identifier
                         })) : [];
                         this.editForm = {
                             id: data.id,
@@ -427,9 +427,9 @@
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
                             payment: data.payment || '',
                             message: data.message || '',
-                            img: imgList // 设置img字段为数组
+                            img: imgList // Ensure array
                         };
-                        this.dialogFormVisible = true; // 显示编辑表单
+                        this.dialogFormVisible = true; // display edit form
                     })
                     .catch(error => {
                         console.error("There was an error fetching the booking data!", error);
@@ -438,7 +438,7 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        // 在提交之前，将img字段转换为逗号分隔的字符串
+                        // Convert the img field to a comma-separated string before committing
                         const imgString = this.editForm.img.map(file => file.url).join(",");
                         const updatedForm = { ...this.editForm, img: imgString };
                         axios.post(`/booking/update`, updatedForm)
@@ -447,8 +447,8 @@
                                     message: 'Successfully updated!',
                                     type: 'success'
                                 });
-                                this.dialogFormVisible = false; // 关闭对话框
-                                this.fetchTableData(); // 刷新表格数据
+                                this.dialogFormVisible = false; // Close the dialog box
+                                this.fetchTableData(); // Refresh the table data
                             })
                             .catch(error => {
                                 console.error("There was an error updating the booking data!", error);

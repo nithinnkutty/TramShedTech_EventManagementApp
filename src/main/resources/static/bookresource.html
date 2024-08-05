@@ -244,7 +244,7 @@
                             ...this.ruleForm,
                             startDate: this.ruleForm.daterange[0],
                             endDate: this.ruleForm.daterange[1],
-                            img: imgNames  // 将img数组转换为逗号分隔的字符串
+                            img: imgNames  // Converts imgList to a comma-separated string
                         };
                         console.log(formData);
                         axios.post('/booking/add', formData)
