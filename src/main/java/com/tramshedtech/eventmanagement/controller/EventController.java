@@ -1,7 +1,9 @@
 package com.tramshedtech.eventmanagement.controller;
 
 import com.tramshedtech.eventmanagement.service.EventService;
+import com.tramshedtech.eventmanagement.service.FeedbackService;
 import com.tramshedtech.eventmanagement.entity.Event;
+import com.tramshedtech.eventmanagement.entity.Feedback;
 import jakarta.annotation.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,9 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private FeedbackService feedbackService;
 
     @GetMapping
     public ResponseResult<List<Event>> getAllEvents() {
@@ -86,5 +91,20 @@ public class EventController {
                 .setData(eventTitles);
     }
 
+    @PostMapping("/{eventId}/feedback")
+    public ResponseResult addFeedback(@PathVariable Long eventId, @RequestBody Feedback feedback) {
+        feedback.setEventId(eventId);
+        boolean success = feedbackService.addFeedback(feedback);
+        return new ResponseResult().setCode(success ? 200 : 500).setStatus(success ? ResponseStatus.SUCCESS : ResponseStatus.FAIL);
+    }
+
+    @GetMapping("/{eventId}/feedback")
+    public ResponseResult<List<Feedback>> getFeedbackByEventId(@PathVariable Long eventId) {
+        List<Feedback> feedbackList = feedbackService.getFeedbackByEventId(eventId);
+        return new ResponseResult<List<Feedback>>()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage("Feedback retrieved successfully")
+                .setData(feedbackList);
+    }
 
 }
