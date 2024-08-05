@@ -5,6 +5,7 @@ import com.tramshedtech.eventmanagement.service.FeedbackService;
 import com.tramshedtech.eventmanagement.entity.Event;
 import com.tramshedtech.eventmanagement.entity.Feedback;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,7 +82,18 @@ public class EventController {
             return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
         }
     }
-    
+
+    @GetMapping("/getRoom/{eventId}")
+    public ResponseEntity<String> getAllRoomName(@PathVariable int eventId) {
+        try {
+            String roomName = eventService.getAllRoomName(eventId);
+            return ResponseEntity.ok(roomName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving room name");
+        }
+    }
+
     @GetMapping("/titles")
     public ResponseResult<List<String>> getAllEventTitles() {
         List<String> eventTitles = eventService.getAllEventTitles();
