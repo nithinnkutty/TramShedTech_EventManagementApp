@@ -142,11 +142,11 @@
                                 label="Room Name"
                                 width="180">
                         </el-table-column>
-<!--                        <el-table-column-->
-<!--                                prop="postcode"-->
-<!--                                label="Postcode"-->
-<!--                                width="180">-->
-<!--                        </el-table-column>-->
+                        <!--                        <el-table-column-->
+                        <!--                                prop="postcode"-->
+                        <!--                                label="Postcode"-->
+                        <!--                                width="180">-->
+                        <!--                        </el-table-column>-->
                         <el-table-column
                                 prop="location"
                                 label="Location">
@@ -424,7 +424,7 @@
                             postcode: data.postcode || '',
                             location: data.location || '',
                             daterange: [data.startDate, data.endDate],
-                            av: Array.isArray(data.av) ? data.av : data.av.split(","), // 确保av是数组
+                            av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
                             payment: data.payment || '',
                             message: data.message || '',
                             img: imgList // 设置img字段为数组
