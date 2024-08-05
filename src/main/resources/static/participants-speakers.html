@@ -32,7 +32,7 @@
             <option v-for="event in events" :key="event.id" :value="event.title">{{ event.title }}</option>
         </select>
         <input type="text" v-model="newParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
-        <textarea v-model="newParticipantSpeaker.bio" placeholder="Professional Bio"></textarea>
+        <textarea v-model="newParticipantSpeaker.bio" placeholder="Professional Bio/LinkedIn Profile"></textarea>
         <input type="text" v-model="newParticipantSpeaker.multipleRoles" placeholder="Multiple Roles">
         <button type="submit" class="btn add-btn">Add</button>
     </form>
@@ -46,7 +46,7 @@
             <th>Status</th>
             <th>Event Participation</th>
             <th>Relationship with Company</th>
-            <th>Professional Bio</th>
+            <th>Professional Bio/LinkedIn Profile</th>
             <th>Multiple Roles</th>
             <th>Actions</th>
         </tr>
@@ -90,10 +90,11 @@
                 <option value="Declined">Declined</option>
             </select>
             <select v-model="currentParticipantSpeaker.eventParticipation" required>
+                <option value="" disabled selected hidden>Event Participation</option>
                 <option v-for="event in events" :key="event.id" :value="event.title">{{ event.title }}</option>
             </select>
             <input type="text" v-model="currentParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
-            <textarea v-model="currentParticipantSpeaker.bio" placeholder="Professional Bio"></textarea>
+            <textarea v-model="currentParticipantSpeaker.bio" placeholder="Professional Bio/LinkedIn Profile"></textarea>
             <input type="text" v-model="currentParticipantSpeaker.multipleRoles" placeholder="Multiple Roles">
             <button type="submit" class="btn update-btn">Update</button>
             <button type="button" class="btn cancel-btn" @click="cancelEdit">Cancel</button>
