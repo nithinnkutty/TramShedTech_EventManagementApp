@@ -46,4 +46,10 @@ public class ParticipantSpeakerController {
         boolean success = participantSpeakerService.delete(id);
         return new ResponseResult<Boolean>().setCode(success ? 200 : 500).setStatus(success ? ResponseStatus.SUCCESS : ResponseStatus.FAIL).setData(success);
     }
+
+    @PostMapping("/{id}/publish")
+    public ResponseResult<String> publish(@PathVariable int id) {
+        String publishUrl = participantSpeakerService.publish(id);
+        return new ResponseResult<String>().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(publishUrl);
+    }
 }
