@@ -133,6 +133,7 @@
             token: '',
             username: '',
             position: 3,
+            department: '',
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
@@ -143,6 +144,8 @@
                 this.fetchAvatar();
                 this.getUsername();
                 this.getUserPosition();
+                localStorage.setItem('position', JSON.stringify(this.position));
+                localStorage.setItem('department', JSON.stringify(this.department));
             }
 
         },
@@ -155,6 +158,9 @@
                 })
                     .then(response => {
                         this.position = response.data.data.position;
+                        this.department = response.data.data.department;
+                        console.log(this.position);
+                        console.log(this.department);
                     })
                     .catch(error => {
                         console.error('Failed to fetch position:', error);

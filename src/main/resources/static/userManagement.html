@@ -68,20 +68,19 @@
             <div>
                 <el-row class="custom-row">
                     <el-col>
-                        <el-button type="primary" icon="el-icon-plus" size="medium" @click="outerVisible = true" class="custom-button">Add user</el-button>
-                        <el-upload action="http://localhost:8060/excel/upload" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
+                        <el-button type="primary" icon="el-icon-plus" size="medium" @click="innerVisibleAdd = true" class="custom-button">Add user</el-button>
+                        <el-upload action="/files/excel" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
                             <el-button icon="el-icon-upload2" size="medium">Import</el-button>
                         </el-upload>
-                        <download-excel class="export-excel-wrapper custom-export" :data="officeleavelist" name="请假申请表.xls">
+                        <download-excel class="export-excel-wrapper custom-export" :data="userList" name="Users Table.xls">
                             <el-button icon="el-icon-download" size="medium">Derive</el-button>
                         </download-excel>
                         <el-popover placement="top" width="160" v-model="visible" class="custom-popover">
-                            <p>选择排序规则</p>
+                            <p>Selection rules</p>
                             <div style="text-align: right; margin: 0">
-                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('beginDate')">按开始时间</el-button>
-                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('summitDate')">按提交时间</el-button>
-                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('orderStatus')">按审批状态</el-button>
-                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('submitter')">按提交人员</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('beginDate')">By Birthdays</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('orderStatus')">By Position</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('submitter')">By Department</el-button>
                             </div>
                             <el-button slot="reference" icon="el-icon-s-data" size="medium">排序</el-button>
                         </el-popover>
@@ -148,6 +147,78 @@
             </el-row>
         </el-main>
     </el-container>
+
+    <el-dialog
+            width="40%"
+            title="Add New User"
+            :visible.sync="innerVisibleAdd"
+            append-to-body>
+        <el-form :model="userListAdd" :rules="rules2" ref="userListAdd" label-width="120px">
+            <el-form-item label="User Account" prop="account">
+                <el-input placeholder="Please enter username" v-model="userListAdd.account"></el-input>
+            </el-form-item>
+            <el-form-item label="User Password" prop="password">
+                <el-input placeholder="Please enter password" v-model="userListAdd.password" type="password"></el-input>
+            </el-form-item>
+            <el-form-item label="User Email" prop="email">
+                <el-input placeholder="Please enter email" v-model="userListAdd.email" type="email"></el-input>
+            </el-form-item>
+            <el-form-item label="User Department" prop="department">
+                <el-select v-model="userListAdd.did" placeholder="Please select department">
+                    <el-option
+                            v-for="item in options"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Position" prop="position">
+                <el-select v-model="userListAdd.pid" placeholder="Please select position">
+                    <el-option
+                            v-for="item in options2"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Gender" prop="gender">
+                <el-select v-model="userListAdd.sex" placeholder="Please select gender">
+                    <el-option
+                            v-for="item in options3"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Birthday" prop="birthday">
+                <el-date-picker
+                        size="medium"
+                        v-model="userListAdd.birthday"
+                        style="width: 100%;"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="Select birthday">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="User's Phone" prop="phone">
+                <el-input placeholder="Please enter user's phone" v-model="userListAdd.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="User's WeChat" prop="wechat">
+                <el-input placeholder="Please enter user's WeChat" v-model="userListAdd.wechat"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitFormAdd('userListAdd')" :plain="true">Add</el-button>
+                <el-button @click="resetForm('userListAdd')">Reset</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
 </div>
 
 </body>
@@ -178,48 +249,24 @@
                         wechat: "",
                         zip: ""
                     }],
-                officeleavelist2:
-                    [{
-                        id: "",
-                        type: "",
-                        reason: "",
-                        beginDate: "",
-                        endDate: "",
-                        days: "",
-                        summitDate: "",
-                        orderStatus: "",
-                        submitter: "",
-                        approver: "",
-                        approverTime: "",
-                        relatedBusiness: "",
-                        businessType: "",
-                        notifyPerson: "",
-                        approvalType: "",
-                        zip: ""
-                    }]
-                ,
-                pagesize: 10, // 当前页大小
-                total: 100, // 总条数
-                currentPage: 1, // 当前页
+                innerVisibleAdd: false,
+                outerVisible: false,
+                position: '',
+                department: '',
+                pagesize: 10, // Current Page Size
+                total: 100, // total number of articles
+                currentPage: 1, // Current Page
                 multipleSelection: [],
                 options: [{
-                    id: "1", status: "富冈义勇"
+                    id: "1", status: "Tomioka Yoshihiro"
                 }],
                 options2: [{
-                    id: "1", type: "我妻善逸"
+                    id: "1", type: "Kochou Shinobu"
                 }],
-                options3: [{
-                    id: "1", type: "灶门碳治郎"
-                }],
-                options4: [{
-                    id: "1", name: "嘴平伊之助"
-                }],
-                options5: [{
-                    id: "1", name: "栗花落香奈乎"
-                }],
-                options6: [{
-                    id: "1", level: "宇髓天元"
-                }],
+                options3: [
+                    { id: "1", name: "Male" },
+                    { id: "2", name: "Female" }
+                ],
                 value: '',
                 id: '',
                 account: "",
@@ -227,165 +274,56 @@
                 pid: "",
                 sex: "",
                 birthday: "",
-                outerVisible: false,
-                innerVisible1: false,
                 innerVisible2: false,
                 innerVisible3: false,
                 innerVisible4: false,
                 innerVisible5: false,
                 delid: 1,
                 fullscreenLoading: false,
-                ruleForm: {
-                    type: "",
-                    days: "",
-                    reason: '',
-                    beginDate: "",
-                    relatedBusiness: "",
-                    businessType: "",
-                    approver: "",
-                    notifyPerson: [],
-                    delivery: false,
-                    zip: ""
-                },
-                ruleForm2: {
-                    days: "",
-                    beginDate: "",
-                    address: "",
-                    fee: "",
-                    reason: "",
-                    relatedBusiness: "",
-                    businessType: "",
-                    approver: "",
-                    notifyPerson: [],
-                    delivery: false,
-                },
-                ruleForm3: {
-                    loanAmount: "",
-                    loanReason: "",
-                    relatedBusiness: "",
-                    businessType: "",
-                    approver: "",
-                    notifyPerson: [],
-                    delivery: false,
-                },
-                ruleForm4: {
-                    visitCustomer: "",
-                    visitReason: "",
-                    visitTime: "",
-                    relatedBusiness: "",
-                    approver: "",
-                    notifyPerson: [],
-                    delivery: false,
-                },
-                ruleForm5: {
-                    emergency: "",
-                    requestContent: "",
-                    relatedBusiness: "",
-                    businessType: "",
-                    approver: "",
-                    notifyPerson: [],
-                    delivery: false,
-                },
+                userListAdd:
+                    [{
+                        account: "",
+                        password: "",
+                        email: "",
+                        did: "",
+                        pid: "",
+                        sex: "",
+                        birthday: "",
+                        phone: "",
+                        wechat: "",
+                    }],
                 dialogVisible: false,
-                rules: {
-                    days: [
-                        {required: true, message: '请输入请假天数', trigger: 'blur'},
-                        {type: 'number', message: '天数必须为数字值'}
-                    ],
-                    type: [
-                        {required: true, message: '请选择请假类型', trigger: 'change'}
-                    ],
-                    beginDate: [
-                        {type: 'string', required: true, message: '请选择日期', trigger: 'blur'}
-                    ],
-                    notifyPerson: [
-                        {type: 'array', required: true, message: '请至少选择一个通知人员', trigger: 'change'}
-                    ],
-                    reason: [
-                        {required: true, message: '请填写请假原因', trigger: 'blur'},
-                        {min: 1, max: 60, message: '长度在 1 到 60 个字符', trigger: 'blur'}
-                    ],
-                    approver: [
-                        {required: true, message: '请选择审批人员', trigger: 'change'}
-                    ],
-                },
                 rules2: {
-                    address: [
-                        {required: true, message: '请输入出差地址', trigger: 'blur'},
-                        {min: 1, max: 25, message: '长度在 1 到 25 个字符', trigger: 'blur'}
+                    account: [
+                        {required: true, message: 'User name cannot be empty', trigger: 'blur'},
+                        {min: 1, max: 25, message: '1 to 25 characters in length', trigger: 'blur'}
                     ],
-                    days: [
-                        {required: true, message: '请输入请假天数', trigger: 'blur'},
-                        {type: 'number', message: '天数必须为数字值'}
+                    password: [
+                        {required: true, message: 'User password cannot be empty', trigger: 'blur'},
+                        {min: 6, message: 'Minimum password length of 6 digits', trigger: 'blur'}
                     ],
-                    fee: [
-                        {required: true, message: '请输入预算费用', trigger: 'blur'},
-                        {type: 'number', message: '费用必须为数字值'}
+                    email: [
+                        { required: true, message: 'Email cannot be empty', trigger: 'blur' },
+                        { type: 'email', message: 'Please enter a valid e-mail address', trigger: ['blur', 'change'] }
                     ],
-                    type: [
-                        {required: true, message: '请选择请假类型', trigger: 'change'}
+                    position: [
+                        {required: true, message: 'Please select the user\'s position', trigger: 'change'}
                     ],
-                    beginDate: [
-                        {type: 'string', required: true, message: '请选择日期', trigger: 'blur'}
+                    department: [
+                        {required: true, message: 'Please select the user\'s department', trigger: 'change'}
                     ],
-                    notifyPerson: [
-                        {type: 'array', required: true, message: '请至少选择一个通知人员', trigger: 'change'}
+                    gender: [
+                        {required: true, message: 'Please select the user\'s gender', trigger: 'change'}
                     ],
-                    reason: [
-                        {required: true, message: '请填写请假原因', trigger: 'blur'},
-                        {min: 1, max: 60, message: '长度在 1 到 60 个字符', trigger: 'blur'}
+                    birthday: [
+                        {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
                     ],
-                    approver: [
-                        {required: true, message: '请选择审批人员', trigger: 'change'}
+                    phone: [
+                        { required: true, message: 'User\'s phone cannot be empty', trigger: 'blur' },
+                        { pattern: /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/, message: 'Please enter a valid UK cell phone number', trigger: ['blur', 'change'] }
                     ],
-                },
-                rules3: {
-                    loanReason: [
-                        {required: true, message: '请输入借款原因', trigger: 'blur'},
-                        {min: 1, max: 25, message: '长度在 1 到 50 个字符', trigger: 'blur'}
-                    ],
-                    loanAmount: [
-                        {required: true, message: '请输入借款金额', trigger: 'blur'},
-                        {type: 'number', message: '金额必须为数字值'}
-                    ],
-                    notifyPerson: [
-                        {type: 'array', required: true, message: '请至少选择一个通知人员', trigger: 'change'}
-                    ],
-                    approver: [
-                        {required: true, message: '请选择审批人员', trigger: 'change'}
-                    ],
-                },
-                rules4: {
-                    visitCustomer: [
-                        {required: true, message: '请选择拜访客户类型', trigger: 'change'}
-                    ],
-                    bisitTime: [
-                        {type: 'string', required: true, message: '请选择拜访时间', trigger: 'blur'}
-                    ],
-                    notifyPerson: [
-                        {type: 'array', required: true, message: '请至少选择一个通知人员', trigger: 'change'}
-                    ],
-                    visitReason: [
-                        {required: true, message: '请填写拜访原因', trigger: 'blur'},
-                        {min: 1, max: 60, message: '长度在 1 到 60 个字符', trigger: 'blur'}
-                    ],
-                    approver: [
-                        {required: true, message: '请选择审批人员', trigger: 'change'}
-                    ],
-                },
-                rules5: {
-                    emergency: [
-                        {required: true, message: '请选择紧急状态类型', trigger: 'change'}
-                    ],
-                    requestContent: [
-                        {required: true, message: '请填写请示内容', trigger: 'blur'},
-                        {min: 1, max: 60, message: '长度在 1 到 60 个字符', trigger: 'blur'}
-                    ],
-                    notifyPerson: [
-                        {type: 'array', required: true, message: '请至少选择一个通知人员', trigger: 'change'}
-                    ],
-                    approver: [
-                        {required: true, message: '请选择审批人员', trigger: 'change'}
+                    wechat: [
+                        {required: true, message: 'Please enter the user\'s wechat', trigger: 'blur'}
                     ],
                 },
             }
@@ -394,6 +332,8 @@
             this.showpage();
             this.showDepartments();
             this.showOptions();
+            this.position = JSON.parse(localStorage.getItem('position'));
+            this.department = JSON.parse(localStorage.getItem('department'));
         },
         methods: {
             handleSizeChange: function (size) {
@@ -454,6 +394,35 @@
                 this.did = "",
                 this.sex = "",
                 this.birthday = "";
+            },
+            submitFormAdd(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$axios.post("/officeleave/add",this.ruleForm).then(res => {
+                            console.log('ytwdbz')
+                            console.log(res.data)
+                            if(res.data == true){
+                                this.innerVisibleAdd = false
+                                this.$message({
+                                    message: 'Add successfully',
+                                    type: 'success'
+                                });
+                                this.showpage()
+                                this.ruleForm = {type:"",days:"",reason: '',summitDate:"",relatedBusiness:"",businessType:"",approver:"",notifyPerson:[]};
+                            }
+                        })
+                    } else {
+                        this.$message({
+                            message: 'Add fail',
+                            type: 'error'
+                        });
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
             },
         }
     });
