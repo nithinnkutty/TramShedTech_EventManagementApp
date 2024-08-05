@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Participants and Speakers</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/participants_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="/js/vue.js" defer></script>
     <script src="/js/axios.min.js" defer></script>
@@ -16,15 +16,24 @@
         <input type="text" v-model="newParticipantSpeaker.name" placeholder="Name" required>
         <input type="email" v-model="newParticipantSpeaker.email" placeholder="Email" required>
         <input type="text" v-model="newParticipantSpeaker.company" placeholder="Company" required>
-        <select v-model="newParticipantSpeaker.role" required>
+        <select v-model="newParticipantSpeaker.role" required class="placeholder">
+            <option value="" disabled selected hidden>Role</option>
             <option value="Speaker">Speaker</option>
             <option value="Panelist">Panelist</option>
         </select>
-        <select v-model="newParticipantSpeaker.status" required>
+        <select v-model="newParticipantSpeaker.status" required class="placeholder">
+            <option value="" disabled selected hidden>Status</option>
             <option value="Invited">Invited</option>
             <option value="Confirmed">Confirmed</option>
             <option value="Declined">Declined</option>
         </select>
+        <select v-model="newParticipantSpeaker.eventParticipation" required class="placeholder">
+            <option value="" disabled selected hidden>Event Participation</option>
+            <option v-for="event in events" :key="event.id" :value="event.title">{{ event.title }}</option>
+        </select>
+        <input type="text" v-model="newParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
+        <textarea v-model="newParticipantSpeaker.bio" placeholder="Professional Bio"></textarea>
+        <input type="text" v-model="newParticipantSpeaker.multipleRoles" placeholder="Multiple Roles">
         <button type="submit" class="btn add-btn">Add</button>
     </form>
     <table class="styled-table">
@@ -35,6 +44,10 @@
             <th>Company</th>
             <th>Role</th>
             <th>Status</th>
+            <th>Event Participation</th>
+            <th>Relationship with Company</th>
+            <th>Professional Bio</th>
+            <th>Multiple Roles</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -45,12 +58,19 @@
             <td>{{ participantSpeaker.company }}</td>
             <td>{{ participantSpeaker.role }}</td>
             <td>{{ participantSpeaker.status }}</td>
+            <td>{{ participantSpeaker.eventParticipation }}</td>
+            <td>{{ participantSpeaker.relationshipWithCompany }}</td>
+            <td>{{ participantSpeaker.bio }}</td>
+            <td>{{ participantSpeaker.multipleRoles }}</td>
             <td>
                 <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
-                <!-- Add email button -->
                 <button class="btn email-btn" @click="sendEmail(participantSpeaker.email)"><i class="fas fa-envelope"></i> Email</button>
+                <button class="btn publish-btn" @click="publishParticipantSpeaker(participantSpeaker)"><i class="fas fa-share-square"></i> Publish</button>
             </td>
+        </tr>
+        <tr v-if="participantSpeakers.length === 0">
+            <td colspan="10" style="text-align: center;">No data available</td>
         </tr>
         </tbody>
     </table>
@@ -69,10 +89,128 @@
                 <option value="Confirmed">Confirmed</option>
                 <option value="Declined">Declined</option>
             </select>
+            <select v-model="currentParticipantSpeaker.eventParticipation" required>
+                <option v-for="event in events" :key="event.id" :value="event.title">{{ event.title }}</option>
+            </select>
+            <input type="text" v-model="currentParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
+            <textarea v-model="currentParticipantSpeaker.bio" placeholder="Professional Bio"></textarea>
+            <input type="text" v-model="currentParticipantSpeaker.multipleRoles" placeholder="Multiple Roles">
             <button type="submit" class="btn update-btn">Update</button>
             <button type="button" class="btn cancel-btn" @click="cancelEdit">Cancel</button>
         </form>
     </div>
 </div>
 </body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            participantSpeakers: [],
+            events: [],  // Add events data
+            newParticipantSpeaker: {
+                name: '',
+                email: '',
+                company: '',
+                role: '',
+                status: '',
+                eventParticipation: '',
+                relationshipWithCompany: '',
+                bio: '',
+                multipleRoles: ''
+            },
+            currentParticipantSpeaker: {},
+            editMode: false
+        },
+        mounted() {
+            this.fetchParticipantSpeakers();
+            this.fetchEvents();  // Fetch events when component is mounted
+        },
+        methods: {
+            fetchParticipantSpeakers() {
+                axios.get('/participants-speakers')
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.participantSpeakers = response.data.data;
+                        } else {
+                            alert('Failed to fetch participants and speakers');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch participants and speakers:', error);
+                    });
+            },
+            fetchEvents() {
+                axios.get('/api/events')
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.events = response.data.data;
+                        } else {
+                            alert('Failed to fetch events');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch events:', error);
+                    });
+            },
+            addParticipantSpeaker() {
+                axios.post('/participants-speakers', this.newParticipantSpeaker)
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.participantSpeakers.push({ ...this.newParticipantSpeaker, id: response.data.data.id }); // Add the new entry with ID
+                            this.newParticipantSpeaker = { name: '', email: '', company: '', role: '', status: '', eventParticipation: '', relationshipWithCompany: '', bio: '', multipleRoles: '' };
+                        } else {
+                            alert('Failed to add participant/speaker');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to add participant/speaker:', error);
+                    });
+            },
+            editParticipantSpeaker(participantSpeaker) {
+                this.currentParticipantSpeaker = { ...participantSpeaker };
+                this.editMode = true;
+            },
+            updateParticipantSpeaker() {
+                axios.put(`/participants-speakers/${this.currentParticipantSpeaker.id}`, this.currentParticipantSpeaker)
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            const index = this.participantSpeakers.findIndex(ps => ps.id === this.currentParticipantSpeaker.id);
+                            this.$set(this.participantSpeakers, index, this.currentParticipantSpeaker);
+                            this.editMode = false;
+                            this.currentParticipantSpeaker = {};
+                        } else {
+                            alert('Failed to update participant/speaker');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to update participant/speaker:', error);
+                    });
+            },
+            deleteParticipantSpeaker(id) {
+                axios.delete(`/participants-speakers/${id}`)
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.participantSpeakers = this.participantSpeakers.filter(ps => ps.id !== id);
+                        } else {
+                            alert('Failed to delete participant/speaker');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to delete participant/speaker:', error);
+                    });
+            },
+            sendEmail(email) {
+                window.location.href = `mailto:${email}`;
+            },
+            publishParticipantSpeaker(participantSpeaker) {
+                // Logic to publish participant/speaker
+                alert(`Published ${participantSpeaker.name}`);
+            },
+            cancelEdit() {
+                this.editMode = false;
+                this.currentParticipantSpeaker = {};
+            }
+        }
+    });
+</script>
 </html>

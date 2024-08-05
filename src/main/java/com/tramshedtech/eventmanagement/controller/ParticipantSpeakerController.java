@@ -34,8 +34,9 @@ public class ParticipantSpeakerController {
         return new ResponseResult<Boolean>().setCode(success ? 200 : 500).setStatus(success ? ResponseStatus.SUCCESS : ResponseStatus.FAIL).setData(success);
     }
 
-    @PutMapping
-    public ResponseResult<Boolean> update(@RequestBody ParticipantSpeaker participantSpeaker) {
+    @PutMapping("/{id}")
+    public ResponseResult<Boolean> update(@PathVariable int id, @RequestBody ParticipantSpeaker participantSpeaker) {
+        participantSpeaker.setId(id);
         boolean success = participantSpeakerService.update(participantSpeaker);
         return new ResponseResult<Boolean>().setCode(success ? 200 : 500).setStatus(success ? ResponseStatus.SUCCESS : ResponseStatus.FAIL).setData(success);
     }

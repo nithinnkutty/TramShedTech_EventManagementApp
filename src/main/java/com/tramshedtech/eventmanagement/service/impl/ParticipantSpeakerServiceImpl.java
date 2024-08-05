@@ -40,7 +40,6 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
         return result;
     }
 
-
     @Override
     public boolean delete(int id) {
         return participantSpeakerMapper.delete(id);
