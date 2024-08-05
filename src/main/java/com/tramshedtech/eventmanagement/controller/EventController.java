@@ -76,5 +76,15 @@ public class EventController {
             return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
         }
     }
+    
+    @GetMapping("/titles")
+    public ResponseResult<List<String>> getAllEventTitles() {
+        List<String> eventTitles = eventService.getAllEventTitles();
+        return new ResponseResult<List<String>>()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage("Event titles retrieved successfully")
+                .setData(eventTitles);
+    }
+
 
 }

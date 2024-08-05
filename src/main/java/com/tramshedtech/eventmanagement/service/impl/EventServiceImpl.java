@@ -33,4 +33,9 @@ public class EventServiceImpl implements EventService {
             return 0L;
         }
     }
+
+    @Override
+    public List<String> getAllEventTitles() {
+        return eventMapper.getAllEventTitles();
+    }
 }
