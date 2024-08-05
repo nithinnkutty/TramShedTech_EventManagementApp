@@ -37,7 +37,7 @@
                             <p>Room: {{ event.room }}</p>
                         </div>
                         <div v-if="selectedFilter === 'completed'" class="feedback-button">
-                            <el-button type="primary" @click="showFeedbackForm(event)">Leave Feedback</el-button>
+                            <el-button type="primary" @click.stop="showFeedbackForm(event)">Leave Feedback</el-button> <!-- .stop modifier added -->
                         </div>
                     </el-card>
                 </el-col>
@@ -69,6 +69,6 @@
     </el-dialog>
 </div>
 
-<script src="/js/dashboard.js"></script> <!-- Added script reference to dashboard.js -->
+<script src="/js/dashboard.js"></script><!-- Added script reference to dashboard.js -->
 </body>
 </html>
