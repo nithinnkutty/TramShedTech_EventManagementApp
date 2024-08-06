@@ -10,4 +10,12 @@ public interface BookingMapper {
     boolean addBooking(Bookings book);
 
     List<String> getAllRoomName();
+
+    boolean updateBooking(Bookings book);
+
+    boolean softDeleteBooking(Integer id);
+
+    Bookings getBookingById(Integer id);
+
+    List<Bookings> searchAll();
 }

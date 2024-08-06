@@ -114,7 +114,7 @@
                     <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -147,9 +147,8 @@
             return {};
         },
         methods: {
-            bookResource() {
-                // Redirect to the booking page
-                window.location.href = 'bookresource.html';
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
             },
             viewResources() {
                 // Redirect to the view resources page

@@ -74,123 +74,130 @@
 
 
 <body>
-<div id="app" class="app-container">
-    <el-container>
-        <el-header>
-            <el-row :gutter="20">
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
-                </el-col>
-            </el-row>
-        </el-header>
-        <el-main>
-            <el-row>
-                <el-col :span="24">
-                    <div class="form-container">
-                        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-                            <el-form-item label="First Name" prop="firstName">
-                                <el-input v-model="ruleForm.firstName"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Last Name" prop="lastName">
-                                <el-input v-model="ruleForm.lastName"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Email" prop="email">
-                                <el-input v-model="ruleForm.email"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Location" prop="location">
-                                <el-select v-model="ruleForm.location" placeholder="Please select location">
-                                    <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
-                                    <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
-                                    <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
-                                    <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
-                                    <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
-                                    <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="Book resource between" prop="daterange">
-                                <el-date-picker
-                                        v-model="ruleForm.daterange"
-                                        type="datetimerange"
-                                        range-separator="to"
-                                        start-placeholder="Start date"
-                                        end-placeholder="End date"
-                                        :disabled-date="disabledDate"
-                                        style="width: 100%;">
-                                </el-date-picker>
-                            </el-form-item>
-                            <el-form-item label="AV Requirements" prop="av">
-                                <el-checkbox-group v-model="ruleForm.av">
-                                    <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
-                                    <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
-                                    <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
-                                    <el-checkbox label="Projector" name="Projector"></el-checkbox>
-                                    <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
-                                    <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
-                                </el-checkbox-group>
-                            </el-form-item>
-                            <el-form-item label="Payment method" prop="payment">
-                                <el-radio-group v-model="ruleForm.payment">
-                                    <el-radio label="Paypal"></el-radio>
-                                    <el-radio label="Applepay"></el-radio>
-                                    <el-radio label="Credit card"></el-radio>
-                                    <el-radio label="Debit card"></el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="Message">
-                                <el-input type="textarea" v-model="ruleForm.message"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
-                                <el-button @click="resetForm('ruleForm')">Reset</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                </el-col>
-            </el-row>
-            <!-- add other function here -->
-        </el-main>
-    </el-container>
+<div id="app">
+    <el-row :gutter="20">
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
+        </el-col>
+    </el-row>
+
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="180px" class="demo-ruleForm">
+        <el-form-item label="Room Number" prop="roomNumber">
+            <el-input v-model="ruleForm.roomNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="Room Name" prop="roomName">
+            <el-input v-model="ruleForm.roomName"></el-input>
+        </el-form-item>
+        <el-form-item label="Postcode" prop="postcode">
+            <el-input v-model="ruleForm.postcode"></el-input>
+        </el-form-item>
+        <el-form-item label="Location" prop="location">
+            <el-select v-model="ruleForm.location" placeholder="Please select location">
+                <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
+                <el-option label="Tramshed Tech, Grangetown" value="Tramshed Tech, Grangetown"></el-option>
+                <el-option label="Tramshed Tech Innovation Station, Newport" value="Tramshed Tech Innovation Station, Newport"></el-option>
+                <el-option label="Tramshed Tech Griffin Place, Newport" value="Tramshed Tech Griffin Place, Newport"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="Book resource between" prop="daterange">
+            <el-date-picker
+                    v-model="ruleForm.daterange"
+                    type="datetimerange"
+                    range-separator="to"
+                    start-placeholder="Start date"
+                    end-placeholder="End date"
+                    :disabled-date="disabledDate"
+                    style="width: 100%;">
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="AV Requirements" prop="av">
+            <el-checkbox-group v-model="ruleForm.av">
+                <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
+                <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
+                <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
+                <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
+                <el-checkbox label="Projector" name="Projector"></el-checkbox>
+                <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+        <!-- Add a warning prompt and set closable to false -->
+        <el-alert
+                title="Basic equipments we already have: a large TV screen, hybrid set-up, water."
+                type="warning"
+                :closable="false">
+        </el-alert>
+        <!-- New upload image form item -->
+        <el-form-item label="Upload Image" prop="img">
+            <el-upload
+                    action="/booking/upload"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove"
+                    :file-list="ruleForm.img"
+                    :before-upload="beforeUpload"
+                    :on-success="handleUploadSuccess"
+                    accept="image/*">
+                <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+        </el-form-item>
+        <el-form-item label="Payment method" prop="payment">
+            <el-radio-group v-model="ruleForm.payment">
+                <el-radio label="Paypal"></el-radio>
+                <el-radio label="Applepay"></el-radio>
+                <el-radio label="Credit card"></el-radio>
+                <el-radio label="Debit card"></el-radio>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Message">
+            <el-input type="textarea" v-model="ruleForm.message"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
+            <el-button @click="resetForm('ruleForm')">Reset</el-button>
+        </el-form-item>
+    </el-form>
 </div>
-
-
-
-
 <script>
+
     new Vue({
         el: '#app',
         data() {
             return {
+                searchQuery: '',
                 ruleForm: {
-                    firstName: '',
-                    lastName: '',
-                    email: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
                     location: '',
                     daterange: [],
                     av: [],
                     payment: '',
-                    message: ''
+                    message: '',
+                    img: []
                 },
                 rules: {
-                    firstName: [
-                        { required: true, message: 'Please enter your first name', trigger: 'blur' },
-                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
+                    roomNumber: [
+                        { required: true, message: 'Please enter the room number', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
                     ],
-                    lastName: [
-                        { required: true, message: 'Please enter your last name', trigger: 'blur' },
-                        { min: 3, max: 50, message: 'The length is 3 to 50 characters', trigger: 'blur' }
+                    roomName: [
+                        { required: true, message: 'Please enter the room name', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
                     ],
-                    email: [
-                        { required: true, message: 'Please enter your email address', trigger: 'blur' },
-                        { type: 'email', message: 'Please enter the correct email address', trigger: 'blur' }
+                    postcode: [
+                        { required: true, message: 'Please enter the postcode info', trigger: 'blur' },
                     ],
                     location: [
                         { required: true, message: 'Please select the location', trigger: 'change' }
@@ -205,31 +212,52 @@
                     payment: [
                         { required: true, message: 'Please select a payment method', trigger: 'change' }
                     ],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ],
                     message: [
                         { required: false }
                     ]
-                }
+                },
+                dialogImageUrl: '',
+                dialogVisible: false
             };
         },
         methods: {
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.ruleForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
             submitForm(formName) {
-                console.log(this.ruleForm);
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        const imgNames = this.ruleForm.img.map(item => item.name).join(',');
                         const formData = {
                             ...this.ruleForm,
+                            startDate: this.ruleForm.daterange[0],
+                            endDate: this.ruleForm.daterange[1],
+                            img: imgNames  // Converts imgList to a comma-separated string
                         };
-                        formData.startDate = this.ruleForm.daterange[0];
-                        formData.endDate = this.ruleForm.daterange[1];
                         console.log(formData);
                         axios.post('/booking/add', formData)
                             .then(response => {
                                 console.log(response);
-                                if (response.status === 200) {
+                                if (response.status === 200 && response.data.data) {
+                                    const newBookingId = response.data.data.id;
                                     this.$message({
                                         message: 'Resource booked successfully',
                                         type: 'success'
                                     });
+                                    localStorage.setItem("bookingId", newBookingId);
+                                    window.location.href = '/bookmanagement.html';
+                                } else {
+                                    alert('Resource booking failed');
                                 }
                             })
                             .catch(error => {
@@ -249,20 +277,21 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
+
             viewResources() {
-                // Redirect to the view resources page
                 window.location.href = 'viewresources.html';
             },
             bookaResource() {
-                // Redirect to the book a resource page
                 window.location.href = 'bookresource.html';
             },
             cancelBooking() {
-                // Redirect to the cancel booking page
                 window.location.href = 'cancel.html';
             },
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
+            },
             disabledDate(time) {
-                return time.getTime() < Date.now() - 86400000; // Disable dates before today
+                return time.getTime() < Date.now() - 86400000;
             },
             validateDateRange(rule, value, callback) {
                 const [start, end] = value;
@@ -273,16 +302,33 @@
                 } else {
                     callback();
                 }
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
             }
         }
     });
+
+
+
 </script>
-
-
-
-
-
-
 
 </body>
 </html>
