@@ -20,7 +20,7 @@ body {
 }
 
 .content {
-    display: flex;
+    /*display: flex;*/
     flex-direction: column;
     align-items: stretch; /* Centers content horizontally */
     padding: 20px; /* Uniform padding */
@@ -50,33 +50,70 @@ body {
 
 .event-card {
     display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensures content does not spill out */
+    border-radius: 8px; /* Rounded corners for a smoother look */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover effects */
+    cursor: pointer; /* Indicates the card is clickable */
+    background-color: #ffffff; /* Light background for the card */
+    display: flex;
     flex-direction: column; /* Ensures content is laid out vertically inside the card */
     height: 100%; /* Uses available height */
-    cursor: pointer; /* Change cursor to pointer on hover */
-    background-color: #fff; /* White background for each card */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
-    border-radius: 5px; /* Rounded corners */
+}
+
+.event-card:hover {
+    transform: translateY(-5px); /* Lift card up slightly on hover */
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
 }
 
 .event-card-img img {
-    width: 100%; /* Ensures image covers the width */
-    height: 150px; /* Fixed height for the image */
-    object-fit: cover; /* Ensures the image covers the assigned area without distortion */
+    width: 100%; /* Ensure image covers the full width of the card */
+    height: 200px; /* Fixed height for images */
+    object-fit: cover; /* Ensures images cover the area well without distortion */
 }
 
 .event-details {
-    padding: 10px; /* Padding inside the details for spacing */
-    flex-grow: 1; /* Allows the details section to take up remaining space */
+    padding: 10px; /* Spacious padding around the text content */
+    flex-grow: 1; /* Allows details to fill remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space between items */
 }
 
 .event-title {
+    font-size: 1.2em; /* Slightly larger font size */
+    font-weight: 600; /* Medium font weight for better readability */
+    color: #333; /* Darker text for better contrast */
+    margin-bottom: 8px; /* Space below the title */
+}
+
+p {
+    margin: 4px 0; /* Reduced margin for a compact look */
+    color: #666; /* Lighter text color for other details */
+    font-size: 0.9em; /* Slightly smaller font size for details */
+}
+
+.event-details .location {
+    font-weight: bold; /* Make location bold */
+    color: #007BFF; /* Example: blue color for location */
+}
+
+.event-details .completed {
+    color: #28a745; /* Bootstrap green for success, or choose your own color */
     font-weight: bold;
-    font-size: 1.2em; /* Larger font size for better readability */
+}
+
+.feedback-button {
+    margin-top: auto; /* Pushes the button to the bottom */
 }
 
 @media (max-width: 768px) {
     .event-col {
         flex: 1 1 100%; /* Stacks the tiles on smaller screens */
+    }
+    .event-card-img img {
+        height: 150px; /* Smaller images on mobile devices */
     }
 }
 

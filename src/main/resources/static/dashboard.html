@@ -44,12 +44,14 @@
                         </div>
                         <div class="event-details">
                             <p class="event-title">{{ event.title }}</p>
-                            <p>{{ event.date }} </p>
+                            <p>{{ event.date }}</p>
                             <p>{{ event.time }}</p>
-                            <p>Site: {{ event.site }}</p>
+                            <p class="location">Location: {{ event.site }}</p>
                             <p>Room: {{ event.room }}</p>
+                            <!-- Display 'Completed' if the event date is before today -->
+                            <p v-if="new Date(event.date) < new Date()" class="completed">Completed</p>
                         </div>
-                        <div v-if="selectedFilter === 'completed'" class="feedback-button">
+                        <div v-if="new Date(event.date) < new Date()" class="feedback-button">
                             <el-button type="primary" @click.stop="showFeedbackForm(event)">Leave Feedback</el-button> <!-- .stop modifier added -->
                         </div>
                     </el-card>
