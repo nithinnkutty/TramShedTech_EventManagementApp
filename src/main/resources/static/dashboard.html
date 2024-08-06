@@ -14,12 +14,25 @@
 <div id="app">
     <!-- Filter dropdown -->
     <el-row class="filter-row">
-        <el-select v-model="selectedFilter" placeholder="Select" @change="filterEvents">
-            <el-option label="All Events" value="all"></el-option>
-            <el-option label="Upcoming" value="upcoming"></el-option>
-            <el-option label="Completed" value="completed"></el-option>
-        </el-select>
-    </el-row>
+    <!-- Filter for event status -->
+    <el-select v-model="selectedFilter" placeholder="Select Status" @change="filterEvents">
+        <el-option label="All Events" value="all"></el-option>
+        <el-option label="Upcoming" value="upcoming"></el-option>
+        <el-option label="Completed" value="completed"></el-option>
+    </el-select>
+
+    <!-- Filter for event year with default 'All' option -->
+    <el-select v-model="selectedYear" placeholder="Select Year" @change="filterEvents">
+        <el-option label="All Years" value="all"></el-option> <!-- Default option to ignore year filter -->
+        <el-option v-for="year in uniqueYears" :key="year" :label="year" :value="year"></el-option>
+    </el-select>
+
+    <!-- Filter for event month with default 'All' option -->
+    <el-select v-model="selectedMonth" placeholder="Select Month" @change="filterEvents">
+        <el-option label="All Months" value="all"></el-option> <!-- Default option to ignore month filter -->
+        <el-option v-for="month in months" :key="month" :label="month" :value="month"></el-option>
+    </el-select>
+</el-row>
     <div class="container">
         <div class="content">
             <!-- Event tiles -->
@@ -31,12 +44,14 @@
                         </div>
                         <div class="event-details">
                             <p class="event-title">{{ event.title }}</p>
-                            <p>{{ event.date }} </p>
+                            <p>{{ event.date }}</p>
                             <p>{{ event.time }}</p>
-                            <p>Site: {{ event.site }}</p>
+                            <p class="location">Location: {{ event.site }}</p>
                             <p>Room: {{ event.room }}</p>
+                            <!-- Display 'Completed' if the event date is before today -->
+                            <p v-if="new Date(event.date) < new Date()" class="completed">Completed</p>
                         </div>
-                        <div v-if="selectedFilter === 'completed'" class="feedback-button">
+                        <div v-if="new Date(event.date) < new Date()" class="feedback-button">
                             <el-button type="primary" @click.stop="showFeedbackForm(event)">Leave Feedback</el-button> <!-- .stop modifier added -->
                         </div>
                     </el-card>
