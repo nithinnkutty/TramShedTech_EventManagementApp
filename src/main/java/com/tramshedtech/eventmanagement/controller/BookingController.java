@@ -5,6 +5,7 @@ import com.tramshedtech.eventmanagement.entity.Bookings;
 import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import jakarta.annotation.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -126,6 +127,15 @@ public class BookingController {
             responseResult.setMessage("Booking failed");
         }
         return responseResult;
+    }
+
+    @GetMapping("/getRoom")
+    public ResponseEntity<List<String>> getRoom() {
+        List<String> addresses = bookingService.getAllRoomName();
+        if (addresses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(addresses);
     }
 
     @PostMapping("/delete")

@@ -9,6 +9,8 @@ import java.util.List;
 public interface BookingMapper {
     boolean addBooking(Bookings book);
 
+    List<String> getAllRoomName();
+
     boolean updateBooking(Bookings book);
 
     boolean softDeleteBooking(Integer id);

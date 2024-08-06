@@ -2,18 +2,24 @@ new Vue({
     el: '#app',
     data: {
         participantSpeakers: [],
+        events: [],
         newParticipantSpeaker: {
             name: '',
             email: '',
             company: '',
-            role: 'Speaker',
-            status: 'Invited'
+            role: '',
+            status: '',
+            eventParticipation: '',
+            relationshipWithCompany: '',
+            bio: '',
+            multipleRoles: ''
         },
         currentParticipantSpeaker: {},
         editMode: false
     },
     mounted() {
         this.fetchParticipantSpeakers();
+        this.fetchEvents();
     },
     methods: {
         fetchParticipantSpeakers() {
@@ -29,12 +35,25 @@ new Vue({
                     console.error('Failed to fetch participants and speakers:', error);
                 });
         },
+        fetchEvents() {
+            axios.get('/api/events')
+                .then(response => {
+                    if (response.data.status === 'SUCCESS') {
+                        this.events = response.data.data;
+                    } else {
+                        alert('Failed to fetch events');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch events:', error);
+                });
+        },
         addParticipantSpeaker() {
             axios.post('/participants-speakers', this.newParticipantSpeaker)
                 .then(response => {
                     if (response.data.status === 'SUCCESS') {
-                        this.participantSpeakers.push({ ...this.newParticipantSpeaker, id: response.data.data.id }); // Add the new entry with ID
-                        this.newParticipantSpeaker = { name: '', email: '', company: '', role: 'Speaker', status: 'Invited' };
+                        this.participantSpeakers.push({ ...this.newParticipantSpeaker, id: response.data.data.id });
+                        this.newParticipantSpeaker = { name: '', email: '', company: '', role: '', status: '', eventParticipation: '', relationshipWithCompany: '', bio: '', multipleRoles: '' };
                     } else {
                         alert('Failed to add participant/speaker');
                     }
@@ -48,7 +67,7 @@ new Vue({
             this.editMode = true;
         },
         updateParticipantSpeaker() {
-            axios.put('/participants-speakers', this.currentParticipantSpeaker)
+            axios.put(`/participants-speakers/${this.currentParticipantSpeaker.id}`, this.currentParticipantSpeaker)
                 .then(response => {
                     if (response.data.status === 'SUCCESS') {
                         const index = this.participantSpeakers.findIndex(ps => ps.id === this.currentParticipantSpeaker.id);
@@ -75,6 +94,12 @@ new Vue({
                 .catch(error => {
                     console.error('Failed to delete participant/speaker:', error);
                 });
+        },
+        sendEmail(email) {
+            window.location.href = `mailto:${email}`;
+        },
+        publishParticipantSpeaker(participantSpeaker) {
+            alert(`Published ${participantSpeaker.name}`);
         },
         cancelEdit() {
             this.editMode = false;

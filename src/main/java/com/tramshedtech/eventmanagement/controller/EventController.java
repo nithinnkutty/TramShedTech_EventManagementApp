@@ -1,8 +1,11 @@
 package com.tramshedtech.eventmanagement.controller;
 
 import com.tramshedtech.eventmanagement.service.EventService;
+import com.tramshedtech.eventmanagement.service.FeedbackService;
 import com.tramshedtech.eventmanagement.entity.Event;
+import com.tramshedtech.eventmanagement.entity.Feedback;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +38,9 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private FeedbackService feedbackService;
+
     @GetMapping
     public ResponseResult<List<Event>> getAllEvents() {
         List<Event> events = eventService.getAllEvents();
@@ -62,11 +68,55 @@ public class EventController {
 
     @PostMapping("/create")
     public ResponseResult createEvent(@RequestBody Event event) {
-        try{
+        try {
             Long eventCreatedId = eventService.addEvent(event);
-            return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(eventCreatedId);
-        }catch (Exception e){
+            if (eventCreatedId > 0) {
+                System.out.println("Event Created Successfully with ID: " + eventCreatedId);
+                return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(eventCreatedId);
+            } else {
+                System.out.println("Event Creation Failed");
+                return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
         }
     }
+
+    @GetMapping("/getRoom/{eventId}")
+    public ResponseEntity<String> getAllRoomName(@PathVariable int eventId) {
+        try {
+            String roomName = eventService.getAllRoomName(eventId);
+            return ResponseEntity.ok(roomName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving room name");
+        }
+    }
+
+    @GetMapping("/titles")
+    public ResponseResult<List<String>> getAllEventTitles() {
+        List<String> eventTitles = eventService.getAllEventTitles();
+        return new ResponseResult<List<String>>()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage("Event titles retrieved successfully")
+                .setData(eventTitles);
+    }
+
+    @PostMapping("/{eventId}/feedback")
+    public ResponseResult addFeedback(@PathVariable Long eventId, @RequestBody Feedback feedback) {
+        feedback.setEventId(eventId);
+        boolean success = feedbackService.addFeedback(feedback);
+        return new ResponseResult().setCode(success ? 200 : 500).setStatus(success ? ResponseStatus.SUCCESS : ResponseStatus.FAIL);
+    }
+
+    @GetMapping("/{eventId}/feedback")
+    public ResponseResult<List<Feedback>> getFeedbackByEventId(@PathVariable Long eventId) {
+        List<Feedback> feedbackList = feedbackService.getFeedbackByEventId(eventId);
+        return new ResponseResult<List<Feedback>>()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage("Feedback retrieved successfully")
+                .setData(feedbackList);
+    }
+
 }

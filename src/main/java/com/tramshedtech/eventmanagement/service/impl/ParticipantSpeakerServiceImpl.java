@@ -40,9 +40,19 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
         return result;
     }
 
-
     @Override
     public boolean delete(int id) {
         return participantSpeakerMapper.delete(id);
+    }
+
+    @Override
+    public String publish(int id) {
+        ParticipantSpeaker participantSpeaker = participantSpeakerMapper.getById(id);
+        if (participantSpeaker == null) {
+            throw new RuntimeException("Participant/Speaker not found");
+        }
+        // Generate URL for published page (for simplicity, using a static base URL)
+        String publishUrl = "http://yourdomain.com/participants-speakers/" + id;
+        return publishUrl;
     }
 }

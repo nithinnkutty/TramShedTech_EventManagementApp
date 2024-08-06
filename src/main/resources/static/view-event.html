@@ -16,7 +16,7 @@
                     <el-card  :body-style="{ padding: '0px' }" shadow="hover">
                         <img src="img/roomtype.png" class="image">
                         <div class="image-caption">
-                            <span>{{eventForm.room}}</span>
+                            <span>{{eventForm.fullRoomName}}</span>
                         </div>
                     </el-card>
                 </el-col>
@@ -26,8 +26,7 @@
                             <div class="event-id">Event ID:{{eventForm.id}}</div>
                             <i class="el-icon-user-solid"></i>
                             <div class="speaker-info">
-                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Jeffery</a><br>
-                                <a href="javascript:void(0);" @click="handleSpeakerClick('Jeffery')">Speaker: Tommy</a>
+                                <a href="javascript:void(0);" @click="handleSpeakerClick('eventForm.speaker')">Speaker: {{eventForm.speaker}}</a>
                             </div>
                             <div class="time-display">
                                 <span>Time: {{eventForm.date}} {{ eventForm.time }}</span>
@@ -64,12 +63,15 @@
                     responsible: '',
                     staff: '',
                     company: '',
-                    email: ''
+                    email: '',
+                    speaker: '',
+                    fullRoomName: ''
                 }
             };
         },
         mounted() {
             this.fetchEventData();
+            this.fecthRooms();
         },
         methods: {
             handleSpeakerClick(name) {
@@ -77,17 +79,43 @@
                 this.$router.push({name: 'speakerProfile', params: {speakerName: name}});
             },
             fetchEventData() {
-                const eventId = localStorage.getItem("eventId");
-                console.log(eventId);
+                const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;
+                if (!eventId) {
+                    console.error("No event ID found");
+                    return;
+                }
+                console.log("Fetching event data for ID:", eventId);
                 axios.get(`/api/events/${eventId}`)
                     .then(response => {
-                        this.eventForm = response.data.data;
-                        localStorage.removeItem('eventId');
+                        // this.eventForm = response.data.data;
+                        this.eventForm.id = response.data.data.id;
+                        this.eventForm.title = response.data.data.title;
+                        this.eventForm.time = response.data.data.time;
+                        this.eventForm.responsible = response.data.data.responsible;
+                        this.eventForm.staff = response.data.data.staff;
+                        this.eventForm.company = response.data.data.company;
+                        this.eventForm.email = response.data.data.email;
+                        this.eventForm.speaker = response.data.data.speaker;
+                        // localStorage.removeItem('eventId');
                     })
                     .catch(error => {
                         console.error("There was an error fetching the event data!", error);
                     });
-            }
+            },
+            fecthRooms() {
+                const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;
+                console.log("Fetching rooms for event:", eventId);
+                axios.get(`/api/events/getRoom/${eventId}`)
+                    .then(response => {
+                        console.log("Received room name:", response.data);
+                        this.eventForm.fullRoomName = response.data;
+                        console.log("Room name:", this.eventForm.fullRoomName);
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the room details!", error);
+                    });
+
+            },
         }
     });
 </script>

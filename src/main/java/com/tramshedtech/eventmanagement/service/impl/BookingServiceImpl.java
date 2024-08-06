@@ -75,4 +75,7 @@ public class BookingServiceImpl implements BookingService {
         }
         return bookingsVos;
     }
+
+    @Override
+    public List<String> getAllRoomName(){return bookingMapper.getAllRoomName();}
 }
