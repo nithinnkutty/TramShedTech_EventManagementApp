@@ -20,9 +20,10 @@ new Vue({
         fetchEvents() {
             axios.get('/api/events')
                 .then(response => {
-                    this.events = response.data.data;
+                    // Sort events by date from oldest to newest
+                    this.events = response.data.data.sort((a, b) => new Date(a.date) - new Date(b.date));
                     this.uniqueYears = [...new Set(this.events.map(event => new Date(event.date).getFullYear().toString()))];
-                    this.filterEvents();
+                    this.filterEvents(); // Apply initial filters
                 })
                 .catch(error => {
                     console.error("There was an error fetching the events!", error);
