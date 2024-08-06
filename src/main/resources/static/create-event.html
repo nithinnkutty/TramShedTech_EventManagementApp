@@ -10,7 +10,7 @@
     <title>Create Event Page</title>
 </head>
 <body>
-<div  id="event">
+<div id="event">
     <div class="title">
         <el-col :span="24" style="padding-bottom: 20px">
             <div class="grid-content caption">CREATE EVENT</div>
@@ -74,18 +74,18 @@
                             v-for="item in room"
                             :key="item.value"
                             :label="item.label"
-                            :value="item.label">
+                            :value="item.value">
                     </el-option>
                 </el-select>
             </div></el-col>
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Tag</div></el-col>
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event Type</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-select v-model="formData.tag" clearable placeholder="please select">
+                <el-select v-model="formData.type" clearable placeholder="please select">
                     <el-option
-                            v-for="item in tag"
+                            v-for="item in type"
                             :key="item.value"
                             :label="item.label"
                             :value="item.label">
@@ -104,11 +104,62 @@
         </el-row>
 
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Responsible</div></el-col>
+            <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="grid-content input">
-                    <el-input v-model="formData.responsible" placeholder="responsible"></el-input>
+                    <el-input v-model="formData.site" placeholder="location"></el-input>
                 </div>
+            </div></el-col>
+        </el-row>
+
+        <!-- Form fields for catering -->
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.cateringType" clearable placeholder="Select Catering Type">
+                    <el-option label="Cold Finger Buffet" value="Cold Finger Buffet"></el-option>
+                    <el-option label="Sandwich Buffet" value="Sandwich Buffet"></el-option>
+                    <el-option label="Grazeboards" value="Grazeboards"></el-option>
+                    <el-option label="Breakfast Catering" value="Breakfast Catering"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Count</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.cateringCount" placeholder="Number of People"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Beverage Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.beverageType" clearable placeholder="Select Beverage Type">
+                    <el-option label="Soft Drinks" value="Soft Drinks"></el-option>
+                    <el-option label="Juices" value="Juices"></el-option>
+                    <el-option label="Tea and Coffee" value="Tea and Coffee"></el-option>
+                    <el-option label="Alcoholic Beverages" value="Alcoholic Beverages"></el-option>
+                    <el-option label="Non-Alcoholic Beverages" value="Non-Alcoholic Beverages"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Dietary Requirements</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.dietaryRequirements" placeholder="Specify Dietary Requirements"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Serving Time</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-time-select
+                        v-model="formData.cateringServingTime"
+                        placeholder="Select Serving Time"
+                        :picker-options="{
+                        start: '08:00',
+                        step: '00:15',
+                        end: '23:00'
+                    }">
+                </el-time-select>
             </div></el-col>
         </el-row>
     </el-row>
@@ -122,9 +173,14 @@
             <el-col :span="6"><div class="grid-content"></div></el-col>
 
             <el-table :data="formData.tableData" border style="width: 55%;">
-                <el-table-column prop="type" label="Event Type" width="180">
+                <el-table-column prop="tag" label="Tag" width="180">
                     <template slot-scope="scope">
-                        <el-input v-model="scope.row.type" placeholder="Event type" class="table"></el-input>
+                        <el-input v-model="scope.row.tag" placeholder="Tag" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="responsible" label="Responsible" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.responsible" placeholder="Responsible" class="table"></el-input>
                     </template>
                 </el-table-column>
                 <el-table-column prop="staff" label="Support Staff" width="180">
@@ -147,28 +203,17 @@
                         <el-input v-model="scope.row.email" placeholder="Contact Email" class="table"></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column prop="location" label="Location" width="180">
-                    <template slot-scope="scope">
-                        <el-input v-model="scope.row.site" placeholder="Location" class="table"></el-input>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="AV" label="AV" width="180">
-                    <template slot-scope="scope">
-                        <el-input v-model="scope.row.av" placeholder="AV" class="table"></el-input>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="notes" label="AV Notes" width="180">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.note" placeholder="AV Notes" class="table"></el-input>
                     </template>
                 </el-table-column>
             </el-table>
-
         </el-row>
     </div>
 
     <div class="button">
-    <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
+        <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
     </div>
 </div>
 </body>
@@ -183,7 +228,14 @@
                     date: '',
                     time: '',
                     speaker: '',
-                    responsible: '',
+                    site: '',
+                    // catering fields
+                    cateringType: '',
+                    cateringCount: 0,
+                    beverageType: '',
+                    dietaryRequirements: '',
+                    cateringServingTime: '',
+                    // Initialize table data
                     tableData: [{
                         type: '',
                         staff: '',
@@ -191,49 +243,75 @@
                         contact: '',
                         email: '',
                         location: '',
-                        av: '',
                         note: ' '
                     }],
                 },
                 room: [{
-                    value: 'option 1',
-                    label: 'meeting room 1'
-                }, {
-                    value: 'option 2',
-                    label: 'meeting room 2'
-                }, {
-                    value: 'option 3',
-                    label: 'meeting room 3'
-                }, {
-                    value: 'option 4',
-                    label: 'meeting room 4'
-                }, {
-                    value: 'option 5',
-                    label: 'meeting room 5'
+                    value: '',
+                    label: ''
                 }],
-                tag: [{
+                type: [{
                     value: 'option 1',
-                    label: 'Technology'
+                    label: 'Networking'
                 }, {
                     value: 'option 2',
-                    label: 'Education'
+                    label: 'Panels'
                 }, {
-                    value: 'option 3',
-                    label: 'Healthcare'
+                    value: '3',
+                    label: 'Speakers'
                 }, {
                     value: 'option 4',
-                    label: 'Finance'
+                    label: 'Q&A’s'
                 }, {
                     value: 'option 5',
-                    label: 'Marketing'
+                    label: 'Presentations'
                 },
                 {
                     value: 'option 6',
-                    label: 'Real Estate'
-                }],
+                    label: 'Social Gatherings'
+                }, {
+                    value: 'option 7',
+                    label: 'Markets'
+                },{
+                    value: 'option 8',
+                    label: 'Miscellaneous'
+                },{
+                    value: 'option 9',
+                    label: 'Festival'
+                },{
+                    value: 'option 10',
+                    label: 'Conference '
+                }
+                ],
             };
         },
+        created(){
+            this.fecthRooms();
+        },
         methods: {
+            fecthRooms() {
+                axios.get('/booking/getRoom')
+                    .then(response => {
+                        if (!response.data || !Array.isArray(response.data)) {
+                            console.error('No data or data is not an array');
+                            return;
+                        }
+                        this.room = response.data.map((fullAddress, index) => {
+                            console.log(fullAddress);
+                            if (!fullAddress) {
+                                console.error('Invalid full address encountered', fullAddress);
+                                return { value: `${index}`, label: 'Invalid address' };
+                            }
+                            return {
+                                value: `${index}`,
+                                label: fullAddress
+                            };
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch rooms:', error);
+                    });
+            },
             /*Converts the obtained date data into the desired date YYYY-MM-DD*/
             getFormattedDate(date) {
                 const year = date.getFullYear();
@@ -242,9 +320,13 @@
                 return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             },
             handleButtonClick() {
+                if (!this.formData.title || !this.formData.date || !this.formData.startTime || !this.formData.endTime || !this.formData.site || !this.formData.room) {
+                    // Alert user all fields are required
+                    alert('Please fill in all required fields: Event Name, Date, Time, Location, and Room.');
+                    return;  // Stop the function if validation fails
+                }
                 this.getFormData();
             },
-
             getFormData() {
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
@@ -252,17 +334,23 @@
                     date: formattedDate,
                     time: this.formData.startTime + '-' + this.formData.endTime,
                     room: this.formData.room,
-                    tag: this.formData.tag,
+                    type: this.formData.type,
                     speaker: this.formData.speaker,
-                    responsible: this.formData.responsible,
+                    site: this.formData.site,
                     staff: this.formData.tableData[0].staff,
-                    type: this.formData.tableData[0].type,
+                    tag: this.formData.tableData[0].tag,
                     company: this.formData.tableData[0].company,
                     contact: this.formData.tableData[0].contact,
                     email: this.formData.tableData[0].email,
-                    site: this.formData.tableData[0].site,
-                    av: this.formData.tableData[0].av,
-                    note: this.formData.tableData[0].note
+                    responsible: this.formData.tableData[0].responsible,
+                    note: this.formData.tableData[0].note,
+                    // Catering fields
+                    cateringType: this.formData.cateringType,
+                    cateringCount: this.formData.cateringCount,
+                    beverageType: this.formData.beverageType,
+                    dietaryRequirements: this.formData.dietaryRequirements,
+                    cateringServingTime: this.formData.cateringServingTime
+                    // Include table data
                 };
                 console.log(eventData);
                 axios.post('/api/events/create', eventData).then(response => {
@@ -274,11 +362,10 @@
                     } else {
                         alert('Event not created');
                     }
-
                 })
-                    .catch(error => {
-                        console.log('Error creating event', error);
-                    });
+                .catch(error => {
+                    console.log('Error creating event', error);
+                });
             }
         }
     });

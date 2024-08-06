@@ -10,4 +10,9 @@ public class ParticipantSpeaker {
     private String company;
     private String role; // Speaker, Panelist, etc.
     private String status; // Invited, Confirmed, Declined
+    private Long eventId; // Foreign key to events table
+    private String eventParticipation;
+    private String relationshipWithCompany;
+    private String bio;
+    private String multipleRoles;
 }

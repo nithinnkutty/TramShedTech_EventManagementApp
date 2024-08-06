@@ -78,9 +78,20 @@ form button {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 4px;
     margin: 5px;
     flex: 1;
+}
+
+form select {
+    border-radius: 0;
+}
+
+form select.placeholder {
+    color: grey;
+}
+
+form select:not(.placeholder) {
+    color: black;
 }
 
 form button {
