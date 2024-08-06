@@ -49,8 +49,9 @@ body {
 }
 
 .event-card {
-    display: flex;
-    flex-direction: column;
+    justify-content: space-between; /* Aligns children at the space between */
+    width: 100%; /* Adjust width as needed */
+    box-sizing: border-box; /* Includes padding and border in the width and height */
     overflow: hidden; /* Ensures content does not spill out */
     border-radius: 8px; /* Rounded corners for a smoother look */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
@@ -106,6 +107,9 @@ p {
 
 .feedback-button {
     margin-top: auto; /* Pushes the button to the bottom */
+    width: 100%; /* Optional: Ensures button stretches to the full width of the card */
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
 }
 
 @media (max-width: 768px) {
