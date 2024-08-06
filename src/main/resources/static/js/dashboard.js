@@ -3,7 +3,10 @@ new Vue({
     data: {
         events: [],
         filteredEvents: [],
-        selectedFilter: 'all',
+        selectedFilter: 'All Events',
+        uniqueSites: [],
+        uniqueYears: [],
+        months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         showFeedbackModal: false,
         selectedEvent: {},
         feedback: {
@@ -18,6 +21,7 @@ new Vue({
             axios.get('/api/events')
                 .then(response => {
                     this.events = response.data.data;
+                    this.uniqueYears = [...new Set(this.events.map(event => new Date(event.date).getFullYear().toString()))];
                     this.filterEvents();
                 })
                 .catch(error => {
@@ -25,19 +29,29 @@ new Vue({
                 });
         },
         filterEvents() {
-            const now = new Date();
+            let filtered = this.events;
+
             if (this.selectedFilter === 'upcoming') {
-                this.filteredEvents = this.events.filter(event => new Date(event.date) >= now);
+                filtered = filtered.filter(event => new Date(event.date) > new Date());
             } else if (this.selectedFilter === 'completed') {
-                this.filteredEvents = this.events.filter(event => new Date(event.date) < now);
-            } else {
-                this.filteredEvents = this.events;
+                filtered = filtered.filter(event => new Date(event.date) < new Date());
             }
+
+            if (this.selectedYear !== 'all') {
+                filtered = filtered.filter(event => new Date(event.date).getFullYear().toString() === this.selectedYear);
+            }
+
+            if (this.selectedMonth !== 'all') {
+                filtered = filtered.filter(event => new Date(event.date).getMonth() === this.months.indexOf(this.selectedMonth) - 1);
+            }
+
+            this.filteredEvents = filtered;
         },
         viewEvent(eventId) {
             localStorage.setItem("eventId", eventId);
             window.location.href = `/view-event.html`;
         },
+
         showFeedbackForm(event) {
             this.selectedEvent = event;
             this.showFeedbackModal = true;
@@ -71,5 +85,8 @@ new Vue({
     },
     mounted() {
         this.fetchEvents();
+        this.selectedYear = 'all';  // Set the default filter for year to 'all'
+        this.selectedMonth = 'all';  // Set the default filter for month to 'all'
     }
 });
+
