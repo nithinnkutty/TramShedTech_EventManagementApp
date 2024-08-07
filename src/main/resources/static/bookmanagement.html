@@ -222,6 +222,9 @@
             <el-form-item label="Postcode" prop="postcode">
                 <el-input v-model="editForm.postcode"></el-input>
             </el-form-item>
+            <el-form-item label="Capacity" prop="roomCapacity">
+                <el-input-number v-model="editForm.roomCapacity" :min="1"></el-input-number>
+            </el-form-item>
             <el-form-item label="Location" prop="location">
                 <el-select v-model="editForm.location" placeholder="Please select location">
                     <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
@@ -339,6 +342,7 @@
                     av: [],
                     payment: '',
                     message: '',
+                    roomCapacity:'',
                     img: [] // make sure it's an array
                 },
                 rules: {
@@ -437,7 +441,8 @@
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
                             payment: data.payment || '',
                             message: data.message || '',
-                            img: imgList // Ensure array
+                            roomCapacity: data.roomCapacity || '',
+                            img: imgList // 设置img字段为数组
                         };
                         this.dialogFormVisible = true; // display edit form
                     })

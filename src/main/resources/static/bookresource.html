@@ -100,6 +100,9 @@
         <el-form-item label="Postcode" prop="postcode">
             <el-input v-model="ruleForm.postcode"></el-input>
         </el-form-item>
+        <el-form-item label="Capacity" prop="roomCapacity">
+            <el-input-number v-model="ruleForm.roomCapacity" :min="1"></el-input-number>
+        </el-form-item>
         <el-form-item label="Location" prop="location">
             <el-select v-model="ruleForm.location" placeholder="Please select location">
                 <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
@@ -180,6 +183,7 @@
                     roomNumber: '',
                     roomName: '',
                     postcode: '',
+                    roomCapacity:'',
                     location: '',
                     daterange: [],
                     av: [],
