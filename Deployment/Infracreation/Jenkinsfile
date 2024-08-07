@@ -1,21 +1,50 @@
 pipeline {
     agent any
 
+    environment {
+        OS_PASSWORD = credentials('openstackpass_nithin')
+        OS_SSH_KEY = credentials('OS_SSH_KEY')
+    }
 
     stages {
-        stage('Terraform Apply') {
+        stage('Create Infra') {
             steps {
                 script {
+                    dir("${WORKSPACE}/Deployment/Infracreation/Terraform/") {
+                        sh '''
+                            ls
+                            pwd
+                            chmod +x GROUP-1-TGD-2425-openrc.sh
+                            source ${PWD}/GROUP-1-TGD-2425-openrc.sh
 
-//                     sh 'source openrc.sh'
-//                     Initialize and apply Terraform
-//                     sh 'terraform init -input=false'
-//                     sh 'terraform apply -auto-approve'
-                    sh 'echo Building in ${WORKSPACE}'
-                    sh 'echo "This is working"'
+                            terraform init -input=false
+                            terraform plan
+                            terraform apply -auto-approve
+                        '''
+                        env.INSTANCE_IP = sh(script: "terraform output -raw instance_ip", returnStdout: true).trim()
+                    }
                 }
             }
         }
+
+        stage('Check Instance Readiness') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Retry mechanism to check instance readiness
+                        timeout(time: 2, unit: 'MINUTES') {
+                            waitUntil {
+                                def ready = sh(script: "ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} 'echo ready'", returnStatus: true) == 0
+                                return ready
+                            }
+                        }
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
         stage('Install java and gradle'){
             steps{
                 script {
