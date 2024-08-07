@@ -309,6 +309,11 @@
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                this.ruleForm.img = fileList.map(f => ({
+                    name: f.name,
+                    url: f.url,
+                    uid: f.uid,
+                }));
             },
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;

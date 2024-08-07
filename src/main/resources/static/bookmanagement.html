@@ -137,12 +137,8 @@
                                 width="55"
                                 align="center">
                             <template slot-scope="scope">
-                                {{ scope.$index + 1}}
+                                {{ scope.$index + 1 }}
                             </template>
-                        </el-table-column>
-                        <el-table-column
-                                type="selection"
-                                width="55">
                         </el-table-column>
                         <el-table-column
                                 prop="startDate"
@@ -154,11 +150,6 @@
                                 label="Room Name"
                                 width="180">
                         </el-table-column>
-                        <!--                        <el-table-column-->
-                        <!--                                prop="postcode"-->
-                        <!--                                label="Postcode"-->
-                        <!--                                width="180">-->
-                        <!--                        </el-table-column>-->
                         <el-table-column
                                 prop="location"
                                 label="Location">
@@ -268,6 +259,7 @@
                         :on-remove="handleRemove"
                         :file-list="editForm.img"
                         :before-upload="beforeUpload"
+                        :on-success="handleUploadSuccess"
                         accept="image/*">
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -419,7 +411,16 @@
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.editForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
             handleEdit(index, row) {
                 console.log("Edit button clicked", index, row);
                 axios.get(`/booking/${row.id}`)
@@ -431,6 +432,7 @@
                             url: url,
                             uid: url, // Use the URL as the unique identifier
                         })) : [];
+                        console.log("imgList:", imgList);
                         this.editForm = {
                             id: data.id,
                             roomNumber: data.roomNumber || '',
@@ -456,6 +458,7 @@
                         // Convert the img field to a comma-separated string before committing
                         const imgNames = this.editForm.img.map(item => item.name).join(',');
                         const updatedForm = { ...this.editForm, img: imgNames };
+                        debugger
                         axios.post(`/booking/update`, updatedForm)
                             .then(response => {
                                 this.$message({
@@ -581,6 +584,8 @@
 
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                // Remove the file from the img array
+                this.editForm.img = this.editForm.img.filter(item => item.uid !== file.uid);
             },
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
