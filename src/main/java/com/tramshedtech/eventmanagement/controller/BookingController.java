@@ -157,10 +157,33 @@ public class BookingController {
         return responseResult;
     }
 
+    @PostMapping("/updateStatus")
+    public ResponseResult updateStatus(@RequestBody Map<String, Integer> requestData) {
+        Integer id = requestData.get("id");
+        Integer status = requestData.get("status");
+        boolean result = bookingService.updateBookingStatus(id, status);
+        ResponseResult responseResult = new ResponseResult();
+        if (result) {
+            responseResult.setCode(200);
+            responseResult.setMessage("Booking deleted successfully");
+        } else {
+            responseResult.setCode(400);
+            responseResult.setMessage("Booking deletion failed");
+        }
+        return responseResult;
+    }
+
 
     @GetMapping("/searchAll")
-    public List<BookingsVo> searchAll () throws ParseException {
+    public List<BookingsVo> searchAll() throws ParseException {
         List<BookingsVo> bookings = bookingService.searchAll();
+//        System.out.println(bookings);
+        return bookings;
+    }
+
+    @GetMapping("/searchNotCancel")
+    public List<BookingsVo> searchNotCancel() throws ParseException {
+        List<BookingsVo> bookings = bookingService.searchNotCancel();
 //        System.out.println(bookings);
         return bookings;
     }
