@@ -38,16 +38,14 @@
         <el-container style="background-color: white;height: 600px;">
             <el-aside width="214px" style="background-color: #F9B117;height: 100%;">
                 <div>
-                    <el-menu
-                            default-active="1"
-                            class="el-menu-vertical-demo custom-menu">
+                    <el-menu default-active="1" class="el-menu-vertical-demo custom-menu">
                         <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Dash Board</span>
+                            <span slot="title">Dashboard</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('create-event.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
-                            <span slot="title">Event management</span>
+                            <span slot="title">Event Management</span>
                         </el-menu-item>
                         <el-menu-item index="3" @click="change('participants-speakers.html')" class="custom-menu-item">
                             <i class="el-icon-document"></i>
@@ -61,11 +59,64 @@
                 </div>
             </el-aside>
             <el-main style="background-color: beige;height: 100%;">
-                <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
+                <!-- Divide the page into multiple small pages, each page can display an independent HTML file -->
                 <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;padding: 0px"></iframe>
             </el-main>
         </el-container>
     </el-container>
+
+    <!-- Footer section -->
+    <footer class="generic-padding">
+        <div class="row">
+            <div class="col-6 col-lg-4">
+                <img src="https://cdn.tramshedtech.co.uk/static/img/home/LOGO%20Concept%201.svg" width="90%" height="auto" alt="Tramshed Tech Logo" style="max-width: 200px;">
+                <div class="copyright-text mt-3 mt-lg-5 mb-2">Copyright © 2023 Tramshed Tech</div>
+                <div class="copyright-text mb-2">All rights reserved</div>
+                <div class="row mt-0 mt-lg-5 gx-0 gx-lg-1 gy-2 gy-lg-0 d-flex" id="footer-social-media-links-1">
+                    <a href="https://www.linkedin.com/company/tramshed-tech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Linkedin%20Logo.svg" alt="LinkedIn">
+                    </a>
+                    <a href="https://www.facebook.com/tramshedtech/" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Facebook%20Logo.svg" alt="Facebook">
+                    </a>
+                    <a href="https://twitter.com/TramshedTech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/X%20Logo.svg" alt="X">
+                    </a>
+                    <a href="https://www.instagram.com/tramshedtech/?hl=en" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Instagram%20Logo.svg" alt="Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/@tramshedtech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/TikTok%20Logo.svg" alt="TikTok">
+                    </a>
+                    <a href="https://chat.whatsapp.com/Feq2E16MNlOGWOtgmB7NCT" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/whatsapp-logo.svg" alt="WhatsApp">
+                    </a>
+                </div>
+            </div>
+            <div class="col-3 col-lg-2">
+                <div class="footer-header">Company</div>
+                <div class="footer-link">
+                    <a href="https://members.tramshedtech.co.uk/login" target="_blank" rel="noopener">Members Login</a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4 mt-5 mt-lg-0">
+                <div id="footer-social-media-links-2">
+                    <p class="footer-header">Download our App</p>
+                    <a href="https://apps.apple.com/gb/app/tramshed-tech/id1496178665" style="margin-right: 10px;">
+                        <img class="no-border-radius mb-3 mb-lg-0" src="https://cdn.tramshedtech.co.uk/static/img/icons/Apple%20Store.svg" alt="Apple Store" width="120px" height="auto">
+                    </a>
+                    <a class="mt-3 mt-lg-0" href="https://play.google.com/store/apps/details?id=com.nexudusspaces.tramshedtech&amp;hl=en_GB&amp;gl=US">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/icons/Android%20Store.svg" alt="Google Play" width="135px" height="auto">
+                    </a>
+                </div>
+            </div>
+            <div class="col-6 d-flex d-lg-none">
+                <div class="footer-link mt-5">
+                    Subscribe to our <a href="https://share-eu1.hsforms.com/1cg9VbQ-lSEu9h1dveuw1Ewf9dkj" target="_blank" style="text-decoration: underline;">newsletter</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
 </body>
 <style scoped>
@@ -78,23 +129,23 @@
         height: 100%;
     }
     .custom-menu {
-        padding: 10px; /* 调整菜单周围的空隙 */
-        background-color: #F9B117; /* 设置周围空隙的背景颜色 */
+        padding: 10px; /* Adjust menu padding */
+        background-color: #F9B117; /* Menu background color */
     }
 
     .custom-menu-item {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 10px 0; /* 调整菜单项上下的空隙 */
-        border-radius: 8px; /* 调整菜单项的圆角 */
-        background-color: white; /* 调整菜单项的背景颜色 */
+        margin: 10px 0; /* Adjust menu item margin */
+        border-radius: 8px; /* Adjust menu item border radius */
+        background-color: white; /* Menu item background color */
     }
 
-    /* 重写 Element UI 的样式 */
+    /* Override Element UI styles */
     .custom-menu-item > .el-menu-item {
-        width: 100%; /* 确保菜单项占满父容器的宽度 */
-        text-align: center; /* 菜单项内容居中 */
+        width: 100%; /* Ensure menu items fill the parent container width */
+        text-align: center; /* Center menu item content */
     }
     .underline-button {
         text-decoration: underline;
@@ -113,8 +164,52 @@
     }
 
     .user-avatar {
-        margin-right: 10px; /* 调整头像与按钮之间的间距 */
+        margin-right: 10px; /* Adjust spacing between avatar and button */
     }
+
+    /* Footer styles */
+    footer.generic-padding {
+        background-color: #333;
+        color: #fff;
+        padding: 20px 20px;
+    }
+
+    footer .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    footer .col-6, footer .col-3, footer .col-lg-4, footer .col-lg-2 {
+        flex: 1;
+        margin: 10px;
+    }
+
+    footer .footer-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    footer .footer-link a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    footer .footer-link a:hover {
+        text-decoration: underline;
+    }
+
+    footer .footer-social-media-icon img {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Adjust spacing between social media icons */
+    #footer-social-media-links-1 .footer-social-media-icon,
+    #footer-social-media-links-2 .footer-social-media-icon {
+        margin: 0 1px;
+    }
+
 </style>
 <script>
     new Vue({
@@ -128,24 +223,23 @@
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
             if (!this.token) {
-                return; // 如果没有token，结束方法
+                return; // End method if no token
             } else {
                 this.fetchAvatar();
                 this.getUsername();
             }
-
         },
         methods: {
             change: function (uri) {
                 this.currentPage = uri
             },
             fetchAvatar() {
-                console.log("方法调用成功")
+                console.log("Method called successfully")
                 axios.get('/user/findAvatar', {
                 })
                     .then(response => {
                         console.log(response.data);
-                        this.imageUrl = response.data.data; // 假设返回的数据中包含avatarUrl
+                        this.imageUrl = response.data.data; // Assuming the response contains avatarUrl
                     })
                     .catch(error => {
                         console.error('Failed to fetch avatar:', error);
@@ -181,5 +275,4 @@
         }
     })
 </script>
-
 </html>
