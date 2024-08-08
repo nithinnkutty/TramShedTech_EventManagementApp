@@ -120,4 +120,8 @@
         <result column="wechat" property="wechat" />
     </resultMap>
 
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user(account,password,email,did,pid,sex,birthday,phone,wechat,status) VALUES (#{account}, #{password},#{email},#{did},#{pid},#{sex},#{birthday},#{phone},#{wechat},0)
+    </insert>
+
 </mapper>

@@ -68,7 +68,7 @@
             <div>
                 <el-row class="custom-row">
                     <el-col>
-                        <el-button type="primary" icon="el-icon-plus" size="medium" @click="innerVisibleAdd = true" class="custom-button">Add user</el-button>
+                        <el-button type="primary" icon="el-icon-plus" size="medium" @click="showAddUserDialog" class="custom-button">Add user</el-button>
                         <el-upload action="/files/excel" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
                             <el-button icon="el-icon-upload2" size="medium">Import</el-button>
                         </el-upload>
@@ -82,9 +82,9 @@
                                 <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('orderStatus')">By Position</el-button>
                                 <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('submitter')">By Department</el-button>
                             </div>
-                            <el-button slot="reference" icon="el-icon-s-data" size="medium">排序</el-button>
+                            <el-button slot="reference" icon="el-icon-s-data" size="medium">Order</el-button>
                         </el-popover>
-                        <el-button icon="el-icon-s-grid" size="medium" class="custom-list">列表</el-button>
+                        <el-button icon="el-icon-s-grid" size="medium" class="custom-list">List</el-button>
                     </el-col>
                 </el-row>
                 <el-row class="custom-row">
@@ -166,7 +166,7 @@
             <el-form-item label="User Department" prop="department">
                 <el-select v-model="userListAdd.did" placeholder="Please select department">
                     <el-option
-                            v-for="item in options"
+                            v-for="item in filteredDepartments"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -177,7 +177,7 @@
             <el-form-item label="User Position" prop="position">
                 <el-select v-model="userListAdd.pid" placeholder="Please select position">
                     <el-option
-                            v-for="item in options2"
+                            v-for="item in filteredPositions"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -237,7 +237,7 @@
                 ],
                 visible: false,
                 userList:
-                    [{
+                    {
                         id: "",
                         account: "",
                         email: "",
@@ -248,7 +248,7 @@
                         phone: "",
                         wechat: "",
                         zip: ""
-                    }],
+                    },
                 innerVisibleAdd: false,
                 outerVisible: false,
                 position: '',
@@ -281,7 +281,7 @@
                 delid: 1,
                 fullscreenLoading: false,
                 userListAdd:
-                    [{
+                    {
                         account: "",
                         password: "",
                         email: "",
@@ -291,7 +291,9 @@
                         birthday: "",
                         phone: "",
                         wechat: "",
-                    }],
+                    },
+                filteredDepartments: [],
+                filteredPositions: [],
                 dialogVisible: false,
                 rules2: {
                     account: [
@@ -306,15 +308,15 @@
                         { required: true, message: 'Email cannot be empty', trigger: 'blur' },
                         { type: 'email', message: 'Please enter a valid e-mail address', trigger: ['blur', 'change'] }
                     ],
-                    position: [
-                        {required: true, message: 'Please select the user\'s position', trigger: 'change'}
-                    ],
-                    department: [
-                        {required: true, message: 'Please select the user\'s department', trigger: 'change'}
-                    ],
-                    gender: [
-                        {required: true, message: 'Please select the user\'s gender', trigger: 'change'}
-                    ],
+                    // position: [
+                    //     {required: true, message: 'Please select the user\'s position', trigger: 'change'}
+                    // ],
+                    // department: [
+                    //     {required: true, message: 'Please select the user\'s department', trigger: 'change'}
+                    // ],
+                    // gender: [
+                    //     {required: true, message: 'Please select the user\'s gender', trigger: 'change'}
+                    // ],
                     birthday: [
                         {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
                     ],
@@ -334,6 +336,8 @@
             this.showOptions();
             this.position = JSON.parse(localStorage.getItem('position'));
             this.department = JSON.parse(localStorage.getItem('department'));
+            console.log(this.position);
+            console.log(this.department);
         },
         methods: {
             handleSizeChange: function (size) {
@@ -359,12 +363,14 @@
                 axios.get("/user/findAllDepartments").then(res => {
                     console.log(res.data)
                     this.options = res.data.data;
+                    this.filterOptions(); // Calling the filter method after the data has been loaded
                 })
             },
             showOptions:function () {
                 axios.get("/user/findAllPositions").then(res => {
                     console.log(res.data)
                     this.options2 = res.data.data;
+                    this.filterOptions(); // Calling the filter method after the data has been loaded
                 })
             },
             search:function (params) {
@@ -398,7 +404,7 @@
             submitFormAdd(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$axios.post("/officeleave/add",this.ruleForm).then(res => {
+                        axios.post("/user/addUser",this.userListAdd).then(res => {
                             console.log('ytwdbz')
                             console.log(res.data)
                             if(res.data == true){
@@ -408,7 +414,7 @@
                                     type: 'success'
                                 });
                                 this.showpage()
-                                this.ruleForm = {type:"",days:"",reason: '',summitDate:"",relatedBusiness:"",businessType:"",approver:"",notifyPerson:[]};
+                                this.userListAdd = {id: "", account: "", email: "", did: "", pid: "", sex: "", birthday: "", phone: "", wechat: ""};
                             }
                         })
                     } else {
@@ -423,6 +429,22 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+            showAddUserDialog() {
+                this.pid = this.position; // Assignment of position from local storage
+                this.userListAdd.pid = this.pid;
+                this.userListAdd.did = this.department; // Assigning values from locally stored departments
+                this.filterOptions();
+                this.innerVisibleAdd = true;
+            },
+            filterOptions() {
+                if (this.pid !== null && this.pid < 6) {
+                    this.filteredDepartments = this.options.filter(item => item.id === this.department);
+                    this.filteredPositions = this.options2.filter(item => item.id <= this.pid);
+                } else {
+                    this.filteredDepartments = this.options;
+                    this.filteredPositions = this.options2;
+                }
             },
         }
     });

@@ -144,8 +144,6 @@
                 this.fetchAvatar();
                 this.getUsername();
                 this.getUserPosition();
-                localStorage.setItem('position', JSON.stringify(this.position));
-                localStorage.setItem('department', JSON.stringify(this.department));
             }
 
         },
@@ -161,6 +159,8 @@
                         this.department = response.data.data.department;
                         console.log(this.position);
                         console.log(this.department);
+                        localStorage.setItem('position', JSON.stringify(this.position));
+                        localStorage.setItem('department', JSON.stringify(this.department));
                     })
                     .catch(error => {
                         console.error('Failed to fetch position:', error);

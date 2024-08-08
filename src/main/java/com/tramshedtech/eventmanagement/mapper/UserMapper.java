@@ -1,6 +1,7 @@
 package com.tramshedtech.eventmanagement.mapper;
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.Vo.UserVo;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
@@ -36,4 +37,6 @@ public interface UserMapper {
     List<Position> findAllPosition();
 
     List<User> search(User users);
+
+    boolean addUser(UserVo user);
 }

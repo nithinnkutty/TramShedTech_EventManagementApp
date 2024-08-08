@@ -3,6 +3,7 @@ package com.tramshedtech.eventmanagement.controller;
 
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.Vo.UserVo;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
@@ -22,7 +23,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -272,5 +276,28 @@ public class UserController {
         responseResult.setData(userService.search(pages,users));
         return responseResult;
 
+    }
+
+    @PostMapping("/addUser")
+    public boolean addUser(@RequestBody UserVo user) throws ParseException {
+//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//        Date entryDate = format.parse(String.valueOf(user.getBirthday()));
+//        user.setBirthday(entryDate);
+
+        if(user.getSex().equals("1")){
+            user.setSex("Male");
+        } else if (user.getSex().equals("2")){
+            user.setSex("Female");
+        } else {
+            user.setSex("None");
+        }
+
+        String passWord = DigestUtils.md5Hex(user.getPassword());
+        user.setPassword(passWord);
+
+        System.out.println(user);
+
+        boolean r = userService.addUser(user);
+        return r;
     }
 }

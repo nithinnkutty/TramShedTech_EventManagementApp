@@ -2,6 +2,7 @@ package com.tramshedtech.eventmanagement.service;
 
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.Vo.UserVo;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
@@ -35,4 +36,6 @@ public interface UserService {
     List<Position> findAllPosition();
 
     CustomPage search(CustomPage pages, User users);
+
+    boolean addUser(UserVo user);
 }

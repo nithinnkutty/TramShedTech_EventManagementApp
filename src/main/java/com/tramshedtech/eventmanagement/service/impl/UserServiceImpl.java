@@ -3,6 +3,7 @@ package com.tramshedtech.eventmanagement.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
+import com.tramshedtech.eventmanagement.Vo.UserVo;
 import com.tramshedtech.eventmanagement.entity.CustomPage;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
@@ -125,6 +126,11 @@ public class UserServiceImpl implements UserService {
                 pageInfo.getPages(),
                 pageInfo.getList()
         );
+    }
+
+    @Override
+    public boolean addUser(UserVo user) {
+        return userMapper.addUser(user);
     }
 
 

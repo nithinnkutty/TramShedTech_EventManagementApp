@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import com.tramshedtech.eventmanagement.util.ResponseStatus;
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * authentication
  */
-
+@WebFilter("/filter")
 public class AuthFliter implements Filter {
 
     @Override
@@ -47,7 +48,7 @@ public class AuthFliter implements Filter {
                 servletResponse.setContentType("application/json;charset=utf-8");
 
                 // Data returned
-                ResponseResult responseResult = new ResponseResult().setCode(401).setMessage("您还没登陆，请登录").setStatus(ResponseStatus.NO_LOGIN);
+                ResponseResult responseResult = new ResponseResult().setCode(401).setMessage("You are not logged in, please log in").setStatus(ResponseStatus.NO_LOGIN);
 
                 // Convert an object to a string in JSON format: Jackson
                 String json = new ObjectMapper().writeValueAsString(responseResult);
@@ -71,12 +72,12 @@ public class AuthFliter implements Filter {
 
     // Determine if uri can be accessed anonymously (without logging in)
     public boolean anon(String uri){
-        if (1 == 1) return true; // Temporary release of all requests
+//        if (1 == 1) return true; // Temporary release of all requests
         // If it's the root path, just let it go.
         if(uri.equals("/")) return true;
 
         // All uri's that can be accessed anonymously
-        List<String> anons = Arrays.asList("/login.html","/js","/css","/user/login");
+        List<String> anons = Arrays.asList("/login.html","/js","/css","/user/login","/index.html","/img","/dashboard.html", "/api/events");
 
         // Set the variable, the default is false, means it can not be returned anonymously
         // AtomicBoolean: Atomicxxx variables can be shared within the current method and the method's lambda expression
