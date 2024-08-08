@@ -48,6 +48,7 @@ pipeline {
             }
         }
 
+
         stage('Install java and gradle'){
             steps{
                 script {
@@ -57,7 +58,11 @@ pipeline {
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 sudo yum update -y
 sudo yum install wget -y
+echo "Installing Git"
 sudo yum install git -y
+echo "Adding git.cardiff.ac.uk public key to jenkins known_hosts"
+ssh-keyscan git.cardiff.ac.uk >> ~/.ssh/known_hosts
+chmod 644 ~/.ssh/known_hosts
 echo "Installing Java"
 sudo yum install -y java-17-openjdk
 java -version

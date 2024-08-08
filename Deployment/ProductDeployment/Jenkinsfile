@@ -24,12 +24,11 @@ pipeline {
                 }
             }
         }
-        stage('Clone ') {
+        stage('Clone Project ') {
             steps {
                 script {
-                    // Clone commands
-                    sh 'echo "ssh into newly created instance"'
-                    sh 'echo "Clone Repo"'
+                    sh 'echo "SSH into newly created instance"'
+                    sh 'echo "clone the project"'
                 }
             }
         }
