@@ -71,6 +71,19 @@
             background-color: #45b4ed; /* Custom background color */
             color: white;
         }
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .location-text {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 
 
@@ -84,13 +97,13 @@
                     <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -106,7 +119,7 @@
                         <div class="card-content">
                             <h3>{{ room.roomName }}</h3>
                             <p>Room Number: {{ room.roomNumber }}</p>
-                            <p>Location: {{ room.location }}</p>
+                            <p class="location-text">Location: {{ room.location }}</p>
                             <el-button type="primary" @click="confirmCancel(room)">Cancel Booking</el-button>
                         </div>
                     </el-card>
