@@ -94,6 +94,46 @@ public class EventController {
         }
     }
 
+    @PostMapping("/delete/{id}")
+    public ResponseResult deleteEvent(@PathVariable Long id) {
+        try {
+            int result = eventService.softDeleteEvent(id);
+            if (result > 0) {
+                return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setMessage("Event deleted successfully");
+            } else {
+                return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL).setMessage("Event deletion failed");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL).setMessage("An error occurred");
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseResult updateEvent(@PathVariable Long id, @RequestBody Event event) {
+        event.setId(id);
+        try {
+            boolean success = eventService.updateEvent(event);
+            if (success) {
+                return new ResponseResult()
+                        .setCode(200)
+                        .setStatus(ResponseStatus.SUCCESS)
+                        .setMessage("Event updated successfully");
+            } else {
+                return new ResponseResult()
+                        .setCode(500)
+                        .setStatus(ResponseStatus.FAIL)
+                        .setMessage("Failed to update event");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseResult()
+                    .setCode(500)
+                    .setStatus(ResponseStatus.FAIL)
+                    .setMessage("An error occurred while updating the event");
+        }
+    }
+
     @GetMapping("/titles")
     public ResponseResult<List<String>> getAllEventTitles() {
         List<String> eventTitles = eventService.getAllEventTitles();

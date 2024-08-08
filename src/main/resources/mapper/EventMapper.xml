@@ -6,7 +6,7 @@
 
     <!-- Select all events -->
     <select id="getAllEvents" resultType="com.tramshedtech.eventmanagement.entity.Event">
-        SELECT * FROM events
+        SELECT * FROM events WHERE del = 1
     </select>
 
     <!-- Select event by ID -->
@@ -19,6 +19,30 @@
         INSERT INTO events(title, date, time, site, room, speaker, responsible, type, staff, company, contact, email, note, tag, cateringType, cateringCount, beverageType, dietaryRequirements, cateringServingTime)
         VALUES (#{title}, #{date}, #{time}, #{site}, #{room}, #{speaker}, #{responsible}, #{type}, #{staff}, #{company}, #{contact}, #{email}, #{note}, #{tag}, #{cateringType}, #{cateringCount}, #{beverageType}, #{dietaryRequirements}, #{cateringServingTime})
     </insert>
+
+    <!-- Delete event in DB -->
+    <update id="softDelete">
+        UPDATE events SET del = 0 WHERE id = #{id}
+    </update>
+
+    <!-- Update event data in DB -->
+    <update id="update">
+        UPDATE events
+        SET title = #{title},
+            date = #{date},
+            time = #{time},
+            room = #{room},
+            type = #{type},
+            speaker = #{speaker},
+            tag = #{tag},
+            responsible = #{responsible},
+            staff = #{staff},
+            company = #{company},
+            contact = #{contact},
+            email = #{email},
+            note = #{note}
+        WHERE id = #{id}
+    </update>
 
     <!-- Select room name in DB -->
     <select id="getRoomById" resultType="string">

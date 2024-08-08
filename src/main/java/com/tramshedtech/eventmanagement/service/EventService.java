@@ -14,4 +14,8 @@ public interface EventService {
     String getAllRoomName(int eventId);
 
     List<String> getAllEventTitles();
+
+    int softDeleteEvent(Long id);
+
+    boolean updateEvent(Event event);
 }

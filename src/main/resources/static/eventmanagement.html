@@ -22,6 +22,11 @@
             width="55">
     </el-table-column>
     <el-table-column
+            prop="id"
+            label="Event ID"
+            width="80">
+    </el-table-column>
+    <el-table-column
             prop="title"
             label="Event Name"
             width="180">
@@ -98,6 +103,9 @@
 
   <el-dialog :visible.sync="editDialogVisible" title="Edit Event">
     <el-form :model="editForm">
+      <el-form-item label="Event ID">
+        <el-input v-model="editForm.id"></el-input>
+      </el-form-item>
       <el-form-item label="Event Name">
         <el-input v-model="editForm.title"></el-input>
       </el-form-item>
@@ -107,34 +115,34 @@
       <el-form-item label="Time">
         <el-input v-model="editForm.time"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="room">
         <el-input v-model="editForm.room"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="type">
         <el-input v-model="editForm.type"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="speaker">
         <el-input v-model="editForm.speaker"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="tag">
         <el-input v-model="editForm.tag"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="responsible">
         <el-input v-model="editForm.responsible"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="staff">
         <el-input v-model="editForm.staff"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="company">
         <el-input v-model="editForm.company"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="contact">
         <el-input v-model="editForm.contact"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="email">
         <el-input v-model="editForm.email"></el-input>
       </el-form-item>
-      <el-form-item label="Time">
+      <el-form-item label="note">
         <el-input v-model="editForm.note"></el-input>
       </el-form-item>
     </el-form>
@@ -156,150 +164,66 @@
     el: '#app',
     data() {
       return {
-        tableData: [{
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Networking',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Food Festival',
-          date: '2024-07-25',
-          time:  '08:30-10:45',
-          room: 'The Crossing Cardiff CF24 2SO',
-          type: 'Networking',
-          speaker: 'Tommy',
-          tag: 'Real Estate',
-          responsible: 'Tommy',
-          staff: 'Tommy',
-          company: 'Cardiff',
-          contact: '12412412',
-          email: '124121@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Testmerge',
-          date: '2025-08-21',
-          time:  '09:00-14:45',
-          room: 'Zeng Cardiff Room 1 CF24 14O',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tony',
-          staff: 'Ta',
-          company: 'Cardiff',
-          contact: '102370',
-          email: '192879@cardiff',
-          note: 'No'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }, {
-          title: 'Tech Conference 2024',
-          date: '2016-05-03',
-          time:  '10:00-17:30',
-          room: 'Tramshed Tech Barry, Goodsheds Cardiff CF24 1SO',
-          type: 'Q&A’s',
-          speaker: 'Tommy',
-          tag: 'Marketing',
-          responsible: 'Tom',
-          staff: 'Tom',
-          company: 'Cardiff',
-          contact: '1241342',
-          email: '124124@cardiff',
-          note: 'Mic'
-        }],
+        tableData: [],
         multipleSelection: [],
         editDialogVisible: false,
         editForm: {}
       }
     },
+    created() {
+      this.fetchTableData();
+    },
     methods: {
+      fetchTableData() {
+        axios.get('/api/events')
+                .then(response => {
+                  if (response.data && response.data.status === 'SUCCESS') {
+                    this.tableData = response.data.data;
+                  } else {
+                    console.error('Failed to load events:', response.data.message);
+                  }
+                })
+                .catch(error => {
+                  console.error('Error fetching events:', error);
+                });
+      },
       handleEdit(index, row) {
         this.editForm = { ...row };
         this.editDialogVisible = true;
         console.log(index, row);
       },
       saveEdit() {
-        const index = this.tableData.findIndex(item => item.title === this.editForm.title);
-        if (index !== -1) {
-          this.$set(this.tableData, index, { ...this.editForm });
-        }
-        this.editDialogVisible = false;
+        // const index = this.tableData.findIndex(item => item.title === this.editForm.title);
+        // if (index !== -1) {
+        //   this.$set(this.tableData, index, { ...this.editForm });
+        // }
+        // this.editDialogVisible = false;
+        axios.put(`/api/events/${this.editForm.id}`, this.editForm)
+                .then(response => {
+                  if (response.data.status === 'SUCCESS') {
+                    const index = this.tableData.findIndex(item => item.id === this.editForm.id);
+                    if (index !== -1) {
+                      this.$set(this.tableData, index, { ...this.editForm });
+                    }
+                    this.editDialogVisible = false;
+                    this.$message({
+                      type: 'success',
+                      message: 'Event updated successfully'
+                    });
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: 'Failed to update event: ' + response.data.message
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error updating event:', error);
+                  this.$message({
+                    type: 'error',
+                    message: 'An error occurred while updating the event'
+                  });
+                });
       },
       handleDelete(index, row) {
         this.$confirm('Are you sure you want to delete this event?', 'Warning', {
@@ -307,10 +231,25 @@
           cancelButtonText: 'No',
           type: 'warning'
         }).then(() => {
-          this.tableData.splice(index, 1);
-          this.$message({
-            type: 'success',
-            message: 'Delete completed'
+          axios.post(`/api/events/delete/${row.id}`).then(response => {
+            if (response.data.status === 'SUCCESS') {
+              this.tableData.splice(index, 1);
+              this.$message({
+                type: 'success',
+                message: 'Delete completed'
+              });
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Delete failed'
+              });
+            }
+          }).catch(error => {
+            console.error(error);
+            this.$message({
+              type: 'error',
+              message: 'An error occurred'
+            });
           });
         }).catch(() => {
           this.$message({
