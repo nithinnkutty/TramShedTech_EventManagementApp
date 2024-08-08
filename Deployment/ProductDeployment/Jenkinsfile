@@ -1,8 +1,30 @@
 pipeline {
     agent any
 
+    environment {
+        OS_SSH_KEY = credentials('OS_SSH_KEY')
+        GIT_SSH_CREDS =  credentials('GIT_SSH_CREDS')
+    }
+
     stages {
-        stage('Clone') {
+        stage('Get instance IP') {
+            steps {
+                script {
+                    echo 'Attempting to copy artifacts from InfraCreation job...'
+                    // Copy the instance_ip.txt file from the previous job
+                    copyArtifacts(
+                            projectName: 'TramshedTechProject_InfraCreation',
+                            filter: 'instance_ip.txt',
+                            target: 'artifacts',
+                            selector: lastSuccessful()
+                    )
+                    echo 'Artifacts copied. Reading instance IP...'
+                    env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
+                    sh 'echo "Instance IP: $INSTANCE_IP"'
+                }
+            }
+        }
+        stage('Clone ') {
             steps {
                 script {
                     // Clone commands
