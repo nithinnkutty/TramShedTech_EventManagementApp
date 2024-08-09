@@ -35,10 +35,10 @@
                 </el-col>
                 <!-- Language Switcher -->
                 <el-col :span="2" style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">
-                    <img src="https://cdn.britannica.com/62/4962-004-7D6CF6DB/Flag-Wales.jpg" width="26px" height="auto" alt="Language Flag" class="me-1">
+                    <img :src="currentFlag" width="20px" height="14px" alt="Language Flag" class="me-1" style="margin-right: 5px;">
                     <el-dropdown @command="changeLanguage">
                         <el-button type="text" class="el-dropdown-link">
-                            {{ currentLanguage }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            {{ currentLanguage }}<i class="el-icon-arrow-down el-icon--right" style="margin-left: 3px;"></i>
                         </el-button>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item command="en">English</el-dropdown-item>
@@ -232,6 +232,7 @@
             token: '',
             username: '',
             currentLanguage: 'EN',
+            currentFlag: 'https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg', // default to UK flag
             translations: {}
         },
         mounted() {
@@ -284,6 +285,9 @@
                 this.currentLanguage = language.toUpperCase();
                 window.localStorage.setItem('language', this.currentLanguage);
 
+                // Update the flag based on the selected language
+                this.updateFlag();
+
                 // Load the language file dynamically
                 this.loadTranslations(language);
             },
@@ -303,6 +307,13 @@
                 const key = element.getAttribute('data-i18n-key');
                 element.textContent = this.translations[key] || key;
             });
+            },
+            updateFlag() {
+                if (this.currentLanguage === 'EN') {
+                    this.currentFlag = 'https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg'; // UK flag
+                } else if (this.currentLanguage === 'CY') {
+                    this.currentFlag = 'https://cdn.britannica.com/62/4962-004-7D6CF6DB/Flag-Wales.jpg'; // Wales flag
+                }
             },
             logout() {
                 window.localStorage.removeItem('token');
