@@ -71,7 +71,7 @@ public class BookingController {
         String roomNumber = (String) bookingData.get("roomNumber");
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
-        String location = (String) bookingData.get("location");
+        Integer location = (Integer) bookingData.get("location");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -212,7 +212,7 @@ public class BookingController {
         String roomNumber = (String) bookingData.get("roomNumber");
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
-        String location = (String) bookingData.get("location");
+        Integer location = (Integer) bookingData.get("location");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
