@@ -50,7 +50,7 @@
                             v-model="entrydate"
                             type="date"
                             value-format="yyyy-MM-dd"
-                            placeholder="Search by birtyday">
+                            placeholder="Search by entrydate">
                     </el-date-picker>
                 </el-col>
                 <el-button
@@ -134,7 +134,7 @@
                             <template slot-scope="scope">
                                 <span>
                                     <el-button type="text" size="small" icon="el-icon-arrow-right" @click="details(scope)">Modify</el-button>
-                                    <el-button type="text" size="small" icon="el-icon-delete-solid" @click="appear(scope)">Delete</el-button>
+                                    <el-button type="text" size="small" icon="el-icon-delete-solid" @click="del(scope)">Delete</el-button>
                                 </span>
                             </template>
                         </el-table-column>
@@ -152,7 +152,8 @@
             width="40%"
             title="Add New User"
             :visible.sync="innerVisibleAdd"
-            append-to-body>
+            append-to-body
+            @before-close="handleBeforeClose">
         <el-form :model="userListAdd" :rules="rules2" ref="userListAdd" label-width="120px">
             <el-form-item label="User Account" prop="account">
                 <el-input placeholder="Please enter username" v-model="userListAdd.account"></el-input>
@@ -234,7 +235,7 @@
             <el-form-item label="User Department" prop="department">
                 <el-select v-model="userListModify.did" placeholder="Please select department">
                     <el-option
-                            v-for="item in filteredDepartments"
+                            v-for="item in options"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -245,7 +246,7 @@
             <el-form-item label="User Position" prop="position">
                 <el-select v-model="userListModify.pid" placeholder="Please select position">
                     <el-option
-                            v-for="item in filteredPositions"
+                            v-for="item in options2"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -439,14 +440,14 @@
                 axios.get("/user/findAllDepartments").then(res => {
                     console.log(res.data)
                     this.options = res.data.data;
-                    this.filterOptions(); // Calling the filter method after the data has been loaded
+                    // this.filterOptions(); // Calling the filter method after the data has been loaded
                 })
             },
             showOptions:function () {
                 axios.get("/user/findAllPositions").then(res => {
                     console.log(res.data)
                     this.options2 = res.data.data;
-                    this.filterOptions(); // Calling the filter method after the data has been loaded
+                    // this.filterOptions(); // Calling the filter method after the data has been loaded
                 })
             },
             search:function (params) {
@@ -469,6 +470,10 @@
             handleSelectionChange: function(val) {
                 this.multipleSelection = val;
                 console.log(this.multipleSelection)
+            },
+            handleBeforeClose(done) {
+                this.$refs.userListAdd.resetFields();
+                done();
             },
             reset:function () {
                 this.account = "";
@@ -528,6 +533,26 @@
                 axios.get("/user/findbyIdModify/"+this.id).then(res => {
                     console.log(res.data.data)
                     this.userListModify = res.data.data;
+                })
+            },
+            del:function (scope) {
+                this.id = scope.row.id
+                axios.post("/user/findbyIdDel/"+this.id).then(res => {
+                    console.log(res.data.data)
+                    if (res.data.data == true) {
+                        this.$message({
+                            message: 'Delete user successfully',
+                            type: 'success'
+                        });
+                        this.showpage();
+                    } else {
+                        this.$message({
+                            message: 'Delete user fail',
+                            type: 'error'
+                        });
+                        console.log('error delete!!');
+                        return false;
+                    }
                 })
             },
         }

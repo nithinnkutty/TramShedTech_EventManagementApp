@@ -247,7 +247,7 @@ public class UserController {
         users.setDid(request.getParameter("did"));
         users.setPid(request.getParameter("pid"));
         users.setSex(request.getParameter("sex"));
-        users.setEntrydate(request.getParameter("birthday"));
+        users.setEntrydate(request.getParameter("entrydate"));
 
         System.out.println(users);
 
@@ -306,5 +306,15 @@ public class UserController {
                 .setCode(200)
                 .setStatus(ResponseStatus.SUCCESS)
                 .setData(user);
+    }
+
+    @PostMapping("/findbyIdDel/{id}")
+    public ResponseResult findbyIdDel(@PathVariable("id") int id){
+        boolean r = userService.findbyIdDel(id);
+
+        return new ResponseResult()
+                .setCode(200)
+                .setStatus(ResponseStatus.SUCCESS)
+                .setData(r);
     }
 }

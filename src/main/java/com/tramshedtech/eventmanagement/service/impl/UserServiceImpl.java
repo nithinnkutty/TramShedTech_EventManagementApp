@@ -138,5 +138,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.findbyIdModify(id);
     }
 
+    @Override
+    public boolean findbyIdDel(int id) {
+        return userMapper.findbyIdDel(id);
+    }
+
 
 }

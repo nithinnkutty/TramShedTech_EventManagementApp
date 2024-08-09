@@ -41,4 +41,6 @@ public interface UserMapper {
     boolean addUser(UserVo user);
 
     UserVo findbyIdModify(int id);
+
+    boolean findbyIdDel(int id);
 }
