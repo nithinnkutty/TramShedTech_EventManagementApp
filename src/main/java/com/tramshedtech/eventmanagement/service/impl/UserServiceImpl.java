@@ -133,5 +133,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.addUser(user);
     }
 
+    @Override
+    public UserVo findbyIdModify(int id) {
+        return userMapper.findbyIdModify(id);
+    }
+
 
 }

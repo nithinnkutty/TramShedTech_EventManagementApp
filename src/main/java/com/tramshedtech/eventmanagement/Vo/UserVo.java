@@ -15,7 +15,7 @@ public class UserVo {
     private String did;
     private String pid;
     private String sex;
-    private Date birthday;
+    private Date entrydate;
     private String phone;
     private String wechat;
 }

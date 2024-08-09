@@ -39,4 +39,6 @@ public interface UserMapper {
     List<User> search(User users);
 
     boolean addUser(UserVo user);
+
+    UserVo findbyIdModify(int id);
 }

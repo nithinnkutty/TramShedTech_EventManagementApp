@@ -38,4 +38,6 @@ public interface UserService {
     CustomPage search(CustomPage pages, User users);
 
     boolean addUser(UserVo user);
+
+    UserVo findbyIdModify(int id);
 }

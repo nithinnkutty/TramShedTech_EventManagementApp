@@ -13,7 +13,7 @@ public class User {
     private String did;
     private String pid;
     private String sex;
-    private String birthday;
+    private String entrydate;
     private String phone;
     private String wechat;
 }

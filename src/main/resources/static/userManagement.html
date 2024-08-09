@@ -47,7 +47,7 @@
                 <el-col :span="3" style="margin-right: 20px;">
                     <el-date-picker
                             size="medium"
-                            v-model="birthday"
+                            v-model="entrydate"
                             type="date"
                             value-format="yyyy-MM-dd"
                             placeholder="Search by birtyday">
@@ -78,7 +78,7 @@
                         <el-popover placement="top" width="160" v-model="visible" class="custom-popover">
                             <p>Selection rules</p>
                             <div style="text-align: right; margin: 0">
-                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('beginDate')">By Birthdays</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('beginDate')">By entrydates</el-button>
                                 <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('orderStatus')">By Position</el-button>
                                 <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('submitter')">By Department</el-button>
                             </div>
@@ -115,9 +115,9 @@
                                 <span>{{scope.row.sex}}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column label="Birthday" show-overflow-tooltip width="140">
+                        <el-table-column label="Entrydate" show-overflow-tooltip width="140">
                             <template slot-scope="scope">
-                                <span>{{scope.row.birthday}}</span>
+                                <span>{{scope.row.entrydate}}</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="Phone" show-overflow-tooltip width="160">
@@ -196,14 +196,14 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="User Birthday" prop="birthday">
+            <el-form-item label="User Entrydate" prop="entrydate">
                 <el-date-picker
                         size="medium"
-                        v-model="userListAdd.birthday"
+                        v-model="userListAdd.entrydate"
                         style="width: 100%;"
                         type="date"
                         value-format="yyyy-MM-dd"
-                        placeholder="Select birthday">
+                        placeholder="Select entrydate">
                 </el-date-picker>
             </el-form-item>
             <el-form-item label="User's Phone" prop="phone">
@@ -215,6 +215,74 @@
             <el-form-item>
                 <el-button type="primary" @click="submitFormAdd('userListAdd')" :plain="true">Add</el-button>
                 <el-button @click="resetForm('userListAdd')">Reset</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+    <el-dialog
+            width="40%"
+            title="Modify User Information"
+            :visible.sync="innerVisibleModify"
+            append-to-body>
+        <el-form :model="userListModify" :rules="rules2" ref="userListAdd" label-width="120px">
+            <el-form-item label="User Account" prop="account">
+                <el-input placeholder="Please enter username" v-model="userListModify.account"></el-input>
+            </el-form-item>
+            <el-form-item label="User Email" prop="email">
+                <el-input placeholder="Please enter email" v-model="userListModify.email" type="email"></el-input>
+            </el-form-item>
+            <el-form-item label="User Department" prop="department">
+                <el-select v-model="userListModify.did" placeholder="Please select department">
+                    <el-option
+                            v-for="item in filteredDepartments"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Position" prop="position">
+                <el-select v-model="userListModify.pid" placeholder="Please select position">
+                    <el-option
+                            v-for="item in filteredPositions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Gender" prop="gender">
+                <el-select v-model="userListModify.sex" placeholder="Please select gender">
+                    <el-option
+                            v-for="item in options3"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Entrydate" prop="entrydate">
+                <el-date-picker
+                        size="medium"
+                        v-model="userListModify.entrydate"
+                        style="width: 100%;"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="Select entrydate">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="User's Phone" prop="phone">
+                <el-input placeholder="Please enter user's phone" v-model="userListModify.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="User's WeChat" prop="wechat">
+                <el-input placeholder="Please enter user's WeChat" v-model="userListModify.wechat"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitFormModify('userListModify')" :plain="true">Modify</el-button>
+                <el-button @click="resetForm('userListModify')">Reset</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -244,12 +312,13 @@
                         did: "",
                         pid: "",
                         sex: "",
-                        birthday: "",
+                        entrydate: "",
                         phone: "",
                         wechat: "",
                         zip: ""
                     },
                 innerVisibleAdd: false,
+                innerVisibleModify: false,
                 outerVisible: false,
                 position: '',
                 department: '',
@@ -273,11 +342,7 @@
                 did: "",
                 pid: "",
                 sex: "",
-                birthday: "",
-                innerVisible2: false,
-                innerVisible3: false,
-                innerVisible4: false,
-                innerVisible5: false,
+                entrydate: "",
                 delid: 1,
                 fullscreenLoading: false,
                 userListAdd:
@@ -288,7 +353,18 @@
                         did: "",
                         pid: "",
                         sex: "",
-                        birthday: "",
+                        entrydate: "",
+                        phone: "",
+                        wechat: "",
+                    },
+                userListModify:
+                    {
+                        account: "",
+                        email: "",
+                        did: "",
+                        pid: "",
+                        sex: "",
+                        entrydate: "",
                         phone: "",
                         wechat: "",
                     },
@@ -317,7 +393,7 @@
                     // gender: [
                     //     {required: true, message: 'Please select the user\'s gender', trigger: 'change'}
                     // ],
-                    birthday: [
+                    entrydate: [
                         {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
                     ],
                     phone: [
@@ -382,10 +458,10 @@
                         did: this.did,
                         pid: this.pid,
                         sex: this.sex,
-                        birthday: this.birthday
+                        entrydate: this.entrydate
                     }}).then(res => {
                     console.log(res.data)
-                    console.log(this.birthday)
+                    console.log(this.entrydate)
                     this.userList = res.data.data.pageData;
                     this.total = res.data.data.total;
                 })
@@ -399,7 +475,7 @@
                 this.pid = "",
                 this.did = "",
                 this.sex = "",
-                this.birthday = "";
+                this.entrydate = "";
             },
             submitFormAdd(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -414,7 +490,7 @@
                                     type: 'success'
                                 });
                                 this.showpage()
-                                this.userListAdd = {id: "", account: "", email: "", did: "", pid: "", sex: "", birthday: "", phone: "", wechat: ""};
+                                this.userListAdd = {id: "", account: "", email: "", did: "", pid: "", sex: "", entrydate: "", phone: "", wechat: ""};
                             }
                         })
                     } else {
@@ -445,6 +521,14 @@
                     this.filteredDepartments = this.options;
                     this.filteredPositions = this.options2;
                 }
+            },
+            details: function(scope){
+                this.innerVisibleModify = true;
+                this.id = scope.row.id
+                axios.get("/user/findbyIdModify/"+this.id).then(res => {
+                    console.log(res.data.data)
+                    this.userListModify = res.data.data;
+                })
             },
         }
     });

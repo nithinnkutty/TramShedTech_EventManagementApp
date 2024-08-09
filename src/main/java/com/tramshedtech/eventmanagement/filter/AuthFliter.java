@@ -77,7 +77,7 @@ public class AuthFliter implements Filter {
         if(uri.equals("/")) return true;
 
         // All uri's that can be accessed anonymously
-        List<String> anons = Arrays.asList("/login.html","/js","/css","/user/login","/index.html","/img","/dashboard.html", "/api/events");
+        List<String> anons = Arrays.asList("/login.html","/js","/css","/user/login","/index.html","/img","/dashboard.html", "/api/events","/user/regis");
 
         // Set the variable, the default is false, means it can not be returned anonymously
         // AtomicBoolean: Atomicxxx variables can be shared within the current method and the method's lambda expression

@@ -82,11 +82,6 @@ public class UserController {
 
 
 
-//        Date date = new Date();
-//        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-//        String format = dateFormat.format(date);
-
-
         // The code executes here indicating that the login was successful and returns the user information to the front-end.
         responseResult.setCode(200);
         responseResult.setMessage("Login successful");
@@ -113,6 +108,11 @@ public class UserController {
         String passWord = DigestUtils.md5Hex(user.getPassword());
         user.setPassword(passWord);
         System.out.println(user.getPassword());
+
+        Date date = new Date();
+        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
+        String format = dateFormat.format(date);
+        user.setEntrydate(format);
 
         boolean r = userService.regis(user);
 
@@ -247,7 +247,7 @@ public class UserController {
         users.setDid(request.getParameter("did"));
         users.setPid(request.getParameter("pid"));
         users.setSex(request.getParameter("sex"));
-        users.setBirthday(request.getParameter("birthday"));
+        users.setEntrydate(request.getParameter("birthday"));
 
         System.out.println(users);
 
@@ -258,14 +258,14 @@ public class UserController {
 
         CustomPage pages = new CustomPage().setCurrentPage(page).setSize(size);
 
-        if (users.getBirthday().length()>10){
-            String s = users.getBirthday().substring(0,10);
+        if (users.getEntrydate().length()>10){
+            String s = users.getEntrydate().substring(0,10);
             System.out.println(s);
-            users.setBirthday(s);
+            users.setEntrydate(s);
         } else {
-            int a = users.getBirthday().length();
-            String s = users.getBirthday().substring(0,a);
-            users.setBirthday(s);
+            int a = users.getEntrydate().length();
+            String s = users.getEntrydate().substring(0,a);
+            users.setEntrydate(s);
         }
 
         System.out.println(users);
@@ -280,9 +280,6 @@ public class UserController {
 
     @PostMapping("/addUser")
     public boolean addUser(@RequestBody UserVo user) throws ParseException {
-//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//        Date entryDate = format.parse(String.valueOf(user.getBirthday()));
-//        user.setBirthday(entryDate);
 
         if(user.getSex().equals("1")){
             user.setSex("Male");
@@ -299,5 +296,15 @@ public class UserController {
 
         boolean r = userService.addUser(user);
         return r;
+    }
+
+    @GetMapping("/findbyIdModify/{id}")
+    public ResponseResult findbyIdModify(@PathVariable("id") int id){
+        UserVo user = userService.findbyIdModify(id);
+
+        return new ResponseResult()
+                .setCode(200)
+                .setStatus(ResponseStatus.SUCCESS)
+                .setData(user);
     }
 }
