@@ -19,4 +19,6 @@ public interface BookingService {
     List<BookingsVo> searchAll() throws ParseException;
 
     List<String> getAllRoomName();
+
+    List<Bookings> getRoomsByLocationId(int locationId);
 }

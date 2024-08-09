@@ -67,6 +67,18 @@
         </el-row>
 
         <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.location" @change="fetchRoomsForLocation" clearable placeholder="please select">
+                    <el-option label="Tramshed Tech Barry, GoodSheds" value="1"></el-option>
+                    <el-option label="Tramshed Tech, Grangetown" value="2"></el-option>
+                    <el-option label="Tramshed Tech Innovation Station, Newport" value="3"></el-option>
+                    <el-option label="Tramshed Tech Griffin Place, Newport" value="4"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <el-select v-model="formData.room" clearable placeholder="please select">
@@ -99,15 +111,6 @@
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <div class="grid-content input">
                     <el-input v-model="formData.speaker" placeholder="speaker"></el-input>
-                </div>
-            </div></el-col>
-        </el-row>
-
-        <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
-            <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.site" placeholder="location"></el-input>
                 </div>
             </div></el-col>
         </el-row>
@@ -228,7 +231,7 @@
                     date: '',
                     time: '',
                     speaker: '',
-                    site: '',
+                    location: '',
                     // catering fields
                     cateringType: '',
                     cateringCount: 0,
@@ -312,6 +315,23 @@
                         console.error('Failed to fetch rooms:', error);
                     });
             },
+            fetchRoomsForLocation() {
+                axios.get(`/api/events/rooms/${this.formData.location}`)
+                    .then(response => {
+                        if (!response.data || !Array.isArray(response.data)) {
+                            console.error('No data or data is not an array');
+                            return;
+                        }
+                        this.room = response.data.map(room => ({
+                            value: room.id,
+                            label: `${room.roomName} - ${room.location} - ${room.postcode}`
+
+                        }));
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch corresponding rooms:', error);
+                    });
+            },
             /*Converts the obtained date data into the desired date YYYY-MM-DD*/
             getFormattedDate(date) {
                 const year = date.getFullYear();
@@ -320,7 +340,7 @@
                 return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             },
             handleButtonClick() {
-                if (!this.formData.title || !this.formData.date || !this.formData.startTime || !this.formData.endTime || !this.formData.site || !this.formData.room) {
+                if (!this.formData.title || !this.formData.date || !this.formData.startTime || !this.formData.endTime || !this.formData.location || !this.formData.room) {
                     // Alert user all fields are required
                     alert('Please fill in all required fields: Event Name, Date, Time, Location, and Room.');
                     return;  // Stop the function if validation fails
@@ -336,7 +356,7 @@
                     room: this.formData.room,
                     type: this.formData.type,
                     speaker: this.formData.speaker,
-                    site: this.formData.site,
+                    location: this.formData.location,
                     staff: this.formData.tableData[0].staff,
                     tag: this.formData.tableData[0].tag,
                     company: this.formData.tableData[0].company,
@@ -364,7 +384,7 @@
                     }
                 })
                 .catch(error => {
-                    console.log('Error creating event', error);
+                    console.log('Error creating event', error.response);
                 });
             }
         }

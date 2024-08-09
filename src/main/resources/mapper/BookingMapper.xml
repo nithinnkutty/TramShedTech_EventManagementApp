@@ -82,5 +82,20 @@
         <result column="del" property="del" />
     </resultMap>
 
+    <select id="findRoomsByLocationId" resultType="com.tramshedtech.eventmanagement.entity.Bookings">
+        SELECT
+            b.id,
+            b.room_name AS roomName,
+            l.location,
+            b.postcode
+        FROM
+            bookings b
+                JOIN
+            location l ON b.location = l.id
+        WHERE
+            b.location = #{locationId}
+          AND b.status = 1
+    </select>
+
 
 </mapper>

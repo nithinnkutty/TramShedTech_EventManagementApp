@@ -12,6 +12,7 @@ public class Event {
     private String title;
     private String date;
     private String time;
+    private Integer location;
     private Integer room;
     private String tag;
     private String speaker;
@@ -23,7 +24,6 @@ public class Event {
     private String company;
     private String contact;
     private String email;
-    private String site;
     private String note;
 
     // Fields for catering
