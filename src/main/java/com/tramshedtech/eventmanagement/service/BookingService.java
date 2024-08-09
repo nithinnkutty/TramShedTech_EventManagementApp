@@ -18,5 +18,9 @@ public interface BookingService {
 
     List<BookingsVo> searchAll() throws ParseException;
 
+    boolean updateBookingStatus(Integer id, Integer status);
+
+    List<BookingsVo> searchNotCancel();
+
     List<String> getAllRoomName();
 }

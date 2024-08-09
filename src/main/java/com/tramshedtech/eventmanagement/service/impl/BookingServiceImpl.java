@@ -37,6 +37,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public boolean updateBookingStatus(Integer id, Integer status) {
+        return bookingMapper.updateBookingStatus(id,status);
+    }
+
+    @Override
+    public List<BookingsVo> searchNotCancel() {
+        return bookingMapper.searchNotCancel();
+    }
+
+    @Override
     public Bookings getBookingById(Integer id) {
         return bookingMapper.getBookingById(id);
     }
@@ -63,7 +73,8 @@ public class BookingServiceImpl implements BookingService {
             bookingsVo.setStartTime(booking.getStartTime());
             bookingsVo.setEndDate(endDateString);
             bookingsVo.setEndTime(booking.getEndTime());
-//            bookingsVo.setStatus(booking.getStatus());
+            bookingsVo.setStatus(booking.getStatus());
+            bookingsVo.setRoomCapacity(booking.getRoomCapacity());
             bookingsVo.setPostcode(booking.getPostcode());
             bookingsVo.setMessage(booking.getMessage());
             bookingsVo.setImg(booking.getImg());
