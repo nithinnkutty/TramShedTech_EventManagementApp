@@ -97,6 +97,13 @@
             margin-bottom: 20px;
         }
 
+        .carousel-item img {
+            width: 100%; /* 图片宽度设置为框的100% */
+            height: auto; /* 高度自动调整以保持图片比例 */
+            object-fit: cover; /* 将图片裁剪以适应框的大小 */
+        }
+
+
         .book-resource-button {
             margin-top: 10px;
         }
@@ -126,13 +133,13 @@
                     <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResources">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResources">Create a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -145,12 +152,18 @@
                                 <img :src="imgUrl" alt="Carousel Image">
                             </el-carousel-item>
                         </el-carousel>
-                        <el-descriptions :title="'Room ' + item.roomNumber">
-                            <el-descriptions-item label="description">{{ item.roomName }}-{{ item.location
-                                }}-{{ item.postcode }}
+                        <el-descriptions :title="'Room Name: ' + item.roomName">
+                            <el-descriptions-item label="Description">{{ item.roomNumber }} - {{ item.location
+                                }} - {{ item.postcode }}
                             </el-descriptions-item>
                             <el-descriptions-item label="">
-                                <el-button class="book-resource-button" @click="view(item.id)">view</el-button>
+                                <el-button
+                                        type="primary"
+                                        @click="view(item.id)"
+                                        :disabled="item.status === 0"
+                                        :class="{ 'disabled-button': item.status === 0, 'book-resource-button': true }">
+                                    View
+                                </el-button>
                             </el-descriptions-item>
                         </el-descriptions>
                     </div>
@@ -175,6 +188,9 @@
                 <el-form-item label="Postcode">
                     <el-input v-model="editForm.postcode" readonly></el-input>
                 </el-form-item>
+                <el-form-item label="Capacity" prop="roomCapacity">
+                    <el-input v-model="editForm.roomCapacity" :min="1" readonly></el-input>
+                </el-form-item>
                 <el-form-item label="Location">
                     <el-input v-model="editForm.location" readonly></el-input>
                 </el-form-item>
@@ -183,12 +199,16 @@
                 </el-form-item>
                 <el-form-item label="AV">
                     <el-checkbox-group v-model="editForm.av" readonly>
-                        <el-checkbox :label="item" v-for="item in editForm.av" :key="item">{{ item }}</el-checkbox>
+                        <el-alert
+                                title="Basic equipments we already have: one SCREEN, multi DESKS, multi CHAIRS."
+                                type="warning"
+                                :closable="false">
+                        </el-alert>
                     </el-checkbox-group>
                 </el-form-item>
-                <el-form-item label="Payment">
-                    <el-input v-model="editForm.payment" readonly></el-input>
-                </el-form-item>
+<!--                <el-form-item label="Payment">-->
+<!--                    <el-input v-model="editForm.payment" readonly></el-input>-->
+<!--                </el-form-item>-->
                 <el-form-item label="Message">
                     <el-input v-model="editForm.message" type="textarea" readonly></el-input>
                 </el-form-item>
@@ -217,6 +237,7 @@
                     daterange: [],
                     av: [],
                     payment: '',
+                    roomCapacity:'',
                     message: '',
                     img: []
                 }
@@ -265,6 +286,7 @@
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // Ensure av is an array
                             payment: data.payment || '',
                             message: data.message || '',
+                            roomCapacity: data.roomCapacity || '',
                             img: data.img // Set img field as array
                         };
                         this.dialogFormVisible = true; // Show the dialog

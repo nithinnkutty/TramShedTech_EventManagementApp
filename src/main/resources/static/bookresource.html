@@ -80,13 +80,13 @@
             <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
         </el-col>
         <el-col :span="6">
-            <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+            <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
         </el-col>
         <el-col :span="6">
-            <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+            <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
         </el-col>
         <el-col :span="6">
-            <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
+            <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
         </el-col>
     </el-row>
 
@@ -100,6 +100,9 @@
         <el-form-item label="Postcode" prop="postcode">
             <el-input v-model="ruleForm.postcode"></el-input>
         </el-form-item>
+        <el-form-item label="Capacity" prop="roomCapacity">
+            <el-input-number v-model="ruleForm.roomCapacity" :min="1"></el-input-number>
+        </el-form-item>
         <el-form-item label="Location" prop="location">
             <el-select v-model="ruleForm.location" placeholder="Please select location">
                 <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
@@ -108,7 +111,7 @@
                 <el-option label="Tramshed Tech Griffin Place, Newport" value="Tramshed Tech Griffin Place, Newport"></el-option>
             </el-select>
         </el-form-item>
-        <el-form-item label="Book resource between" prop="daterange">
+        <el-form-item label="Room opening between" prop="daterange">
             <el-date-picker
                     v-model="ruleForm.daterange"
                     type="datetimerange"
@@ -180,6 +183,7 @@
                     roomNumber: '',
                     roomName: '',
                     postcode: '',
+                    roomCapacity:'',
                     location: '',
                     daterange: [],
                     av: [],
@@ -251,19 +255,19 @@
                                 if (response.status === 200 && response.data.data) {
                                     const newBookingId = response.data.data.id;
                                     this.$message({
-                                        message: 'Resource booked successfully',
+                                        message: 'Resource added successfully',
                                         type: 'success'
                                     });
                                     localStorage.setItem("bookingId", newBookingId);
                                     window.location.href = '/bookmanagement.html';
                                 } else {
-                                    alert('Resource booking failed');
+                                    alert('Resource adding failed');
                                 }
                             })
                             .catch(error => {
                                 console.log(error);
                                 this.$message({
-                                    message: 'Resource booking failed',
+                                    message: 'Resource adding failed',
                                     type: 'error'
                                 });
                             });
@@ -305,6 +309,11 @@
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                this.ruleForm.img = fileList.map(f => ({
+                    name: f.name,
+                    url: f.url,
+                    uid: f.uid,
+                }));
             },
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;

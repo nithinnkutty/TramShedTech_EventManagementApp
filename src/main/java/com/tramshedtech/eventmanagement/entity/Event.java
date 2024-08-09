@@ -16,6 +16,7 @@ public class Event {
     private String tag;
     private String speaker;
     private String responsible;
+    private Integer del;
     // Table data fields
     private String type;
     private String staff;

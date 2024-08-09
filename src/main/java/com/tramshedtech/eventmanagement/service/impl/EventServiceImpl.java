@@ -40,5 +40,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public String getAllRoomName(int eventId){return eventMapper.getRoomById(eventId);}
+    public String getAllRoomName(int eventId){ return eventMapper.getRoomById(eventId); }
+
+    @Override
+    public int softDeleteEvent(Long id) { return eventMapper.softDelete(id); }
+
+    @Override
+    public boolean updateEvent(Event event) {
+        int result = eventMapper.update(event);
+        return result > 0;
+    }
 }

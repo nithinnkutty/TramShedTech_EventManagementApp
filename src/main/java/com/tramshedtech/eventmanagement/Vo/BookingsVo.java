@@ -1,7 +1,6 @@
 package com.tramshedtech.eventmanagement.Vo;
 
 import lombok.Data;
-import org.simpleframework.xml.convert.Convert;
 
 import java.io.Serializable;
 import java.sql.Time;
@@ -20,8 +19,14 @@ public class BookingsVo implements Serializable {
     private Time startTime;
     private String endDate;
     private Time endTime;
-//    private String postcode;
-    private String status;
+    /**
+     * capacity of the room
+     */
+    private Integer roomCapacity;
+    /**
+     * status 0 off the shelf 1 on the shelf
+     */
+    private Integer status;
     private String message;
     private String img;
     private String av;

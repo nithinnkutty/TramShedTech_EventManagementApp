@@ -17,6 +17,12 @@ public interface EventMapper {
 
     String getRoomById(int eventId);
 
+    int softDelete(Long id);
+    
+    
+
     @Select("SELECT title FROM events")
     List<String> getAllEventTitles();
+
+    int update(Event event);
 }
