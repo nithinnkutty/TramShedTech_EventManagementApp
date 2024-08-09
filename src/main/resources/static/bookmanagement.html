@@ -95,13 +95,13 @@
                     <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookingRecord">Booking Record</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -137,12 +137,8 @@
                                 width="55"
                                 align="center">
                             <template slot-scope="scope">
-                                {{ scope.$index + 1}}
+                                {{ scope.$index + 1 }}
                             </template>
-                        </el-table-column>
-                        <el-table-column
-                                type="selection"
-                                width="55">
                         </el-table-column>
                         <el-table-column
                                 prop="startDate"
@@ -154,11 +150,6 @@
                                 label="Room Name"
                                 width="180">
                         </el-table-column>
-                        <!--                        <el-table-column-->
-                        <!--                                prop="postcode"-->
-                        <!--                                label="Postcode"-->
-                        <!--                                width="180">-->
-                        <!--                        </el-table-column>-->
                         <el-table-column
                                 prop="location"
                                 label="Location">
@@ -222,6 +213,9 @@
             <el-form-item label="Postcode" prop="postcode">
                 <el-input v-model="editForm.postcode"></el-input>
             </el-form-item>
+            <el-form-item label="Capacity" prop="roomCapacity">
+                <el-input-number v-model="editForm.roomCapacity" :min="1"></el-input-number>
+            </el-form-item>
             <el-form-item label="Location" prop="location">
                 <el-select v-model="editForm.location" placeholder="Please select location">
                     <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
@@ -265,6 +259,7 @@
                         :on-remove="handleRemove"
                         :file-list="editForm.img"
                         :before-upload="beforeUpload"
+                        :on-success="handleUploadSuccess"
                         accept="image/*">
                     <i class="el-icon-plus"></i>
                 </el-upload>
@@ -339,6 +334,7 @@
                     av: [],
                     payment: '',
                     message: '',
+                    roomCapacity:'',
                     img: [] // make sure it's an array
                 },
                 rules: {
@@ -415,7 +411,16 @@
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.editForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
             handleEdit(index, row) {
                 console.log("Edit button clicked", index, row);
                 axios.get(`/booking/${row.id}`)
@@ -427,6 +432,7 @@
                             url: url,
                             uid: url, // Use the URL as the unique identifier
                         })) : [];
+                        console.log("imgList:", imgList);
                         this.editForm = {
                             id: data.id,
                             roomNumber: data.roomNumber || '',
@@ -437,7 +443,8 @@
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
                             payment: data.payment || '',
                             message: data.message || '',
-                            img: imgList // Ensure array
+                            roomCapacity: data.roomCapacity || '',
+                            img: imgList // 设置img字段为数组
                         };
                         this.dialogFormVisible = true; // display edit form
                     })
@@ -451,6 +458,7 @@
                         // Convert the img field to a comma-separated string before committing
                         const imgNames = this.editForm.img.map(item => item.name).join(',');
                         const updatedForm = { ...this.editForm, img: imgNames };
+                        debugger
                         axios.post(`/booking/update`, updatedForm)
                             .then(response => {
                                 this.$message({
@@ -576,6 +584,8 @@
 
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                // Remove the file from the img array
+                this.editForm.img = this.editForm.img.filter(item => item.uid !== file.uid);
             },
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;

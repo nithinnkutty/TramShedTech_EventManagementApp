@@ -66,12 +66,13 @@ public class BookingController {
 
 
     @PostMapping("/add")
-    public ResponseResult addBooking (@RequestBody Map<String, Object> bookingData) throws ParseException {
+    public ResponseResult addBooking(@RequestBody Map<String, Object> bookingData) throws ParseException {
 
         String roomNumber = (String) bookingData.get("roomNumber");
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
         String location = (String) bookingData.get("location");
+        Integer roomCapacity = (Integer) bookingData.get("roomCapacity");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -115,6 +116,9 @@ public class BookingController {
         booking.setMessage(message);
         booking.setImg(img);
         booking.setDel(0);
+        booking.setRoomCapacity(roomCapacity);
+        // Set status to 1 (available)
+        booking.setStatus(1);
 
         boolean r = bookingService.addBooking(booking);
         ResponseResult responseResult = new ResponseResult();
@@ -153,10 +157,33 @@ public class BookingController {
         return responseResult;
     }
 
+    @PostMapping("/updateStatus")
+    public ResponseResult updateStatus(@RequestBody Map<String, Integer> requestData) {
+        Integer id = requestData.get("id");
+        Integer status = requestData.get("status");
+        boolean result = bookingService.updateBookingStatus(id, status);
+        ResponseResult responseResult = new ResponseResult();
+        if (result) {
+            responseResult.setCode(200);
+            responseResult.setMessage("Booking deleted successfully");
+        } else {
+            responseResult.setCode(400);
+            responseResult.setMessage("Booking deletion failed");
+        }
+        return responseResult;
+    }
+
 
     @GetMapping("/searchAll")
-    public List<BookingsVo> searchAll () throws ParseException {
+    public List<BookingsVo> searchAll() throws ParseException {
         List<BookingsVo> bookings = bookingService.searchAll();
+//        System.out.println(bookings);
+        return bookings;
+    }
+
+    @GetMapping("/searchNotCancel")
+    public List<BookingsVo> searchNotCancel() throws ParseException {
+        List<BookingsVo> bookings = bookingService.searchNotCancel();
 //        System.out.println(bookings);
         return bookings;
     }
@@ -213,6 +240,7 @@ public class BookingController {
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
         String location = (String) bookingData.get("location");
+        Integer roomCapacity = (Integer) bookingData.get("roomCapacity");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -255,6 +283,7 @@ public class BookingController {
         booking.setPayment(payment);
         booking.setMessage(message);
         booking.setImg(img);
+        booking.setRoomCapacity(roomCapacity);
         booking.setDel(0);
 
         boolean r = bookingService.updateBooking(booking);

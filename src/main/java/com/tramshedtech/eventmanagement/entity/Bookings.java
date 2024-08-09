@@ -16,8 +16,14 @@ public class Bookings {
     private Time startTime;
     private Date endDate;
     private Time endTime;
-//    private String postcode;
-//    private String status;
+    /**
+     * capacity of the room
+     */
+    private Integer roomCapacity;
+    /**
+     * status 0 off the shelf 1 on the shelf
+     */
+    private Integer status;
     private String message;
     private String img;
     private String av;
