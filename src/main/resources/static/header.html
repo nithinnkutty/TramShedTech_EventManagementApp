@@ -13,25 +13,38 @@
     <el-container style="height: 100%;">
         <el-header style="background-color: #F9B117;height: 80px;margin: 20px;padding: 0px;">
             <el-row style="height: 100%;">
-                <el-col :span="4" style="background-color:white;height: 100%;">
-                    <img src="img/logo.png" class="logo-image" alt="Logo">
+                <el-col :span="4" style="background-color:white;height: 100%; display: flex; align-items: center;">
+                    <img src="img/logo.png" class="logo-image" alt="Logo" style="max-width: 100%; height: auto;">
                 </el-col>
-                <el-col :span="3" :offset="16" style="height: 100%;">
-                    <div class="login-container">
+                <el-col :span="4" :offset="12" style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">
+                    <div class="login-container" style="display: flex; align-items: center;">
                         <el-avatar class="user-avatar" :src="imageUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' "></el-avatar>
                         <el-dropdown v-if="token" @command="handleCommand">
                             <el-button type="text" class="el-dropdown-link">
                                 {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item @click.native="change('profile.html')">Modify Information</el-dropdown-item>
-                                <el-dropdown-item @click.native="change('password.html')">Modify Password</el-dropdown-item>
-                                <el-dropdown-item @click.native="change('avatar.html')">Upload Avatar</el-dropdown-item>
-                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('profile.html')" data-i18n-key="modify_information">Modify Information</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('password.html')" data-i18n-key="modify_password">Modify Password</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('avatar.html')" data-i18n-key="upload_avatar">Upload Avatar</el-dropdown-item>
+                                <el-dropdown-item command="logout" data-i18n-key="logout">Logout</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button v-else type="text" @click="handleLogin" class="underline-button">Login</el-button>
+                        <el-button v-else type="text" @click="handleLogin" class="underline-button" data-i18n-key="login">Login</el-button>
                     </div>
+                </el-col>
+                <!-- Language Switcher -->
+                <el-col :span="2" style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">
+                    <img src="https://cdn.britannica.com/62/4962-004-7D6CF6DB/Flag-Wales.jpg" width="26px" height="auto" alt="Language Flag" class="me-1">
+                    <el-dropdown @command="changeLanguage">
+                        <el-button type="text" class="el-dropdown-link">
+                            {{ currentLanguage }}<i class="el-icon-arrow-down el-icon--right"></i>
+                        </el-button>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="en">English</el-dropdown-item>
+                            <el-dropdown-item command="cy">Welsh</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
                 </el-col>
             </el-row>
         </el-header>
@@ -41,25 +54,24 @@
                     <el-menu default-active="1" class="el-menu-vertical-demo custom-menu">
                         <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Dashboard</span>
+                            <span slot="title" data-i18n-key="dashboard">Dashboard</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('create-event.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
-                            <span slot="title">Event Management</span>
+                            <span slot="title" data-i18n-key="event_management">Event Management</span>
                         </el-menu-item>
                         <el-menu-item index="3" @click="change('participants-speakers.html')" class="custom-menu-item">
                             <i class="el-icon-document"></i>
-                            <span slot="title">Participants & Speakers</span>
+                            <span slot="title" data-i18n-key="participants_speakers">Participants & Speakers</span>
                         </el-menu-item>
                         <el-menu-item index="4" @click="change('bookmanagement.html')" class="custom-menu-item">
                             <i class="el-icon-setting"></i>
-                            <span slot="title">Booking Management</span>
+                            <span slot="title" data-i18n-key="booking_management">Booking Management</span>
                         </el-menu-item>
                     </el-menu>
                 </div>
             </el-aside>
             <el-main style="background-color: beige;height: 100%;">
-                <!-- Divide the page into multiple small pages, each page can display an independent HTML file -->
                 <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;padding: 0px"></iframe>
             </el-main>
         </el-container>
@@ -219,9 +231,14 @@
             imageUrl:'',
             token: '',
             username: '',
+            currentLanguage: 'EN',
+            translations: {}
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
+            const savedLanguage = window.localStorage.getItem('language') || 'en';
+            this.loadTranslations(savedLanguage.toLowerCase());
+            this.currentLanguage = savedLanguage.toUpperCase();
             if (!this.token) {
                 return; // End method if no token
             } else {
@@ -262,6 +279,30 @@
             viewEvent(eventId) {
                 console.log(`Redirecting to event.html?id=${eventId}`);
                 window.location.href = `/event.html?id=${eventId}`;
+            },
+            changeLanguage(language) {
+                this.currentLanguage = language.toUpperCase();
+                window.localStorage.setItem('language', this.currentLanguage);
+
+                // Load the language file dynamically
+                this.loadTranslations(language);
+            },
+            loadTranslations(language) {
+                const langFilePath = `static/locales/${language}.json`;
+                axios.get(langFilePath)
+                .then(response => {
+                this.translations = response.data;
+                this.applyTranslations();
+                })
+                .catch(error => {
+                    console.error("Error loading language file:", error);
+                });
+            },
+            applyTranslations() {
+                document.querySelectorAll('[data-i18n-key]').forEach(element => {
+                const key = element.getAttribute('data-i18n-key');
+                element.textContent = this.translations[key] || key;
+            });
             },
             logout() {
                 window.localStorage.removeItem('token');
