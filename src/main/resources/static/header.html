@@ -288,7 +288,7 @@
                 this.loadTranslations(language);
             },
             loadTranslations(language) {
-                const langFilePath = `static/locales/${language}.json`;
+                const langFilePath = `locales/${language}.json`;
                 axios.get(langFilePath)
                 .then(response => {
                 this.translations = response.data;
