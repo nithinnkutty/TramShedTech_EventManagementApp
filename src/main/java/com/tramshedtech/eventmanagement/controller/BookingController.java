@@ -117,7 +117,7 @@ public class BookingController {
         booking.setImg(img);
         booking.setDel(0);
         booking.setRoomCapacity(roomCapacity);
-        // 新增默认为上架
+        // Set status to 1 (available)
         booking.setStatus(1);
 
         boolean r = bookingService.addBooking(booking);

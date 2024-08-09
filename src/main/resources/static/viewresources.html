@@ -97,6 +97,13 @@
             margin-bottom: 20px;
         }
 
+        .carousel-item img {
+            width: 100%; /* 图片宽度设置为框的100% */
+            height: auto; /* 高度自动调整以保持图片比例 */
+            object-fit: cover; /* 将图片裁剪以适应框的大小 */
+        }
+
+
         .book-resource-button {
             margin-top: 10px;
         }
@@ -145,9 +152,9 @@
                                 <img :src="imgUrl" alt="Carousel Image">
                             </el-carousel-item>
                         </el-carousel>
-                        <el-descriptions :title="'Room ' + item.roomNumber">
-                            <el-descriptions-item label="description">{{ item.roomName }}-{{ item.location
-                                }}-{{ item.postcode }}
+                        <el-descriptions :title="'Room Name: ' + item.roomName">
+                            <el-descriptions-item label="Description">{{ item.roomNumber }} - {{ item.location
+                                }} - {{ item.postcode }}
                             </el-descriptions-item>
                             <el-descriptions-item label="">
                                 <el-button
