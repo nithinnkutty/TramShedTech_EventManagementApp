@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         OS_SSH_KEY = credentials('OS_SSH_KEY')
+        REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
+        PROJECT_DIR = 'eventmanagement'
     }
 
     stages {
