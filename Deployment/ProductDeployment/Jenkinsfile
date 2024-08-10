@@ -27,8 +27,13 @@ pipeline {
         stage('Clone Project ') {
             steps {
                 script {
-                    sh 'echo "SSH into newly created instance"'
-                    sh 'echo "clone the project"'
+                    // Clone commands
+                    sh '''
+                    git clone https://git.cardiff.ac.uk/c23051986/teamatramshedtech.git
+                    mv teamatramshedtech eventmanagement
+                    cd eventmanagement
+                    '''
+                    sh 'echo "Clone Repo"'
                 }
             }
         }
@@ -36,6 +41,11 @@ pipeline {
             steps {
                 script {
                     // build commands
+                    sh
+                    '''
+                    cd eventmanagement
+                    ./gradlew build
+                    '''
                     sh 'echo "Build Project"'
                 }
             }
@@ -44,6 +54,10 @@ pipeline {
             steps {
                 script {
                     // test and test report commands
+                    sh '''
+                    cd eventmanagement
+                    ./gradlew test
+                    '''
                     sh 'echo "Test Project"'
                 }
             }
@@ -52,6 +66,11 @@ pipeline {
             steps {
                 script {
                     // Run project
+                    sh'''
+                    cd eventmanagement
+                    java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar
+                    '''
+
                     sh 'echo "Run Project"'
                 }
             }
