@@ -11,7 +11,17 @@
     </update>
 
     <select id="getBookingById" resultMap="bookingMapById">
-        SELECT * FROM bookings WHERE id = #{id}
+        SELECT
+            b.*,
+            l.location AS locationName
+        FROM
+            bookings b
+                JOIN
+            location l
+            ON
+                b.location = l.id
+        WHERE
+            b.id = #{id}
     </select>
 
     <resultMap id="bookingMapById" type="com.tramshedtech.eventmanagement.entity.Bookings">
@@ -56,12 +66,35 @@
 
     <!-- Select room name in DB -->
     <select id="getAllRoomName" resultType="string">
-        SELECT DISTINCT CONCAT(room_name, ' ', location, ' ', postcode) AS fullAddress From bookings;
+        SELECT DISTINCT CONCAT(b.room_name, ' ', l.locationName, ' ', b.postcode) AS fullAddress
+        FROM bookings b
+                 JOIN location l ON b.location = l.id;
     </select>
 
 
     <select id="searchAll"  resultMap="bookingsMap">
-        SELECT * FROM bookings WHERE del = 0
+        SELECT
+        b.id,
+        b.room_number,
+        b.room_name,
+        b.postcode,
+        l.location AS locationName,
+        b.location AS locationId,
+        b.start_date,
+        b.start_time,
+        b.end_date,
+        b.end_time,
+        b.img,
+        b.message,
+        b.av,
+        b.payment,
+        b.del
+        FROM
+        bookings b
+        JOIN
+        location l ON b.location = l.id
+        WHERE
+        b.del = 0
     </select>
 
     <resultMap id="bookingsMap" type="com.tramshedtech.eventmanagement.entity.Bookings">
@@ -69,7 +102,8 @@
         <result column="room_number" property="roomNumber" />
         <result column="room_name" property="roomName" />
         <result column="postcode" property="postcode" />
-        <result column="location" property="location" />
+        <result column="locationId" property="location" />
+        <result column="locationName" property="locationName"/>
         <result column="start_date" property="startDate" />
         <result column="start_time" property="startTime" />
         <result column="end_date" property="endDate" />
@@ -86,7 +120,7 @@
         SELECT
             b.id,
             b.room_name AS roomName,
-            l.location,
+            l.location AS locationName,
             b.postcode
         FROM
             bookings b

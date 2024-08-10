@@ -318,13 +318,14 @@
             fetchRoomsForLocation() {
                 axios.get(`/api/events/rooms/${this.formData.location}`)
                     .then(response => {
+                        console.log(response.data);
                         if (!response.data || !Array.isArray(response.data)) {
                             console.error('No data or data is not an array');
                             return;
                         }
                         this.room = response.data.map(room => ({
                             value: room.id,
-                            label: `${room.roomName} - ${room.location} - ${room.postcode}`
+                            label: `${room.roomName} - ${room.locationName} - ${room.postcode}`
 
                         }));
                     })

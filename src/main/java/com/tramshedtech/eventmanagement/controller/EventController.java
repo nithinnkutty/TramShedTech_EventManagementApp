@@ -117,6 +117,7 @@ public class EventController {
 
     @GetMapping("/rooms/{locationId}")
     public List<Bookings> getRoomsByLocation(@PathVariable int locationId) {
+        System.out.println("locationId: " + locationId);
         return bookingService.getRoomsByLocationId(locationId);
     }
 

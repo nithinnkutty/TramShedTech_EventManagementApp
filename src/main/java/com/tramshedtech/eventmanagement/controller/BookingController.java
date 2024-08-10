@@ -157,6 +157,10 @@ public class BookingController {
     @GetMapping("/searchAll")
     public List<BookingsVo> searchAll () throws ParseException {
         List<BookingsVo> bookings = bookingService.searchAll();
+        bookings.forEach(booking -> {
+            System.out.println("Booking: " + booking);
+            System.out.println("Location Name: " + booking.getLocationName());
+        });
 //        System.out.println(bookings);
         return bookings;
     }

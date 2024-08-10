@@ -46,8 +46,10 @@
 
     <!-- Select room name in DB -->
     <select id="getRoomById" resultType="string">
-        SELECT CONCAT(b.room_name, ' ', b.location, ' ', b.postcode) AS fullAddress From events e
-        JOIN bookings b ON e.room = b.id
+        SELECT CONCAT(b.room_name, ' ', l.location, ' ', b.postcode) AS fullAddress
+        FROM events e
+                 JOIN bookings b ON e.room = b.id
+                 JOIN location l ON b.location = l.id
         WHERE e.id = #{eventId}
     </select>
 </mapper>

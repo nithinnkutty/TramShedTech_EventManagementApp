@@ -230,7 +230,7 @@
         },
         methods: {
             fetchLocations() {
-                axios.get('/locations')
+                axios.get('/api/locations')
                     .then(response => {
                         console.log(response.data);
                         this.locations = response.data;

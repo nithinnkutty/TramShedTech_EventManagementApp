@@ -12,6 +12,7 @@ public class Bookings {
     private String roomName;
     private String postcode;
     private Integer location;
+    private String locationName;
     private Date startDate;
     private Time startTime;
     private Date endDate;

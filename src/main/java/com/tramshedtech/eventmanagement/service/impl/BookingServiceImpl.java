@@ -59,6 +59,7 @@ public class BookingServiceImpl implements BookingService {
             bookingsVo.setRoomName(booking.getRoomName());
             bookingsVo.setPostcode(booking.getPostcode());
             bookingsVo.setLocation(booking.getLocation());
+            bookingsVo.setLocationName(booking.getLocationName());
             bookingsVo.setStartDate(startDateString);
             bookingsVo.setStartTime(booking.getStartTime());
             bookingsVo.setEndDate(endDateString);
