@@ -46,7 +46,7 @@
                             <p class="event-title">{{ event.title }}</p>
                             <p>{{ event.date }}</p>
                             <p>{{ event.time }}</p>
-                            <p class="location">Location: {{ event.site }}</p>
+                            <p class="location">Location: {{ event.location }}</p>
                             <p>Room: {{ event.room }}</p>
                             <!-- Display 'Completed' if the event date is before today -->
                             <p v-if="new Date(event.date) < new Date()" class="completed">Completed</p>

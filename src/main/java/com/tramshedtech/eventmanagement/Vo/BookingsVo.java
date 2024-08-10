@@ -14,7 +14,8 @@ public class BookingsVo implements Serializable {
     private String roomNumber;
     private String roomName;
     private String postcode;
-    private String location;
+    private Integer location;
+    private String locationName;
     private String startDate;
     private Time startTime;
     private String endDate;

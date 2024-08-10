@@ -71,8 +71,8 @@ public class BookingController {
         String roomNumber = (String) bookingData.get("roomNumber");
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
-        String location = (String) bookingData.get("location");
         Integer roomCapacity = (Integer) bookingData.get("roomCapacity");
+        Integer location = (Integer) bookingData.get("location");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -177,6 +177,10 @@ public class BookingController {
     @GetMapping("/searchAll")
     public List<BookingsVo> searchAll() throws ParseException {
         List<BookingsVo> bookings = bookingService.searchAll();
+        bookings.forEach(booking -> {
+            System.out.println("Booking: " + booking);
+            System.out.println("Location Name: " + booking.getLocationName());
+        });
 //        System.out.println(bookings);
         return bookings;
     }
@@ -239,7 +243,7 @@ public class BookingController {
         String roomNumber = (String) bookingData.get("roomNumber");
         String roomName = (String) bookingData.get("roomName");
         String postcode = (String) bookingData.get("postcode");
-        String location = (String) bookingData.get("location");
+        Integer location = (Integer) bookingData.get("location");
         Integer roomCapacity = (Integer) bookingData.get("roomCapacity");
         String[] dateRange = ((List<String>) bookingData.get("daterange")).toArray(new String[0]);
 

@@ -47,6 +47,10 @@
                         </div>
                     </el-col>
         </div>
+
+        <div class="edit-button" style="text-align: center; margin-top: 20px;">
+            <el-button type="primary" round @click="goToEventManagement">Edit Event</el-button>
+        </div>
     </div>
 
 </body>
@@ -77,6 +81,9 @@
             handleSpeakerClick(name) {
                 console.log("Speaker clicked:", name);
                 this.$router.push({name: 'speakerProfile', params: {speakerName: name}});
+            },
+            goToEventManagement() {
+                window.location.href = '/eventmanagement.html';
             },
             fetchEventData() {
                 const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;

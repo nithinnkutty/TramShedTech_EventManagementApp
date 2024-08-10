@@ -13,6 +13,8 @@ public interface BookingMapper {
 
     List<String> getAllRoomName();
 
+    List<Bookings> findRoomsByLocationId(int locationId);
+
     boolean updateBooking(Bookings book);
 
     boolean softDeleteBooking(Integer id);

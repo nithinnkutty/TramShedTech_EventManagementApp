@@ -23,4 +23,6 @@ public interface BookingService {
     List<BookingsVo> searchNotCancel();
 
     List<String> getAllRoomName();
+
+    List<Bookings> getRoomsByLocationId(int locationId);
 }
