@@ -29,7 +29,7 @@ pipeline {
                 script {
                     // Clone commands
                     sh '''
-                    git clone https://git.cardiff.ac.uk/c23051986/teamatramshedtech.git
+                    git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
                     mv teamatramshedtech eventmanagement
                     cd eventmanagement
                     '''
