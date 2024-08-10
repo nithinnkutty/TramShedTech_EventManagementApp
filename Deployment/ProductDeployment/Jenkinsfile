@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         OS_SSH_KEY = credentials('OS_SSH_KEY')
-        GIT_SSH_CREDS =  credentials('GIT_SSH_CREDS')
     }
 
     stages {
@@ -29,11 +28,12 @@ pipeline {
                 script {
                     // Clone commands
                     sshagent(['OS_SSH_KEY']) {
-                       sh '''
-                       git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
-                       mv teamatramshedtech eventmanagement
-                       cd eventmanagement
-                    '''
+                        sh '''
+                        git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
+                        mv teamatramshedtech eventmanagement
+                        cd eventmanagement
+                        '''
+                    }
                     sh 'echo "Clone Repo"'
                 }
             }
@@ -67,11 +67,10 @@ pipeline {
             steps {
                 script {
                     // Run project
-                    sh'''
+                    sh '''
                     cd eventmanagement
                     java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar
                     '''
-
                     sh 'echo "Run Project"'
                 }
             }
