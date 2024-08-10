@@ -18,6 +18,9 @@ public class Event {
     private String speaker;
     private String responsible;
     private Integer del;
+
+    private String roomName;
+    private String locationName;
     // Table data fields
     private String type;
     private String staff;

@@ -42,7 +42,12 @@
             width="100">
     </el-table-column>
     <el-table-column
-            prop="room"
+            prop="locationName"
+            label="Location"
+            width="300">
+    </el-table-column>
+    <el-table-column
+            prop="fullRoomName"
             label="Room"
             width="400">
     </el-table-column>
@@ -112,8 +117,25 @@
       <el-form-item label="Time">
         <el-input v-model="editForm.time"></el-input>
       </el-form-item>
+      <el-form-item label="Location">
+        <el-select v-model="editForm.locationId" @change="fetchRoomsForLocationEdit" clearable placeholder="please select">
+          <el-option
+                  v-for="location in locations"
+                  :key="location.id"
+                  :label="location.location"
+                  :value="location.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="room">
-        <el-input v-model="editForm.room"></el-input>
+        <el-select v-model="editForm.roomId" clearable placeholder="please select">
+          <el-option
+                  v-for="room in rooms"
+                  :key="room.value"
+                  :label="room.label"
+                  :value="room.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="type">
         <el-input v-model="editForm.type"></el-input>
@@ -164,18 +186,41 @@
         tableData: [],
         multipleSelection: [],
         editDialogVisible: false,
-        editForm: {}
+        editForm: {
+          title: '',
+          date: '',
+          time: '',
+          locationId: '',
+          roomId: '',
+          type: '',
+          speaker: '',
+          tag: '',
+          responsible: '',
+          staff: '',
+          company: '',
+          concat: '',
+          email: '',
+          note: ''
+        },
+        locations: [],
+        rooms: []
       }
     },
     created() {
       this.fetchTableData();
+      this.fetchLocations();
     },
     methods: {
       fetchTableData() {
         axios.get('/api/events')
                 .then(response => {
                   if (response.data && response.data.status === 'SUCCESS') {
-                    this.tableData = response.data.data;
+                    this.tableData = response.data.data.map(event => {
+                      return {
+                        ...event,
+                        fullRoomName: event.roomName
+                      };
+                    });
                   } else {
                     console.error('Failed to load events:', response.data.message);
                   }
@@ -184,23 +229,57 @@
                   console.error('Error fetching events:', error);
                 });
       },
+      fetchLocations() {
+        axios.get('/api/locations')
+                .then(res => {
+                  this.locations = res.data;
+                })
+                .catch(error => {
+                  console.error("There was an error fetching locations!", error);
+                });
+      },
+      fetchRoomsForLocationEdit(locationId) {
+        axios.get(`/api/events/rooms/${locationId}`)
+                .then(response => {
+                  if (!response.data || !Array.isArray(response.data)) {
+                    console.error('No data or data is not an array');
+                    return;
+                  }
+                  this.rooms = response.data.map(room => ({
+                    value: room.id,
+                    label: `${room.roomName} - ${room.locationName} - ${room.postcode}`
+                  }));
+                })
+                .catch(error => {
+                  console.error('Failed to fetch corresponding rooms:', error);
+                });
+      },
       handleEdit(index, row) {
-        this.editForm = { ...row };
+        this.editForm = {
+          ...row,
+          locationId: row.location || '',
+          roomId: row.room || '',
+          fullRoomName: row.roomName
+        };
+        this.fetchRoomsForLocationEdit(this.editForm.locationId);
         this.editDialogVisible = true;
         console.log(index, row);
       },
       saveEdit() {
-        // const index = this.tableData.findIndex(item => item.title === this.editForm.title);
-        // if (index !== -1) {
-        //   this.$set(this.tableData, index, { ...this.editForm });
-        // }
-        // this.editDialogVisible = false;
-        axios.put(`/api/events/${this.editForm.id}`, this.editForm)
+        axios.put(`/api/events/${this.editForm.id}`, {
+          ...this.editForm,
+          location:  this.editForm.locationId,
+          room: this.editForm.roomId
+        })
                 .then(response => {
                   if (response.data.status === 'SUCCESS') {
                     const index = this.tableData.findIndex(item => item.id === this.editForm.id);
                     if (index !== -1) {
-                      this.$set(this.tableData, index, { ...this.editForm });
+                      this.$set(this.tableData, index, {
+                        ...this.editForm,
+                        locationName: this.locations.find(loc => loc.id === this.editForm.locationId).location,
+                        fullRoomName: this.rooms.find(room => room.value === this.editForm.roomId).label
+                      });
                     }
                     this.editDialogVisible = false;
                     this.$message({

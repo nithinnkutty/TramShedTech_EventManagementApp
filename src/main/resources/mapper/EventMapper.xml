@@ -6,12 +6,20 @@
 
     <!-- Select all events -->
     <select id="getAllEvents" resultType="com.tramshedtech.eventmanagement.entity.Event">
-        SELECT * FROM events WHERE del = 1
+        SELECT e.*, CONCAT(b.room_name, '-', l.location, '-', b.postcode) AS roomName, l.location AS locationName
+        FROM events e
+        LEFT JOIN bookings b ON e.room = b.id
+        LEFT JOIN location l ON e.location = l.id
+        WHERE e.del = 1
     </select>
 
     <!-- Select event by ID -->
     <select id="getEventById" parameterType="long" resultType="com.tramshedtech.eventmanagement.entity.Event">
-        SELECT * FROM events WHERE id = #{id}
+        SELECT e.*, CONCAT(b.room_name, '-', l.location, '-', b.postcode) AS roomName, l.location AS locationName
+        FROM events e
+        LEFT JOIN bookings b ON e.room = b.id
+        LEFT JOIN location l ON e.location = l.id
+        WHERE e.id = #{id}
     </select>
 
     <!--Insert data into DB -->
@@ -31,6 +39,7 @@
         SET title = #{title},
             date = #{date},
             time = #{time},
+            location = #{location},
             room = #{room},
             type = #{type},
             speaker = #{speaker},
@@ -48,8 +57,8 @@
     <select id="getRoomById" resultType="string">
         SELECT CONCAT(b.room_name, ' ', l.location, ' ', b.postcode) AS fullAddress
         FROM events e
-                 JOIN bookings b ON e.room = b.id
-                 JOIN location l ON b.location = l.id
+        JOIN bookings b ON e.room = b.id
+        JOIN location l ON b.location = l.id
         WHERE e.id = #{eventId}
     </select>
 </mapper>
