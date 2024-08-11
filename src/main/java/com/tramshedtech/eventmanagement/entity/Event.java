@@ -21,6 +21,7 @@ public class Event {
 
     private String roomName;
     private String locationName;
+    private String img;
     // Table data fields
     private String type;
     private String staff;

@@ -14,9 +14,10 @@
         <div class="information">
                 <el-col :span="8" :offset="4"><div class="grid-content left"></div>
                     <el-card  :body-style="{ padding: '0px' }" shadow="hover">
-                        <img src="img/roomtype.png" class="image">
+                        <img :src="getImgUrls(eventForm.img)[0]" class="image" alt="Event Image">
                         <div class="image-caption">
-                            <span>{{eventForm.fullRoomName}}</span>
+                            <span v-if="eventForm.fullRoomName">{{eventForm.fullRoomName}}</span>
+                            <span v-else>Loading...</span>
                         </div>
                     </el-card>
                 </el-col>
@@ -69,13 +70,14 @@
                     company: '',
                     email: '',
                     speaker: '',
-                    fullRoomName: ''
+                    fullRoomName: '',
+                    img: ''
                 }
             };
         },
         mounted() {
             this.fetchEventData();
-            this.fecthRooms();
+            this.fetchRooms();
         },
         methods: {
             handleSpeakerClick(name) {
@@ -94,22 +96,32 @@
                 console.log("Fetching event data for ID:", eventId);
                 axios.get(`/api/events/${eventId}`)
                     .then(response => {
+                        const eventData = response.data.data;
+                        this.eventForm = {
+                            ...eventData,
+                            img: eventData.img || ''
+                        };
+                        return this.fetchRooms(eventId);
                         // this.eventForm = response.data.data;
-                        this.eventForm.id = response.data.data.id;
-                        this.eventForm.title = response.data.data.title;
-                        this.eventForm.time = response.data.data.time;
-                        this.eventForm.responsible = response.data.data.responsible;
-                        this.eventForm.staff = response.data.data.staff;
-                        this.eventForm.company = response.data.data.company;
-                        this.eventForm.email = response.data.data.email;
-                        this.eventForm.speaker = response.data.data.speaker;
+                        // this.eventForm.id = response.data.data.id;
+                        // this.eventForm.title = response.data.data.title;
+                        // this.eventForm.time = response.data.data.time;
+                        // this.eventForm.responsible = response.data.data.responsible;
+                        // this.eventForm.staff = response.data.data.staff;
+                        // this.eventForm.company = response.data.data.company;
+                        // this.eventForm.email = response.data.data.email;
+                        // this.eventForm.speaker = response.data.data.speaker;
                         // localStorage.removeItem('eventId');
                     })
                     .catch(error => {
                         console.error("There was an error fetching the event data!", error);
                     });
             },
-            fecthRooms() {
+            getImgUrls(imgString) {
+                const baseUrl = "http://127.0.0.1:8082/uploads/";
+                return imgString.split(',').map(img => baseUrl + img.trim());
+            },
+            fetchRooms() {
                 const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;
                 console.log("Fetching rooms for event:", eventId);
                 axios.get(`/api/events/getRoom/${eventId}`)
@@ -117,6 +129,7 @@
                         console.log("Received room name:", response.data);
                         this.eventForm.fullRoomName = response.data;
                         console.log("Room name:", this.eventForm.fullRoomName);
+                        this.$forceUpdate();
                     })
                     .catch(error => {
                         console.error("There was an error fetching the room details!", error);
@@ -158,6 +171,8 @@
     }
     .image {
         width: 100%;
+        height: 195px;
+        object-fit: cover;
         display: block;
         flex: 1;
     }
