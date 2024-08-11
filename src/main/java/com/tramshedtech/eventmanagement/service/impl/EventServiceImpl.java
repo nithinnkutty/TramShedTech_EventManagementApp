@@ -1,7 +1,9 @@
 package com.tramshedtech.eventmanagement.service.impl;
 
 import com.tramshedtech.eventmanagement.entity.Event;
+import com.tramshedtech.eventmanagement.entity.EventSchedule;
 import com.tramshedtech.eventmanagement.mapper.EventMapper;
+import com.tramshedtech.eventmanagement.mapper.EventScheduleMapper;
 import com.tramshedtech.eventmanagement.service.EventService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,9 @@ import java.util.List;
 public class EventServiceImpl implements EventService {
     @Resource
     private EventMapper eventMapper;
+
+    @Resource
+    private EventScheduleMapper eventScheduleMapper;
 
     @Override
     public List<Event> getAllEvents() {
@@ -24,12 +29,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Long addEvent(Event event) {
-        boolean r = eventMapper.add(event);
-        if (r) {
+        boolean result = eventMapper.add(event);
+        if (result) {
+            for (EventSchedule schedule : event.getSchedules()) {
+                schedule.setEventId(event.getId());
+                eventScheduleMapper.insertEventSchedule(schedule);
+            }
             return event.getId();
         } else {
-            // Add logging to capture the event object being inserted
-            System.out.println("Failed to insert event: " + event);
             return 0L;
         }
     }

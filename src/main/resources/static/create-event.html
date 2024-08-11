@@ -26,58 +26,52 @@
             </div></el-col>
         </el-row>
 
+        <!-- Dynamic date-time section -->
         <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Date</div></el-col>
-            <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="block">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Date and Time</div></el-col>
+            <el-col :span="8" :offset="1">
+                <div v-for="(schedule, index) in formData.schedules" :key="index" class="grid-content">
                     <el-date-picker
-                            v-model="formData.date"
+                            v-model="schedule.date"
                             type="date"
                             placeholder="Choose Date">
                     </el-date-picker>
-                </div>
-            </div></el-col>
-        </el-row>
-
-        <el-row :gutter="20">
-            <el-col :span="4" :offset="6"><div class="grid-content information">Time</div></el-col>
-            <el-col :span="8" :offset="1"><div class="grid-content">
-                <el-time-select
-                        class="el-time-select"
-                        placeholder="startTime"
-                        v-model="formData.startTime"
-                        :picker-options="{
+                    <el-time-select
+                            placeholder="Start Time"
+                            v-model="schedule.startTime"
+                            :picker-options="{
                             start: '08:30',
                             step: '00:15',
                             end: '23:30'
                         }">
-                </el-time-select>
-                <el-time-select
-                        class="el-time-select"
-                        placeholder="endTime"
-                        v-model="formData.endTime"
-                        :picker-options="{
+                    </el-time-select>
+                    <el-time-select
+                            placeholder="End Time"
+                            v-model="schedule.endTime"
+                            :picker-options="{
                               start: '08:30',
                               step: '00:15',
                               end: '23:30',
-                              minTime: formData.startTime
+                              minTime: schedule.startTime
                             }">
-                </el-time-select>
-            </div></el-col>
+                    </el-time-select>
+                    <el-button type="danger" @click="removeSchedule(index)">Remove</el-button>
+                </div>
+                <el-button type="primary" @click="addSchedule">Add Date and Time</el-button>
+            </el-col>
         </el-row>
 
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
                 <el-select v-model="formData.location" @change="fetchRoomsForLocation" clearable placeholder="please select">
-                    <el-option label="Tramshed Tech Barry, GoodSheds" value="1"></el-option>
-                    <el-option label="Tramshed Tech, Grangetown" value="2"></el-option>
-                    <el-option label="Tramshed Tech Innovation Station, Newport" value="3"></el-option>
-                    <el-option label="Tramshed Tech Griffin Place, Newport" value="4"></el-option>
-                </el-select>
+                <el-option label="Tramshed Tech Barry, GoodSheds" value="1"></el-option>
+                <el-option label="Tramshed Tech, Grangetown" value="2"></el-option>
+                <el-option label="Tramshed Tech Innovation Station, Newport" value="3"></el-option>
+                <el-option label="Tramshed Tech Griffin Place, Newport" value="4"></el-option>
+            </el-select>
             </div></el-col>
         </el-row>
-
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
             <el-col :span="8" :offset="1"><div class="grid-content">
@@ -228,8 +222,7 @@
             return {
                 formData: {
                     title: '',
-                    date: '',
-                    time: '',
+                    schedules: [{ date: '', startTime: '', endTime: '' }], // Initialize schedules array
                     speaker: '',
                     location: '',
                     // catering fields
@@ -333,18 +326,17 @@
                         console.error('Failed to fetch corresponding rooms:', error);
                     });
             },
-            /*Converts the obtained date data into the desired date YYYY-MM-DD*/
-            getFormattedDate(date) {
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-                const day = date.getDate();
-                return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            addSchedule() {
+                this.formData.schedules.push({ date: '', startTime: '', endTime: '' });
+            },
+            removeSchedule(index) {
+                this.formData.schedules.splice(index, 1);
             },
             handleButtonClick() {
-                if (!this.formData.title || !this.formData.date || !this.formData.startTime || !this.formData.endTime || !this.formData.location || !this.formData.room) {
-                    // Alert user all fields are required
-                    alert('Please fill in all required fields: Event Name, Date, Time, Location, and Room.');
-                    return;  // Stop the function if validation fails
+                const invalidSchedule = this.formData.schedules.some(schedule => !schedule.date || !schedule.startTime || !schedule.endTime);
+                if (!this.formData.title || invalidSchedule || !this.formData.location || !this.formData.room) {
+                    alert('Please fill in all required fields.');
+                    return;
                 }
                 this.getFormData();
             },
@@ -352,8 +344,11 @@
                 const formattedDate = this.getFormattedDate(this.formData.date);
                 const eventData = {
                     title: this.formData.title,
-                    date: formattedDate,
-                    time: this.formData.startTime + '-' + this.formData.endTime,
+                    schedules: this.formData.schedules.map(schedule => ({
+                         date: schedule.date,
+                         startTime: schedule.startTime,
+                         endTime: schedule.endTime
+                    })),
                     room: this.formData.room,
                     type: this.formData.type,
                     speaker: this.formData.speaker,
