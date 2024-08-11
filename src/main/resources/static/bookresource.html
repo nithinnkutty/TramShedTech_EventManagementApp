@@ -105,10 +105,11 @@
         </el-form-item>
         <el-form-item label="Location" prop="location">
             <el-select v-model="ruleForm.location" placeholder="Please select location">
-                <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
-                <el-option label="Tramshed Tech, Grangetown" value="Tramshed Tech, Grangetown"></el-option>
-                <el-option label="Tramshed Tech Innovation Station, Newport" value="Tramshed Tech Innovation Station, Newport"></el-option>
-                <el-option label="Tramshed Tech Griffin Place, Newport" value="Tramshed Tech Griffin Place, Newport"></el-option>
+                <el-option v-for="location in locations"
+                           :key="location.id"
+                           :label="location.location"
+                           :value="location.id">
+                </el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="Room opening between" prop="daterange">
@@ -191,6 +192,7 @@
                     message: '',
                     img: []
                 },
+                locations: [],
                 rules: {
                     roomNumber: [
                         { required: true, message: 'Please enter the room number', trigger: 'blur' },
@@ -227,7 +229,20 @@
                 dialogVisible: false
             };
         },
+        created() {
+            this.fetchLocations();
+        },
         methods: {
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(response => {
+                        console.log(response.data);
+                        this.locations = response.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the locations!", error);
+                    });
+            },
             handleUploadSuccess(response, file, fileList) {
                 console.log('Upload success response:', response);
                 console.log('File:', file);

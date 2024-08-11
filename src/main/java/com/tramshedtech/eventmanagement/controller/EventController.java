@@ -1,10 +1,13 @@
 package com.tramshedtech.eventmanagement.controller;
 
+import com.tramshedtech.eventmanagement.entity.Bookings;
+import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.service.EventService;
 import com.tramshedtech.eventmanagement.service.FeedbackService;
 import com.tramshedtech.eventmanagement.entity.Event;
 import com.tramshedtech.eventmanagement.entity.Feedback;
 import jakarta.annotation.Resource;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -40,6 +43,9 @@ public class EventController {
 
     @Autowired
     private FeedbackService feedbackService;
+
+    @Autowired
+    private BookingService bookingService;
 
     @GetMapping
     public ResponseResult<List<Event>> getAllEvents() {
@@ -107,6 +113,12 @@ public class EventController {
             e.printStackTrace();
             return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL).setMessage("An error occurred");
         }
+    }
+
+    @GetMapping("/rooms/{locationId}")
+    public List<Bookings> getRoomsByLocation(@PathVariable int locationId) {
+        System.out.println("locationId: " + locationId);
+        return bookingService.getRoomsByLocationId(locationId);
     }
 
     @PutMapping("/{id}")

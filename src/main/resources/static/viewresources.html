@@ -153,8 +153,7 @@
                             </el-carousel-item>
                         </el-carousel>
                         <el-descriptions :title="'Room Name: ' + item.roomName">
-                            <el-descriptions-item label="Description">{{ item.roomNumber }} - {{ item.location
-                                }} - {{ item.postcode }}
+                            <el-descriptions-item label="Description">{{ item.roomNumber }} - {{ getLocationName(item.location)}} - {{ item.postcode }}
                             </el-descriptions-item>
                             <el-descriptions-item label="">
                                 <el-button
@@ -227,6 +226,7 @@
         data() {
             return {
                 rooms: [],
+                locations: [],
                 dialogFormVisible: false,
                 editForm: {
                     id: '',
@@ -245,6 +245,7 @@
         },
         mounted() {
             this.fetchRooms();
+            this.fetchLocations();
         },
         methods: {
             fetchRooms() {
@@ -255,6 +256,19 @@
                     .catch(error => {
                         console.error("There was an error when getting booking data!", error);
                     });
+            },
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(res => {
+                        this.locations = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting locations data!", error);
+                    });
+            },
+            getLocationName(locationId) {
+                const location = this.locations.find(loc => loc.id === locationId);
+                return location ? location.location : 'Unknown Location';
             },
             getImgUrls(imgString) {
                 const baseUrl = "http://127.0.0.1:8082/uploads/";
@@ -281,7 +295,7 @@
                             roomNumber: data.roomNumber || '',
                             roomName: data.roomName || '',
                             postcode: data.postcode || '',
-                            location: data.location || '',
+                            location: this.getLocationName(data.location),
                             daterange: [data.startDate, data.endDate],
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // Ensure av is an array
                             payment: data.payment || '',

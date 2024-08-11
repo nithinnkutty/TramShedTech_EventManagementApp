@@ -151,7 +151,7 @@
                                 width="180">
                         </el-table-column>
                         <el-table-column
-                                prop="location"
+                                prop="locationName"
                                 label="Location">
                         </el-table-column>
                         <el-table-column
@@ -216,12 +216,14 @@
             <el-form-item label="Capacity" prop="roomCapacity">
                 <el-input-number v-model="editForm.roomCapacity" :min="1"></el-input-number>
             </el-form-item>
-            <el-form-item label="Location" prop="location">
-                <el-select v-model="editForm.location" placeholder="Please select location">
-                    <el-option label="Tramshed Tech Barry, Goodsheds" value="Tramshed Tech Barry, Goodsheds"></el-option>
-                    <el-option label="Tramshed Tech, Grangetown" value="Tramshed Tech, Grangetown"></el-option>
-                    <el-option label="Tramshed Tech Innovation Station, Newport" value="Tramshed Tech Innovation Station, Newport"></el-option>
-                    <el-option label="Tramshed Tech Griffin Place, Newport" value="Tramshed Tech Griffin Place, Newport"></el-option>
+            <el-form-item label="Location" prop="locationName">
+                <el-select v-model="editForm.locationId" placeholder="Please select location">
+                    <el-option
+                            v-for="location in locations"
+                            :key="location.id"
+                            :label="location.location"
+                            :value="location.id">
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="Book resource between" prop="daterange">
@@ -329,7 +331,8 @@
                     roomNumber: '',
                     roomName: '',
                     postcode: '',
-                    location: '',
+                    locationName: '',
+                    locationId: '',
                     daterange: [],
                     av: [],
                     payment: '',
@@ -381,10 +384,21 @@
             fetchTableData() {
                 axios.get('/booking/searchAll')
                     .then(res => {
+                        console.log(res.data);
                         this.tableData = res.data.filter(item => item.del === 0); // Filter out deleted records
                     })
                     .catch(error => {
                         console.error("There was an error when getting booking data!", error);
+                    });
+            },
+
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(res => {
+                        this.locations = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching locations!", error);
                     });
             },
 
@@ -438,7 +452,8 @@
                             roomNumber: data.roomNumber || '',
                             roomName: data.roomName || '',
                             postcode: data.postcode || '',
-                            location: data.location || '',
+                            locationName: data.locationName || '',
+                            locationId: data.location || '',
                             daterange: [data.startDate, data.endDate],
                             av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
                             payment: data.payment || '',
@@ -457,7 +472,7 @@
                     if (valid) {
                         // Convert the img field to a comma-separated string before committing
                         const imgNames = this.editForm.img.map(item => item.name).join(',');
-                        const updatedForm = { ...this.editForm, img: imgNames };
+                        const updatedForm = { ...this.editForm, img: imgNames, location: this.editForm.locationId };
                         debugger
                         axios.post(`/booking/update`, updatedForm)
                             .then(response => {
@@ -608,6 +623,7 @@
 
         mounted() {
             this.fetchTableData();
+            this.fetchLocations();
         }
     });
 </script>

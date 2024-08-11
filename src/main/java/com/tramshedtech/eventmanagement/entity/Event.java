@@ -12,18 +12,22 @@ public class Event {
     private String title;
     private String date;
     private String time;
+    private Integer location;
     private Integer room;
     private String tag;
     private String speaker;
     private String responsible;
     private Integer del;
+
+    private String roomName;
+    private String locationName;
+    private String img;
     // Table data fields
     private String type;
     private String staff;
     private String company;
     private String contact;
     private String email;
-    private String site;
     private String note;
 
     // Fields for catering
