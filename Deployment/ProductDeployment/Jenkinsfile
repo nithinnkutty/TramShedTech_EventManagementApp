@@ -75,12 +75,13 @@ pipeline {
         stage('Run Project') {
             steps {
                 script {
-                    // Run project
+                    // Run project in the background
                     sh '''
                     cd eventmanagement
-                    java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar
+                    nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+                    echo $! > app.pid
                     '''
-                    sh 'echo "Run Project"'
+                    sh 'echo "Application started in the background."'
                 }
             }
         }
