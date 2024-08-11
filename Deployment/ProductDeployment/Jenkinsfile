@@ -41,25 +41,24 @@ pipeline {
             }
         }
         stage('Build') {
-            steps {
-                script {
-                    // build commands
-                    sh
-                    '''
-                    cd eventmanagement
-                    ./gradlew build
-                    '''
-                    sh 'echo "Build Project"'
+           steps {
+               script {
+                   // Build commands
+                   sh '''
+                   cd eventmanagement
+                   ./gradlew build
+                   '''
+                   sh 'echo "Build Project"'
                 }
             }
         }
         stage('Test') {
-            steps {
-                script {
-                    // test and test report commands
-                    sh '''
-                    cd eventmanagement
-                    ./gradlew test
+           steps {
+               script {
+                   // Test commands
+                   sh '''
+                   cd eventmanagement
+                   ./gradlew test
                     '''
                     sh 'echo "Test Project"'
                 }
