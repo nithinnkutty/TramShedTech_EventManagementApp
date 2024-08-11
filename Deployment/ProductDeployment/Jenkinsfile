@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        OS_SSH_KEY = credentials('OS_SSH_KEY')
+        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
         REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
         PROJECT_DIR = 'eventmanagement'
     }
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // Clone commands
-                    sshagent(['OS_SSH_KEY']) {
+                    sshagent(['GIT_SSH_CREDS']) {
                         sh '''
                         git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
                         mv teamatramshedtech eventmanagement
