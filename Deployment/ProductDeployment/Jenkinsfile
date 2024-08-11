@@ -14,10 +14,10 @@ pipeline {
                     echo 'Attempting to copy artifacts from InfraCreation job...'
                     // Copy the instance_ip.txt file from the previous job
                     copyArtifacts(
-                            projectName: 'TramshedTechProject_InfraCreation',
-                            filter: 'instance_ip.txt',
-                            target: 'artifacts',
-                            selector: lastSuccessful()
+                        projectName: 'TramshedTechProject_InfraCreation',
+                        filter: 'instance_ip.txt',
+                        target: 'artifacts',
+                        selector: lastSuccessful()
                     )
                     echo 'Artifacts copied. Reading instance IP...'
                     env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
@@ -25,7 +25,7 @@ pipeline {
                 }
             }
         }
-        stage('Clone Project ') {
+        stage('Clone Project') {
             steps {
                 script {
                     // Clone commands
@@ -33,11 +33,10 @@ pipeline {
                         // Remove existing directory if it exists
                         sh '''
                         if [ -d "teamatramshedtech" ]; then
-                        rm -rf teamatramshedtech
+                            rm -rf teamatramshedtech
                         fi
                         '''
-
-                    // Clone the repository
+                        // Clone the repository
                         sh '''
                         git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
                         cd eventmanagement
@@ -48,25 +47,25 @@ pipeline {
             }
         }
         stage('Build') {
-           steps {
-               script {
-                   // Build commands
-                   sh '''
-                   cd eventmanagement
-                   chmod +x gradlew
-                   ./gradlew build
-                   '''
-                   sh 'echo "Build Project"'
+            steps {
+                script {
+                    // Build commands
+                    sh '''
+                    cd eventmanagement
+                    chmod +x gradlew
+                    ./gradlew build
+                    '''
+                    sh 'echo "Build Project"'
                 }
             }
         }
         stage('Test') {
-           steps {
-               script {
-                   // Test commands
-                   sh '''
-                   cd eventmanagement
-                   ./gradlew test
+            steps {
+                script {
+                    // Test commands
+                    sh '''
+                    cd eventmanagement
+                    ./gradlew test
                     '''
                     sh 'echo "Test Project"'
                 }
@@ -89,13 +88,10 @@ pipeline {
                     // Stop the application
                     sh '''
                     if [ -f eventmanagement/app.pid ]; then
-                    kill $(cat eventmanagement/app.pid)
-                    echo "Application stopped."
+                        kill $(cat eventmanagement/app.pid)
+                        echo "Application stopped."
                     fi
                     '''
-                            }
-                        }
-                    }
                 }
             }
         }
