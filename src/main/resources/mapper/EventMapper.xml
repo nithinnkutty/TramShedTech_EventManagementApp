@@ -16,19 +16,19 @@
     <!-- Select event by ID -->
     <select id="getEventById" parameterType="long" resultType="com.tramshedtech.eventmanagement.entity.Event">
         SELECT e.*,
-               CONCAT(b.room_name, '-', l.location, '-', b.postcode) AS roomName,
-               l.location AS locationName,
-               b.img AS img
+        CONCAT(b.room_name, '-', l.location, '-', b.postcode) AS roomName,
+        l.location AS locationName,
+        b.img AS img
         FROM events e
         LEFT JOIN bookings b ON e.room = b.id
         LEFT JOIN location l ON e.location = l.id
         WHERE e.id = #{id}
     </select>
 
-    <!--Insert data into DB -->
+    <!-- Insert data into DB -->
     <insert id="add" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO events(title, date, time, location, del, room, speaker, responsible, type, staff, company, contact, email, note, tag, cateringType, cateringCount, beverageType, dietaryRequirements, cateringServingTime)
-        VALUES (#{title}, #{date}, #{time}, #{location}, 1, #{room}, #{speaker}, #{responsible}, #{type}, #{staff}, #{company}, #{contact}, #{email}, #{note}, #{tag}, #{cateringType}, #{cateringCount}, #{beverageType}, #{dietaryRequirements}, #{cateringServingTime})
+        INSERT INTO events(title, location, del, room, speaker, responsible, type, staff, company, contact, email, note, tag, cateringType, cateringCount, beverageType, dietaryRequirements, cateringServingTime)
+        VALUES (#{title}, #{location}, 1, #{room}, #{speaker}, #{responsible}, #{type}, #{staff}, #{company}, #{contact}, #{email}, #{note}, #{tag}, #{cateringType}, #{cateringCount}, #{beverageType}, #{dietaryRequirements}, #{cateringServingTime})
     </insert>
 
     <!-- Delete event in DB -->
@@ -40,19 +40,17 @@
     <update id="update">
         UPDATE events
         SET title = #{title},
-            date = #{date},
-            time = #{time},
-            location = #{location},
-            room = #{room},
-            type = #{type},
-            speaker = #{speaker},
-            tag = #{tag},
-            responsible = #{responsible},
-            staff = #{staff},
-            company = #{company},
-            contact = #{contact},
-            email = #{email},
-            note = #{note}
+        location = #{location},
+        room = #{room},
+        type = #{type},
+        speaker = #{speaker},
+        tag = #{tag},
+        responsible = #{responsible},
+        staff = #{staff},
+        company = #{company},
+        contact = #{contact},
+        email = #{email},
+        note = #{note}
         WHERE id = #{id}
     </update>
 
