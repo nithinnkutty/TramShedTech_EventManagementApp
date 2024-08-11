@@ -46,6 +46,7 @@ pipeline {
                    // Build commands
                    sh '''
                    cd eventmanagement
+                   chmod +x gradlew
                    ./gradlew build
                    '''
                    sh 'echo "Build Project"'
