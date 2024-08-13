@@ -31,19 +31,17 @@ pipeline {
                 script {
                     if (env.INSTANCE_IP) {
                         sh '''
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} <<-EOF
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
                         # Check if Git is installed
                         if ! type git >/dev/null 2>&1; then
                             echo "Git is not installed on the instance."
                             exit 1
                         fi
-
                         # Check if Java is installed
                         if ! type java >/dev/null 2>&1; then
                             echo "Java is not installed on the instance."
                             exit 1
                         fi
-
                         # Check if Gradle is installed
                         if ! type gradle >/dev/null 2>&1; then
                             echo "Gradle is not installed on the instance."
@@ -51,7 +49,7 @@ pipeline {
                         fi
                         EOF
                         '''
-                        sh 'echo "Environment check completed on the instance."'
+                        # sh 'echo "Environment check completed on the instance."'
                     } else {
                         error "Instance IP is not available."
                     }
