@@ -69,11 +69,12 @@
                 <el-row class="custom-row">
                     <el-col>
                         <el-button type="primary" icon="el-icon-plus" size="medium" @click="showAddUserDialog" class="custom-button">Add user</el-button>
-                        <el-upload action="/files/excel" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
+
+                        <el-upload action="/excel/upload" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
                             <el-button icon="el-icon-upload2" size="medium">Import</el-button>
                         </el-upload>
-                        <download-excel class="export-excel-wrapper custom-export" :data="userList" name="Users Table.xls">
-                            <el-button icon="el-icon-download" size="medium">Derive</el-button>
+                        <download-excel class="export-excel-wrapper" :data="userList" name="UsersTable.xls">
+                            <el-button icon="el-icon-download" size="medium" @click="exportExcel">Derive</el-button>
                         </download-excel>
                         <el-popover placement="top" width="160" v-model="visible" class="custom-popover">
                             <p>Selection rules</p>
@@ -630,6 +631,51 @@
                     }
                 });
             },
+            exportExcel: function () {
+                axios({
+                    url: "/user/export",
+                    method: "post",
+                    responseType: 'blob'  // Make sure the responseType is set to blob.
+                }).then(res => {
+                    if (res) {
+                        // Extract filename from Content-Disposition
+                        let contentDisposition = res.headers["content-disposition"];
+                        let fileName = "exported_file.xls"; // Setting the default file name
+
+                        if (contentDisposition) {
+                            let temp = contentDisposition.split(";")[1].split("=")[1];
+                            fileName = decodeURIComponent(temp.replace(/['"]/g, '')); // Handle filenames
+                        }
+
+                        const blob = new Blob([res.data], {
+                            type: "application/vnd.ms-excel;charset=UTF-8",
+                        });
+
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        let a = document.createElement("a"); // Create an a tag for download
+                        a.style.display = 'none';
+                        a.href = blobUrl;
+                        a.download = fileName;  // Set the name of the downloaded file
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(blobUrl);  // Release the URL object
+                        a.remove();
+                    } else {
+                        this.$message.error("Export failed");
+                    }
+                });
+            },
+            handleUploadSuccess2(res) {
+                if (res.code === 200) {
+                    this.$message.success("Forms imported successfully")
+                    this.showpage()
+                } else {
+                    this.$message.error("Table import failed, please check column format and row size")
+                    this.showpage()
+                }
+            },
+
+
         }
     });
 </script>

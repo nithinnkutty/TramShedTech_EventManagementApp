@@ -4,6 +4,7 @@ package com.tramshedtech.eventmanagement.controller;
 
 import com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo;
 import com.tramshedtech.eventmanagement.Vo.UserVo;
+import com.tramshedtech.eventmanagement.config.ExportExcel;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
@@ -25,10 +26,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/user")
@@ -328,9 +326,52 @@ public class UserController {
         } else {
             user.setSex("None");
         }
-        
+
 
         boolean r = userService.modifyUser(user);
         return r;
+    }
+
+    @PostMapping("/export")
+    @ResponseBody
+    public void export(HttpServletRequest request, HttpServletResponse response) {
+
+        //查询数据库中需要导出的数据
+        List<User> userList = userService.allUsersExcel();
+
+        //创建excel表头
+        List<String> column = new ArrayList<>();
+        column.add("id");
+        column.add("Account");
+        column.add("Email");
+        column.add("Department");
+        column.add("Position");
+        column.add("Gender");
+        column.add("Entrydate");
+        column.add("Phone");
+        column.add("Wechat");
+
+        //表头对应的数据
+        List<Map<String, Object>> data = new ArrayList<>();
+
+        //遍历获取到的需要导出的数据，k要和表头一样
+        for (int i = 0; i < userList.size(); i++) {
+            Map<String, Object> dataMap = new HashMap<>();
+            User user = userList.get(i);
+            dataMap.put("id", user.getId());
+            dataMap.put("Account", user.getAccount());
+            dataMap.put("Email", user.getEmail());
+            dataMap.put("Department", user.getDid());
+            dataMap.put("Position", user.getPid());
+            dataMap.put("Gender", user.getSex());
+            dataMap.put("Entrydate", user.getEntrydate());
+            dataMap.put("Phone", user.getPhone());
+            dataMap.put("Wechat", user.getWechat());
+
+            data.add(dataMap);
+        }
+
+        //调用导出工具类
+        ExportExcel.exportExcel("UserList", column, data, request, response);
     }
 }

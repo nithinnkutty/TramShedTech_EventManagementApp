@@ -148,5 +148,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.modifyUser(user);
     }
 
+    @Override
+    public List<User> allUsersExcel() {
+        List<User> allUsers = userMapper.allUsersExcel();
+        return allUsers;
+    }
+
 
 }

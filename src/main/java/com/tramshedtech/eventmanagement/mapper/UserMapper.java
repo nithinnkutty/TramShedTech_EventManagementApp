@@ -45,4 +45,6 @@ public interface UserMapper {
     boolean findbyIdDel(int id);
 
     boolean modifyUser(UserVo user);
+
+    List<User> allUsersExcel();
 }

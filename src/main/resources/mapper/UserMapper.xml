@@ -137,5 +137,21 @@
         update user set account=#{account}, email=#{email} ,did=#{did},pid=#{pid},sex=#{sex},entrydate=#{entrydate},phone=#{phone},wechat=#{wechat},status=0 where id = #{id}
     </update>
 
+    <select id="allUsersExcel" resultMap="userExcelMap">
+        select u.id, u.account, d.name department, p.name position, u.sex, u.entrydate, u.email, u.phone, u.wechat
+        FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id AND status = 0
+    </select>
+
+    <resultMap id="userExcelMap" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="entrydate" property="entrydate" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+    </resultMap>
 
 </mapper>

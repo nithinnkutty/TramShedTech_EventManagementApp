@@ -44,4 +44,6 @@ public interface UserService {
     boolean findbyIdDel(int id);
 
     boolean modifyUser(UserVo user);
+
+    List<User> allUsersExcel();
 }
