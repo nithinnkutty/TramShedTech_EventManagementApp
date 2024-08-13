@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
+        OS_SSH_KEY = credentials('OS_SSH_KEY')
         REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
         PROJECT_DIR = 'eventmanagement'
     }
@@ -30,19 +30,31 @@ pipeline {
             steps {
                 script {
                     if (env.INSTANCE_IP) {
-                        // Clone the repository to the instance
-                        sh '''
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        # Remove existing directory if it exists
-                        if [ -d "teamatramshedtech" ]; then
-                            rm -rf teamatramshedtech
-                        fi
+                        // Use sshagent to handle SSH key securely
+                        sshagent(['GIT_SSH_CREDS']) {
+                            sh """
+ssh -o StrictHostKeyChecking=no -i $OS_SSH_KEY rocky@${INSTANCE_IP} << EOF
+# Print working directory and list files
+pwd
+ls
 
-                        # Clone the repository
-                        git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
-                        cd eventmanagement
-                        EOF
-                        '''
+# Remove existing directory if it exists
+if [ -d "teamatramshedtech" ]; then
+    rm -rf teamatramshedtech
+fi
+
+# Clone the repository
+git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
+
+# Change to the eventmanagement directory
+cd teamatramshedtech
+
+# Confirm the directory and list files
+pwd
+ls -al
+EOF
+"""
+                        }
                         sh 'echo "Project cloned to the instance."'
                     } else {
                         error "Instance IP is not available."
@@ -50,6 +62,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Build') {
             steps {
