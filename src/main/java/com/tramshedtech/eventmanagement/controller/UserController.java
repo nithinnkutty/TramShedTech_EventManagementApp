@@ -317,4 +317,20 @@ public class UserController {
                 .setStatus(ResponseStatus.SUCCESS)
                 .setData(r);
     }
+
+    @PostMapping("/modifyUser")
+    public boolean modifyUser(@RequestBody UserVo user) {
+
+        if(user.getSex().equals("1")){
+            user.setSex("Male");
+        } else if (user.getSex().equals("2")){
+            user.setSex("Female");
+        } else {
+            user.setSex("None");
+        }
+        
+
+        boolean r = userService.modifyUser(user);
+        return r;
+    }
 }

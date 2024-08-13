@@ -125,12 +125,16 @@
     </insert>
 
     <select id="findbyIdModify" resultType="com.tramshedtech.eventmanagement.Vo.UserVo">
-        select account, did, pid, sex, entrydate, email, phone, wechat
+        select id, account, did, pid, sex, entrydate, email, phone, wechat
         FROM user WHERE status = '0' AND id = #{id}
     </select>
 
     <update id="findbyIdDel">
         update user set status = 1 where id = #{id}
+    </update>
+
+    <update id="modifyUser">
+        update user set account=#{account}, email=#{email} ,did=#{did},pid=#{pid},sex=#{sex},entrydate=#{entrydate},phone=#{phone},wechat=#{wechat},status=0 where id = #{id}
     </update>
 
 

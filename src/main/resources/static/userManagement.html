@@ -225,28 +225,27 @@
             title="Modify User Information"
             :visible.sync="innerVisibleModify"
             append-to-body>
-        <el-form :model="userListModify" :rules="rules2" ref="userListAdd" label-width="120px">
+        <el-form :model="userListModify" :rules="rules3" ref="userListModify" label-width="120px">
             <el-form-item label="User Account" prop="account">
                 <el-input placeholder="Please enter username" v-model="userListModify.account"></el-input>
             </el-form-item>
             <el-form-item label="User Email" prop="email">
                 <el-input placeholder="Please enter email" v-model="userListModify.email" type="email"></el-input>
             </el-form-item>
-            <el-form-item label="User Department" prop="department">
-                <el-select v-model="userListModify.did" placeholder="Please select department">
+            <el-form-item label="User Department" prop="did">
+                <el-select v-model="userListModify.did" placeholder="Please select department" :disabled="disableDepartmentSelect">
                     <el-option
                             v-for="item in options"
                             :key="item.id"
                             :label="item.name"
-                            :value="item.id"
-                            :disabled="item.disabled">
+                            :value="item.id">
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="User Position" prop="position">
+            <el-form-item label="User Position" prop="pid">
                 <el-select v-model="userListModify.pid" placeholder="Please select position">
                     <el-option
-                            v-for="item in options2"
+                            v-for="item in filteredPositions2"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -254,14 +253,13 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="User Gender" prop="gender">
+            <el-form-item label="User Gender" prop="sex">
                 <el-select v-model="userListModify.sex" placeholder="Please select gender">
                     <el-option
                             v-for="item in options3"
                             :key="item.id"
                             :label="item.name"
-                            :value="item.id"
-                            :disabled="item.disabled">
+                            :value="item.id">
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -371,6 +369,8 @@
                     },
                 filteredDepartments: [],
                 filteredPositions: [],
+                filteredPositions2: [],
+                disableDepartmentSelect: false,
                 dialogVisible: false,
                 rules2: {
                     account: [
@@ -404,7 +404,30 @@
                     wechat: [
                         {required: true, message: 'Please enter the user\'s wechat', trigger: 'blur'}
                     ],
+
                 },
+                rules3: {
+                    account: [
+                        {required: true, message: 'User name cannot be empty', trigger: 'blur'},
+                        {min: 1, max: 25, message: '1 to 25 characters in length', trigger: 'blur'}
+                    ],
+                    email: [
+                        { required: true, message: 'Email cannot be empty', trigger: 'blur' },
+                        { type: 'email', message: 'Please enter a valid e-mail address', trigger: ['blur', 'change'] }
+                    ],
+                    entrydate: [
+                        {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
+                    ],
+                    phone: [
+                        { required: true, message: 'User\'s phone cannot be empty', trigger: 'blur' },
+                        { pattern: /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/, message: 'Please enter a valid UK cell phone number', trigger: ['blur', 'change'] }
+                    ],
+                    wechat: [
+                        {required: true, message: 'Please enter the user\'s wechat', trigger: 'blur'}
+                    ],
+
+                },
+
             }
         },
         mounted: function() {
@@ -415,6 +438,11 @@
             this.department = JSON.parse(localStorage.getItem('department'));
             console.log(this.position);
             console.log(this.department);
+        },
+        watch: {
+            'userListModify.did'(newVal) {
+                this.adjustFormBasedOnPosition();
+            }
         },
         methods: {
             handleSizeChange: function (size) {
@@ -533,7 +561,28 @@
                 axios.get("/user/findbyIdModify/"+this.id).then(res => {
                     console.log(res.data.data)
                     this.userListModify = res.data.data;
+                    this.adjustFormBasedOnPosition();
                 })
+            },
+            adjustFormBasedOnPosition() {
+                if (this.position < 6) {
+                    this.disableDepartmentSelect = true;
+                    console.log(this.userListModify.did)
+                    if (this.department === this.userListModify.did) {
+                        this.filteredPositions2 = this.options2.filter(item => item.id <= this.position);
+                    } else {
+                        this.filteredPositions2 = this.options2.map(item => ({
+                            ...item,
+                            disabled: true
+                        }));
+                    }
+                } else {
+                    this.disableDepartmentSelect = false;
+                    this.filteredPositions2 = this.options2.map(item => ({
+                        ...item,
+                        disabled: false
+                    }));
+                }
             },
             del:function (scope) {
                 this.id = scope.row.id
@@ -554,6 +603,32 @@
                         return false;
                     }
                 })
+            },
+            submitFormModify(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log(this.userListModify)
+                        axios.post("/user/modifyUser",this.userListModify).then(res => {
+                            console.log(res.data)
+                            if(res.data == true){
+                                this.innerVisibleModify = false
+                                this.$message({
+                                    message: 'Modify User successfully',
+                                    type: 'success'
+                                });
+                                this.showpage()
+                                this.userListModify = {account: "", email: "", did: "", pid: "", sex: "", entrydate: "", phone: "", wechat: ""};
+                            }
+                        })
+                    } else {
+                        this.$message({
+                            message: 'Modify fail',
+                            type: 'error'
+                        });
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
             },
         }
     });

@@ -42,4 +42,6 @@ public interface UserService {
     UserVo findbyIdModify(int id);
 
     boolean findbyIdDel(int id);
+
+    boolean modifyUser(UserVo user);
 }
