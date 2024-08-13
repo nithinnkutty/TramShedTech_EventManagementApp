@@ -5,57 +5,123 @@ body {
     height: 100vh; /* Full viewport height */
     overflow: hidden; /* Prevents body scroll */
 }
+
 #app {
     width: 100%;
     height: 100vh; /* Full height of the viewport */
     display: flex;
     flex-direction: column;
 }
+
 .container {
-    height: 100%; /* Ensure the container takes full height */
-    overflow-y: auto; /* Allow vertical scrolling */
+    flex-grow: 1; /* Takes the remaining height */
+    overflow-y: auto; /* Allows vertical scrolling */
+    background-color: #f4f4f4; /* Light grey background, easier on the eyes */
 }
+
 .content {
-    display: flex;
+    /*display: flex;*/
     flex-direction: column;
-    align-items: stretch;
-    padding: 10px;
-    padding-left: 20px;
+    align-items: stretch; /* Centers content horizontally */
+    padding: 20px; /* Uniform padding */
 }
+
 .filter-row {
     width: 100%;
-    align-items: initial;
-    background: #ebb563;
+    display: flex;
+    justify-content: stretch; /* Space out filters evenly */
     padding: 10px;
-    /*border-bottom: 10px;*/
-    margin-bottom: 10px;
+    background-color: #ebb563;
+    margin-bottom: 10px; /* Space below the filter row */
 }
+
 .event-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: left;
-    margin: -10px; /* Negative margin to compensate for padding in .event-col */
+    justify-content: flex-start; /* Align tiles to the left */
+    padding: 10px; /* Padding inside the row for spacing around edges */
 }
+
 .event-col {
     padding: 10px; /* Space between tiles */
-    box-sizing: border-box; /* Include padding in element's total width and height */
-    flex: 1 1 20%; /* Flex-grow, flex-shrink, flex-basis: Adjust width */
-    max-width: 220px; /* Ensure maximum width, you can adjust this value as needed */
+    flex: 1 1 20%; /* Adjusts basis to auto fit content up to 5 in a row */
+    max-width: 220px; /* Maximum width of each column */
 }
+
 .event-card {
-    width: 100%; /* Full width of the parent container */
-    height:100%; /* Fixed height for tiles */
-    cursor: pointer; /* Change cursor to pointer on hover */
+    justify-content: space-between; /* Aligns children at the space between */
+    width: 100%; /* Adjust width as needed */
+    box-sizing: border-box; /* Includes padding and border in the width and height */
+    overflow: hidden; /* Ensures content does not spill out */
+    border-radius: 8px; /* Rounded corners for a smoother look */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover effects */
+    cursor: pointer; /* Indicates the card is clickable */
+    background-color: #ffffff; /* Light background for the card */
+    display: flex;
+    flex-direction: column; /* Ensures content is laid out vertically inside the card */
+    height: 100%; /* Uses available height */
 }
+
+.event-card:hover {
+    transform: translateY(-5px); /* Lift card up slightly on hover */
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+}
+
 .event-card-img img {
-    width: 100%; /* Full width of the tile */
-    height: 150px; /* Fixed height for the image */
-    object-fit: cover; /* Ensure image covers the area without distortion */
+    width: 100%; /* Ensure image covers the full width of the card */
+    height: 200px; /* Fixed height for images */
+    object-fit: cover; /* Ensures images cover the area well without distortion */
 }
+
 .event-details {
-    padding-left: 10px;
+    padding: 10px; /* Spacious padding around the text content */
+    flex-grow: 1; /* Allows details to fill remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space between items */
 }
+
 .event-title {
-    font-weight: bold;
-    font-size: 1.2em; /* Larger font size */
+    font-size: 1.2em; /* Slightly larger font size */
+    font-weight: 600; /* Medium font weight for better readability */
+    color: #333; /* Darker text for better contrast */
+    margin-bottom: 8px; /* Space below the title */
 }
+
+p {
+    margin: 4px 0; /* Reduced margin for a compact look */
+    color: #666; /* Lighter text color for other details */
+    font-size: 0.9em; /* Slightly smaller font size for details */
+}
+
+.event-details .location {
+    font-weight: bold; /* Make location bold */
+    color: #007BFF; /* Example: blue color for location */
+}
+
+.event-details .completed {
+    color: #28a745; /* Bootstrap green for success, or choose your own color */
+    font-weight: bold;
+}
+
+.feedback-button {
+    margin-top: auto; /* Pushes the button to the bottom */
+    width: 100%; /* Optional: Ensures button stretches to the full width of the card */
+    display: flex;
+    justify-content: center; /* Center the button horizontally */
+}
+
+@media (max-width: 768px) {
+    .event-col {
+        flex: 1 1 100%; /* Stacks the tiles on smaller screens */
+    }
+    .event-card-img img {
+        height: 150px; /* Smaller images on mobile devices */
+    }
+}
+
+.el-select-dropdown {
+    z-index: 10000 !important;
+}
+

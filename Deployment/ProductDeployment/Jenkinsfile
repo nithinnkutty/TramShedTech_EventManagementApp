@@ -1,0 +1,127 @@
+pipeline {
+    agent any
+
+    environment {
+        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
+        REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
+        PROJECT_DIR = 'eventmanagement'
+    }
+
+    stages {
+        stage('Get instance IP') {
+            steps {
+                script {
+                    echo 'Attempting to copy artifacts from InfraCreation job...'
+                    // Copy the instance_ip.txt file from the previous job
+                    copyArtifacts(
+                        projectName: 'TramshedTechProject_InfraCreation',
+                        filter: 'instance_ip.txt',
+                        target: 'artifacts',
+                        selector: lastSuccessful()
+                    )
+                    echo 'Artifacts copied. Reading instance IP...'
+                    env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
+                    sh 'echo "Instance IP: $INSTANCE_IP"'
+                }
+            }
+        }
+
+        stage('Clone Project to Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Clone the repository to the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        # Remove existing directory if it exists
+                        if [ -d "teamatramshedtech" ]; then
+                            rm -rf teamatramshedtech
+                        fi
+
+                        # Clone the repository
+                        git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
+                        cd eventmanagement
+                        EOF
+                        '''
+                        sh 'echo "Project cloned to the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Build commands on the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        cd eventmanagement
+                        chmod +x gradlew
+                        ./gradlew build
+                        EOF
+                        '''
+                        sh 'echo "Build Project on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Test commands on the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        cd eventmanagement
+                        ./gradlew test
+                        EOF
+                        '''
+                        sh 'echo "Test Project on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Run Project') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Run project on the instance in the background
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        cd eventmanagement
+                        nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+                        echo $! > app.pid
+                        EOF
+                        '''
+                        sh 'echo "Application started in the background on the instance."'
+
+                        // Wait for 30 seconds to let the application start
+                        sleep 30
+
+                        // Stop the application
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        if [ -f eventmanagement/app.pid ]; then
+                            kill $(cat eventmanagement/app.pid)
+                            echo "Application stopped."
+                        fi
+                        EOF
+                        '''
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+    }
+}
+

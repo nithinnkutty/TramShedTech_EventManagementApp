@@ -95,13 +95,13 @@
                     <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResource">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
@@ -133,23 +133,26 @@
                                 width="55">
                         </el-table-column>
                         <el-table-column
+                                label="No."
+                                width="55"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
                                 prop="startDate"
                                 label="Start Date"
                                 width="180">
                         </el-table-column>
                         <el-table-column
-                                prop="firstName"
-                                label="Applicant Name"
+                                prop="roomName"
+                                label="Room Name"
                                 width="180">
                         </el-table-column>
                         <el-table-column
-                                prop="location"
+                                prop="locationName"
                                 label="Location">
-                        </el-table-column>
-                        <el-table-column
-                                prop="postcode"
-                                label="Postcode"
-                                width="180">
                         </el-table-column>
                         <el-table-column
                                 prop="endDate"
@@ -198,26 +201,29 @@
         </el-main>
     </el-container>
 
-    <!-- 编辑表单的Dialog -->
+    <!-- Dialog of edit form -->
     <el-dialog title="Edit Booking" :visible.sync="dialogFormVisible">
-        <el-form :model="editForm" ref="editForm" :rules="rules" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="First Name" prop="firstName">
-                <el-input v-model="editForm.firstName"></el-input>
+        <el-form :model="editForm" ref="editForm" :rules="rules" label-width="180px" class="demo-ruleForm">
+            <el-form-item label="Room Number" prop="roomNumber">
+                <el-input v-model="editForm.roomNumber"></el-input>
             </el-form-item>
-            <el-form-item label="Last Name" prop="lastName">
-                <el-input v-model="editForm.lastName"></el-input>
+            <el-form-item label="Room Name" prop="roomName">
+                <el-input v-model="editForm.roomName"></el-input>
             </el-form-item>
-            <el-form-item label="Email" prop="email">
-                <el-input v-model="editForm.email"></el-input>
+            <el-form-item label="Postcode" prop="postcode">
+                <el-input v-model="editForm.postcode"></el-input>
             </el-form-item>
-            <el-form-item label="Location" prop="location">
-                <el-select v-model="editForm.location" placeholder="Please select location">
-                    <el-option label="Cardiff Room 1" value="Cardiff Room 1"></el-option>
-                    <el-option label="Cardiff Room 2" value="Cardiff Room 2"></el-option>
-                    <el-option label="Newport Room 1" value="Newport Room 1"></el-option>
-                    <el-option label="Newport Room 2" value="Newport Room 2"></el-option>
-                    <el-option label="Swansea Room 1" value="Swansea Room 1"></el-option>
-                    <el-option label="Swansea Room 2" value="Swansea Room 2"></el-option>
+            <el-form-item label="Capacity" prop="roomCapacity">
+                <el-input-number v-model="editForm.roomCapacity" :min="1"></el-input-number>
+            </el-form-item>
+            <el-form-item label="Location" prop="locationName">
+                <el-select v-model="editForm.locationId" placeholder="Please select location">
+                    <el-option
+                            v-for="location in locations"
+                            :key="location.id"
+                            :label="location.location"
+                            :value="location.id">
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="Book resource between" prop="daterange">
@@ -241,6 +247,29 @@
                     <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
+            <el-alert
+                    title="Basic equipments we already have: a large TV screen, hybrid set-up, water."
+                    type="warning"
+                    :closable="false">
+            </el-alert>
+            <!-- New upload image form item -->
+            <el-form-item label="Upload Image" prop="img">
+                <el-upload
+                        action="/booking/upload"
+                        list-type="picture-card"
+                        :on-preview="handlePictureCardPreview"
+                        :on-remove="handleRemove"
+                        :file-list="editForm.img"
+                        :before-upload="beforeUpload"
+                        :on-success="handleUploadSuccess"
+                        accept="image/*">
+                    <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+            </el-form-item>
+
             <el-form-item label="Payment method" prop="payment">
                 <el-radio-group v-model="editForm.payment">
                     <el-radio label="Paypal"></el-radio>
@@ -259,6 +288,7 @@
         </el-form>
     </el-dialog>
 </div>
+
 
 
 
@@ -297,18 +327,27 @@
                 searchQuery: '',
                 dialogFormVisible: false,
                 editForm: {
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    location: '',
+                    id: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
+                    locationName: '',
+                    locationId: '',
                     daterange: [],
                     av: [],
                     payment: '',
-                    message: ''
+                    message: '',
+                    roomCapacity:'',
+                    img: [] // make sure it's an array
                 },
                 rules: {
-                    daterange: [{ validator: validateDateRange, trigger: 'change' }]
+                    daterange: [{ validator: validateDateRange, trigger: 'change' }],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ]
                 },
+                dialogImageUrl: '',
+                dialogVisible: false,
                 formLabelWidth: '100px'
             };
         },
@@ -330,6 +369,7 @@
             disabledDate(time) {
                 return time.getTime() < Date.now() - 86400000;
             },
+
             tableRowClassName({ row }) {
                 if (row.status === 'Ongoing') {
                     return 'warning-row';
@@ -340,60 +380,38 @@
                 }
                 return '';
             },
+
             fetchTableData() {
-                setTimeout(() => {
-                    this.tableData = [
-                        {
-                            startDate: 'July 16 2024',
-                            firstName: 'Lily',
-                            location: 'Queen St. Room 101',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 23 2024',
-                            status: 'Upcoming'
-                        },
-                        {
-                            startDate: 'July 18 2024',
-                            firstName: 'Cecilia',
-                            location: 'Queen St. Room 102',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 25 2024',
-                            status: 'Ongoing'
-                        },
-                        {
-                            startDate: 'July 18 2024',
-                            firstName: 'Sunny',
-                            location: 'Queen St. Room 103',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 28 2024',
-                            status: 'Completed'
-                        },
-                        {
-                            startDate: 'July 20 2024',
-                            firstName: 'Zoey',
-                            location: 'Queen St. Room 104',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 30 2024',
-                            status: 'Ongoing'
-                        },
-                        {
-                            startDate: 'July 21 2024',
-                            firstName: 'Zoey',
-                            location: 'Queen St. Room 105',
-                            postcode: 'CF24 0SZ',
-                            endDate: 'July 30 2024',
-                            status: 'Upcoming'
-                        }
-                    ];
-                }, 1000);
+                axios.get('/booking/searchAll')
+                    .then(res => {
+                        console.log(res.data);
+                        this.tableData = res.data.filter(item => item.del === 0); // Filter out deleted records
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting booking data!", error);
+                    });
             },
+
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(res => {
+                        this.locations = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching locations!", error);
+                    });
+            },
+
             handleSizeChange(val) {
                 this.pageSize = val;
                 console.log(`Items per page: ${val}`);
             },
+
             handleCurrentChange(val) {
                 this.currentPage4 = val;
                 console.log(`Current page: ${val}`);
             },
+
             toggleSelection(rows) {
                 if (rows) {
                     rows.forEach(row => {
@@ -403,39 +421,95 @@
                     this.$refs.multipleTable.clearSelection();
                 }
             },
+
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.editForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
             handleEdit(index, row) {
-                console.log("Edit", index, row);
-                this.editForm = {
-                    ...row,
-                    daterange: [row.startDate, row.endDate],
-                    av: Array.isArray(row.av) ? row.av : [], // 确保av是数组
-                    firstName: row.firstName || '',
-                    lastName: row.lastName || '',
-                    email: row.email || '',
-                    location: row.location || '',
-                    payment: row.payment || '',
-                    message: row.message || ''
-                };
-                this.dialogFormVisible = true; // 显示编辑表单
+                console.log("Edit button clicked", index, row);
+                axios.get(`/booking/${row.id}`)
+                    .then(response => {
+                        const data = response.data.data;
+                        // Make sure the img field is an array
+                        const imgList = data.img ? data.img.split(",").map(url => ({
+                            name: url.split("/").pop(), // Extract file name
+                            url: url,
+                            uid: url, // Use the URL as the unique identifier
+                        })) : [];
+                        console.log("imgList:", imgList);
+                        this.editForm = {
+                            id: data.id,
+                            roomNumber: data.roomNumber || '',
+                            roomName: data.roomName || '',
+                            postcode: data.postcode || '',
+                            locationName: data.locationName || '',
+                            locationId: data.location || '',
+                            daterange: [data.startDate, data.endDate],
+                            av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
+                            payment: data.payment || '',
+                            message: data.message || '',
+                            roomCapacity: data.roomCapacity || '',
+                            img: imgList // set img is an array
+                        };
+                        this.dialogFormVisible = true; // display edit form
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the booking data!", error);
+                    });
             },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        // Convert the img field to a comma-separated string before committing
+                        const imgNames = this.editForm.img.map(item => item.name).join(',');
+                        const updatedForm = { ...this.editForm, img: imgNames, location: this.editForm.locationId };
+                        debugger
+                        axios.post(`/booking/update`, updatedForm)
+                            .then(response => {
+                                this.$message({
+                                    message: 'Successfully updated!',
+                                    type: 'success'
+                                });
+                                this.dialogFormVisible = false; // Close the dialog box
+                                this.fetchTableData(); // Refresh the table data
+                            })
+                            .catch(error => {
+                                console.error("There was an error updating the booking data!", error);
+                            });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
             handleDelete(index, row) {
-                console.log("Delete", index, row);
-                this.tableData.splice(index, 1);
-            },
-            confirmDelete(index, row) {
                 this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
                     confirmButtonText: 'Confirm',
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    this.handleDelete(index, row);
-                    this.$message({
-                        type: 'success',
-                        message: 'Deleted successfully!'
-                    });
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -443,6 +517,32 @@
                     });
                 });
             },
+
+            confirmDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+
             deleteSelectedRows() {
                 if (this.multipleSelection.length === 0) {
                     this.$message({
@@ -456,17 +556,19 @@
                     cancelButtonText: 'Cancel',
                     type: 'warning'
                 }).then(() => {
-                    this.multipleSelection.forEach(row => {
-                        const index = this.tableData.indexOf(row);
-                        if (index !== -1) {
-                            this.tableData.splice(index, 1);
-                        }
-                    });
-                    this.multipleSelection = [];
-                    this.$message({
-                        type: 'success',
-                        message: 'Selected rows deleted successfully!'
-                    });
+                    const deletePromises = this.multipleSelection.map(row => axios.post('/booking/delete', { id: row.id }));
+
+                    Promise.all(deletePromises)
+                        .then(() => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Selected rows deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -474,41 +576,58 @@
                     });
                 });
             },
-            handleSearch() {
-                // Add logic to handle search
+
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
             },
+
             viewResources() {
                 window.location.href = 'viewresources.html';
             },
+
             bookaResource() {
                 window.location.href = 'bookresource.html';
             },
+
             cancelBooking() {
                 window.location.href = 'cancel.html';
             },
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$message({
-                            message: 'Successfully updated!',
-                            type: 'success'
-                        });
-                        this.dialogFormVisible = false; // 关闭表单
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
+
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+            },
+
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+                // Remove the file from the img array
+                this.editForm.img = this.editForm.img.filter(item => item.uid !== file.uid);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
             }
         },
+
         mounted() {
             this.fetchTableData();
+            this.fetchLocations();
         }
     });
 </script>
+
 
 </body>
 </html>

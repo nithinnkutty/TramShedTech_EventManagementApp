@@ -1,0 +1,11 @@
+{
+  "dashboard": "Dashboard",
+  "event_management": "Event Management",
+  "participants_speakers": "Participants & Speakers",
+  "resources_management": "Resources Management",
+  "login": "Login",
+  "logout": "Logout",
+  "modify_information": "Modify Information",
+  "modify_password": "Modify Password",
+  "upload_avatar": "Upload Avatar"
+}

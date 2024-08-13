@@ -92,10 +92,35 @@
             margin-left: auto;
             display: block;
         }
+
+        .carousel-container {
+            margin-bottom: 20px;
+        }
+
+        .carousel-item img {
+            width: 100%; /* 图片宽度设置为框的100% */
+            height: auto; /* 高度自动调整以保持图片比例 */
+            object-fit: cover; /* 将图片裁剪以适应框的大小 */
+        }
+
+
+        .book-resource-button {
+            margin-top: 10px;
+        }
+
+        .el-dialog {
+            max-width: 70%;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .dialog-footer {
+            text-align: right;
+        }
     </style>
-
-
-
 
 
 </head>
@@ -108,35 +133,90 @@
                     <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="bookaResources">Book a Resource</el-button>
+                    <el-button type="warning" class="custom-button" @click="bookaResources">Create a Resource</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Booking</el-button>
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-input placeholder="Search" v-model="searchQuery" @input="handleSearch"></el-input>
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
                 </el-col>
             </el-row>
         </el-header>
         <el-main>
             <el-row>
-                <el-col :span="24" v-for="(item, index) in 3" :key="index">
+                <el-col :span="24" v-for="(item, index) in rooms" :key="index">
                     <div class="carousel-container">
                         <el-carousel :interval="5000" arrow="always">
-                            <el-carousel-item v-for="carouselItem in 4" :key="carouselItem">
-                                <h3>{{ carouselItem }}</h3>
+                            <el-carousel-item v-for="imgUrl in getImgUrls(item.img)" :key="imgUrl">
+                                <img :src="imgUrl" alt="Carousel Image">
                             </el-carousel-item>
                         </el-carousel>
-                        <el-descriptions :title="'Room ' + (index + 1)">
-                            <el-descriptions-item label="Cardiff - Queen Street">CF24 0SO</el-descriptions-item>
+                        <el-descriptions :title="'Room Name: ' + item.roomName">
+                            <el-descriptions-item label="Description">{{ item.roomNumber }} - {{ getLocationName(item.location)}} - {{ item.postcode }}
+                            </el-descriptions-item>
                             <el-descriptions-item label="">
-                                <el-button class="book-resource-button" @click="bookResource">BOOK RESOURCE</el-button>
+                                <el-button
+                                        type="primary"
+                                        @click="view(item.id)"
+                                        :disabled="item.status === 0"
+                                        :class="{ 'disabled-button': item.status === 0, 'book-resource-button': true }">
+                                    View
+                                </el-button>
                             </el-descriptions-item>
                         </el-descriptions>
                     </div>
                 </el-col>
             </el-row>
         </el-main>
+        <el-dialog :visible.sync="dialogFormVisible" title="Room Details" width="70%">
+            <el-form :model="editForm" label-width="120px">
+                <el-form-item label="Images">
+                    <el-carousel :interval="5000" arrow="always">
+                        <el-carousel-item v-for="imgUrl in getImgUrlsFromEditForm(editForm.img)" :key="imgUrl">
+                            <img :src="imgUrl" alt="Image">
+                        </el-carousel-item>
+                    </el-carousel>
+                </el-form-item>
+                <el-form-item label="Room Number">
+                    <el-input v-model="editForm.roomNumber" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="Room Name">
+                    <el-input v-model="editForm.roomName" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="Postcode">
+                    <el-input v-model="editForm.postcode" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="Capacity" prop="roomCapacity">
+                    <el-input v-model="editForm.roomCapacity" :min="1" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="Location">
+                    <el-input v-model="editForm.location" readonly></el-input>
+                </el-form-item>
+                <el-form-item label="Date Range">
+                    <el-date-picker v-model="editForm.daterange" type="daterange" readonly></el-date-picker>
+                </el-form-item>
+                <el-form-item label="AV">
+                    <el-checkbox-group v-model="editForm.av" readonly>
+                        <el-alert
+                                title="Basic equipments we already have: one SCREEN, multi DESKS, multi CHAIRS."
+                                type="warning"
+                                :closable="false">
+                        </el-alert>
+                    </el-checkbox-group>
+                </el-form-item>
+<!--                <el-form-item label="Payment">-->
+<!--                    <el-input v-model="editForm.payment" readonly></el-input>-->
+<!--                </el-form-item>-->
+                <el-form-item label="Message">
+                    <el-input v-model="editForm.message" type="textarea" readonly></el-input>
+                </el-form-item>
+
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">Close</el-button>
+      </span>
+        </el-dialog>
     </el-container>
 </div>
 
@@ -144,12 +224,93 @@
     new Vue({
         el: '#app',
         data() {
-            return {};
+            return {
+                rooms: [],
+                locations: [],
+                dialogFormVisible: false,
+                editForm: {
+                    id: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
+                    location: '',
+                    daterange: [],
+                    av: [],
+                    payment: '',
+                    roomCapacity:'',
+                    message: '',
+                    img: []
+                }
+            };
+        },
+        mounted() {
+            this.fetchRooms();
+            this.fetchLocations();
         },
         methods: {
-            bookResource() {
-                // Redirect to the booking page
-                window.location.href = 'bookresource.html';
+            fetchRooms() {
+                axios.get('/booking/searchAll')
+                    .then(res => {
+                        this.rooms = res.data.filter(item => item.del === 0); // Filter out deleted records
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting booking data!", error);
+                    });
+            },
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(res => {
+                        this.locations = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting locations data!", error);
+                    });
+            },
+            getLocationName(locationId) {
+                const location = this.locations.find(loc => loc.id === locationId);
+                return location ? location.location : 'Unknown Location';
+            },
+            getImgUrls(imgString) {
+                const baseUrl = "http://127.0.0.1:8082/uploads/";
+                return imgString.split(',').map(img => baseUrl + img.trim());
+            },
+            getImgUrlsFromEditForm(imgArray) {
+                if (imgArray.length !== 0) {
+                    const baseUrl = "http://127.0.0.1:8082";
+                    return imgArray.split(',').map(img => baseUrl + img.trim());
+                }
+            },
+            view(id) {
+                axios.get(`/booking/${id}`)
+                    .then(response => {
+                        const data = response.data.data;
+                        // Ensure img field is an array
+                        const imgList = data.img ? data.img.split(",").map(url => ({
+                            name: url.split("/").pop(), // Extract file name
+                            url: `http://127.0.0.1:8082/uploads/${url.trim()}`, // Construct the full URL
+                            uid: url, // Use URL as unique ID
+                        })) : [];
+                        this.editForm = {
+                            id: data.id,
+                            roomNumber: data.roomNumber || '',
+                            roomName: data.roomName || '',
+                            postcode: data.postcode || '',
+                            location: this.getLocationName(data.location),
+                            daterange: [data.startDate, data.endDate],
+                            av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // Ensure av is an array
+                            payment: data.payment || '',
+                            message: data.message || '',
+                            roomCapacity: data.roomCapacity || '',
+                            img: data.img // Set img field as array
+                        };
+                        this.dialogFormVisible = true; // Show the dialog
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the booking data!", error);
+                    });
+            },
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
             },
             viewResources() {
                 // Redirect to the view resources page
@@ -166,8 +327,5 @@
         }
     });
 </script>
-
-
-
 </body>
 </html>

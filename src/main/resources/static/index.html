@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Main Page</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="./css/element-index.css">
     <script src="./js/vue.js"></script>
     <script src="./js/axios.min.js"></script>
@@ -13,49 +13,60 @@
     <el-container style="height: 100%;">
         <el-header style="background-color: #F9B117;height: 80px;margin: 20px;padding: 0px;">
             <el-row style="height: 100%;">
-                <el-col :span="4" style="background-color:white;height: 100%;">
-                    <img src="img/logo.png" class="logo-image" alt="Logo">
+                <el-col :span="4" style="background-color:white;height: 100%; display: flex; align-items: center;">
+                    <img src="img/logo.png" class="logo-image" alt="Logo" style="max-width: 100%; height: auto;">
                 </el-col>
-                <el-col :span="3" :offset="16" style="height: 100%;">
-                    <div class="login-container">
+                <el-col :span="4" :offset="12" style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">
+                    <div class="login-container" style="display: flex; align-items: center;">
                         <el-avatar class="user-avatar" :src="imageUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' "></el-avatar>
                         <el-dropdown v-if="token" @command="handleCommand">
                             <el-button type="text" class="el-dropdown-link">
                                 {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item @click.native="change('profile.html')">Modify Information</el-dropdown-item>
-                                <el-dropdown-item @click.native="change('password.html')">Modify Password</el-dropdown-item>
-                                <el-dropdown-item @click.native="change('avatar.html')">Upload Avatar</el-dropdown-item>
-                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('profile.html')" data-i18n-key="modify_information">Modify Information</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('password.html')" data-i18n-key="modify_password">Modify Password</el-dropdown-item>
+                                <el-dropdown-item @click.native="change('avatar.html')" data-i18n-key="upload_avatar">Upload Avatar</el-dropdown-item>
+                                <el-dropdown-item command="logout" data-i18n-key="logout">Logout</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                        <el-button v-else type="text" @click="handleLogin" class="underline-button">Login</el-button>
+                        <el-button v-else type="text" @click="handleLogin" class="underline-button" data-i18n-key="login">Login</el-button>
                     </div>
+                </el-col>
+                <!-- Language Switcher -->
+                <el-col :span="2" style="height: 100%; display: flex; align-items: center; justify-content: flex-end;">
+                    <img :src="currentFlag" width="20px" height="14px" alt="Language Flag" class="me-1" style="margin-right: 5px;">
+                    <el-dropdown @command="changeLanguage">
+                        <el-button type="text" class="el-dropdown-link">
+                            {{ currentLanguage }}<i class="el-icon-arrow-down el-icon--right" style="margin-left: 3px;"></i>
+                        </el-button>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="en">English</el-dropdown-item>
+                            <el-dropdown-item command="cy">Welsh</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
                 </el-col>
             </el-row>
         </el-header>
         <el-container style="background-color: white;height: 600px;">
             <el-aside width="214px" style="background-color: #F9B117;height: 100%;">
                 <div>
-                    <el-menu
-                            default-active="1"
-                            class="el-menu-vertical-demo custom-menu">
+                    <el-menu default-active="1" class="el-menu-vertical-demo custom-menu">
                         <el-menu-item index="1" @click="change('dashboard.html')" class="custom-menu-item">
                             <i class="el-icon-s-promotion"></i>
-                            <span slot="title">Main Page</span>
+                            <span slot="title" data-i18n-key="dashboard">Dashboard</span>
                         </el-menu-item>
                         <el-menu-item index="2" @click="change('create-event.html')" class="custom-menu-item">
                             <i class="el-icon-menu"></i>
-                            <span slot="title">Event management</span>
+                            <span slot="title" data-i18n-key="event_management">Event Management</span>
                         </el-menu-item>
                         <el-menu-item index="3" @click="change('participants-speakers.html')" class="custom-menu-item">
                             <i class="el-icon-document"></i>
-                            <span slot="title">Participants & Speakers</span>
+                            <span slot="title" data-i18n-key="participants_speakers">Participants & Speakers</span>
                         </el-menu-item>
-                        <el-menu-item index="4" @click="change('bookresource.html')" class="custom-menu-item">
+                        <el-menu-item index="4" @click="change('bookmanagement.html')" class="custom-menu-item">
                             <i class="el-icon-setting"></i>
-                            <span slot="title">Booking Management</span>
+                            <span slot="title" data-i18n-key="resources_management">Resources Management</span>
                         </el-menu-item>
                         <el-menu-item index="5" @click="change('userManagement.html')" v-if="position >= 4" class="custom-menu-item">
                             <i class="el-icon-setting"></i>
@@ -70,11 +81,63 @@
                 </div>
             </el-aside>
             <el-main style="background-color: beige;height: 100%;">
-                <!--将页面划分成多个小的页面，每个页面都可以显示一个独立的html文件-->
                 <iframe :src="currentPage" frameborder="0" style="width: 100%;height: 100%;padding: 0px"></iframe>
             </el-main>
         </el-container>
     </el-container>
+
+    <!-- Footer section -->
+    <footer class="generic-padding">
+        <div class="row">
+            <div class="col-6 col-lg-4">
+                <img src="https://cdn.tramshedtech.co.uk/static/img/home/LOGO%20Concept%201.svg" width="90%" height="auto" alt="Tramshed Tech Logo" style="max-width: 200px;">
+                <div class="copyright-text mt-3 mt-lg-5 mb-2">Copyright © 2023 Tramshed Tech</div>
+                <div class="copyright-text mb-2">All rights reserved</div>
+                <div class="row mt-0 mt-lg-5 gx-0 gx-lg-1 gy-2 gy-lg-0 d-flex" id="footer-social-media-links-1">
+                    <a href="https://www.linkedin.com/company/tramshed-tech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Linkedin%20Logo.svg" alt="LinkedIn">
+                    </a>
+                    <a href="https://www.facebook.com/tramshedtech/" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Facebook%20Logo.svg" alt="Facebook">
+                    </a>
+                    <a href="https://twitter.com/TramshedTech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/X%20Logo.svg" alt="X">
+                    </a>
+                    <a href="https://www.instagram.com/tramshedtech/?hl=en" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/Instagram%20Logo.svg" alt="Instagram">
+                    </a>
+                    <a href="https://www.tiktok.com/@tramshedtech" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/TikTok%20Logo.svg" alt="TikTok">
+                    </a>
+                    <a href="https://chat.whatsapp.com/Feq2E16MNlOGWOtgmB7NCT" target="_blank" rel="noopener" class="footer-social-media-icon col-2 col-lg-1">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/home/whatsapp-logo.svg" alt="WhatsApp">
+                    </a>
+                </div>
+            </div>
+            <div class="col-3 col-lg-2">
+                <div class="footer-header">Company</div>
+                <div class="footer-link">
+                    <a href="https://members.tramshedtech.co.uk/login" target="_blank" rel="noopener">Members Login</a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4 mt-5 mt-lg-0">
+                <div id="footer-social-media-links-2">
+                    <p class="footer-header">Download our App</p>
+                    <a href="https://apps.apple.com/gb/app/tramshed-tech/id1496178665" style="margin-right: 10px;">
+                        <img class="no-border-radius mb-3 mb-lg-0" src="https://cdn.tramshedtech.co.uk/static/img/icons/Apple%20Store.svg" alt="Apple Store" width="120px" height="auto">
+                    </a>
+                    <a class="mt-3 mt-lg-0" href="https://play.google.com/store/apps/details?id=com.nexudusspaces.tramshedtech&amp;hl=en_GB&amp;gl=US">
+                        <img class="no-border-radius" src="https://cdn.tramshedtech.co.uk/static/img/icons/Android%20Store.svg" alt="Google Play" width="135px" height="auto">
+                    </a>
+                </div>
+            </div>
+            <div class="col-6 d-flex d-lg-none">
+                <div class="footer-link mt-5">
+                    Subscribe to our <a href="https://share-eu1.hsforms.com/1cg9VbQ-lSEu9h1dveuw1Ewf9dkj" target="_blank" style="text-decoration: underline;">newsletter</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
 </body>
 <style scoped>
@@ -89,6 +152,8 @@
     .custom-menu {
         padding: 10px;
         background-color: #F9B117;
+        padding: 10px; /* Adjust menu padding */
+        background-color: #F9B117; /* Menu background color */
     }
 
     .custom-menu-item {
@@ -98,11 +163,17 @@
         margin: 10px 0;
         border-radius: 8px;
         background-color: white;
+        margin: 10px 0; /* Adjust menu item margin */
+        border-radius: 8px; /* Adjust menu item border radius */
+        background-color: white; /* Menu item background color */
     }
 
+    /* Override Element UI styles */
     .custom-menu-item > .el-menu-item {
         width: 100%;
         text-align: center;
+        width: 100%; /* Ensure menu items fill the parent container width */
+        text-align: center; /* Center menu item content */
     }
     .underline-button {
         text-decoration: underline;
@@ -122,7 +193,52 @@
 
     .user-avatar {
         margin-right: 10px;
+        margin-right: 10px; /* Adjust spacing between avatar and button */
     }
+
+    /* Footer styles */
+    footer.generic-padding {
+        background-color: #333;
+        color: #fff;
+        padding: 20px 20px;
+    }
+
+    footer .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    footer .col-6, footer .col-3, footer .col-lg-4, footer .col-lg-2 {
+        flex: 1;
+        margin: 10px;
+    }
+
+    footer .footer-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    footer .footer-link a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    footer .footer-link a:hover {
+        text-decoration: underline;
+    }
+
+    footer .footer-social-media-icon img {
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Adjust spacing between social media icons */
+    #footer-social-media-links-1 .footer-social-media-icon,
+    #footer-social-media-links-2 .footer-social-media-icon {
+        margin: 0 1px;
+    }
+
 </style>
 <script>
     new Vue({
@@ -134,18 +250,24 @@
             username: '',
             position: 3,
             department: '',
+            currentLanguage: 'EN',
+            currentFlag: 'https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg', // default to UK flag
+            translations: {}
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
             console.log(this.token);
+            const savedLanguage = window.localStorage.getItem('language') || 'en';
+            this.loadTranslations(savedLanguage.toLowerCase());
+            this.currentLanguage = savedLanguage.toUpperCase();
             if (!this.token) {
                 return; // If there is no token, end the method
+                return; // End method if no token
             } else {
                 this.fetchAvatar();
                 this.getUsername();
                 this.getUserPosition();
             }
-
         },
         methods: {
             change: function (uri) {
@@ -167,10 +289,12 @@
                     });
             },
             fetchAvatar() {
+                console.log("Method called successfully")
                 axios.get('/user/findAvatar', {
                 })
                     .then(response => {
                         console.log(response.data);
+                        this.imageUrl = response.data.data; // Assuming the response contains avatarUrl
                         this.imageUrl = response.data.data; // Assuming the returned data contains avatarUrl
                     })
                     .catch(error => {
@@ -195,6 +319,40 @@
                 console.log(`Redirecting to event.html?id=${eventId}`);
                 window.location.href = `/event.html?id=${eventId}`;
             },
+            changeLanguage(language) {
+                this.currentLanguage = language.toUpperCase();
+                window.localStorage.setItem('language', this.currentLanguage);
+
+                // Update the flag based on the selected language
+                this.updateFlag();
+
+                // Load the language file dynamically
+                this.loadTranslations(language);
+            },
+            loadTranslations(language) {
+                const langFilePath = `locales/${language}.json`;
+                axios.get(langFilePath)
+                .then(response => {
+                this.translations = response.data;
+                this.applyTranslations();
+                })
+                .catch(error => {
+                    console.error("Error loading language file:", error);
+                });
+            },
+            applyTranslations() {
+                document.querySelectorAll('[data-i18n-key]').forEach(element => {
+                const key = element.getAttribute('data-i18n-key');
+                element.textContent = this.translations[key] || key;
+            });
+            },
+            updateFlag() {
+                if (this.currentLanguage === 'EN') {
+                    this.currentFlag = 'https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg'; // UK flag
+                } else if (this.currentLanguage === 'CY') {
+                    this.currentFlag = 'https://cdn.britannica.com/62/4962-004-7D6CF6DB/Flag-Wales.jpg'; // Wales flag
+                }
+            },
             logout() {
                 window.localStorage.removeItem('token');
                 this.token = '';
@@ -207,5 +365,4 @@
         }
     })
 </script>
-
 </html>
