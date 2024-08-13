@@ -338,9 +338,39 @@
           this.$refs.multipleTable.clearSelection();
       },
       deleteSelectedRows() {
-        const selectedRows = this.$refs.multipleTable.selection;
-        this.tableData = this.tableData.filter(row => !selectedRows.includes(row));
-        this.$refs.multipleTable.clearSelection();
+          const selectedRows = this.multipleSelection;
+
+          // Create an array of promises to delete each selected row
+          const deletePromises = selectedRows.map(row => {
+              return axios.post(`/api/events/delete/${row.id}`);
+          });
+
+          // Execute all delete requests
+          Promise.all(deletePromises)
+              .then(responses => {
+                  const failedDeletions = responses.filter(response => response.data.status !== 'SUCCESS');
+                  if (failedDeletions.length > 0) {
+                      this.$message({
+                          type: 'error',
+                          message: 'Some deletions failed'
+                      });
+                  } else {
+                      // Filter out deleted rows from the tableData
+                      this.tableData = this.tableData.filter(row => !selectedRows.includes(row));
+                      this.$refs.multipleTable.clearSelection();
+                      this.$message({
+                          type: 'success',
+                          message: 'Selected events deleted successfully'
+                      });
+                  }
+              })
+              .catch(error => {
+                  console.error('Error during deletion:', error);
+                  this.$message({
+                      type: 'error',
+                      message: 'An error occurred while deleting selected events'
+                  });
+              });
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;

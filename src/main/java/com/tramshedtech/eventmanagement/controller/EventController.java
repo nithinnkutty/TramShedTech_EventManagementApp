@@ -73,19 +73,18 @@ public class EventController {
     }
 
     @PostMapping("/create")
-    public ResponseResult createEvent(@RequestBody Event event) {
-        try {
-            Long eventCreatedId = eventService.addEvent(event);
-            if (eventCreatedId > 0) {
-                System.out.println("Event Created Successfully with ID: " + eventCreatedId);
-                return new ResponseResult().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(eventCreatedId);
-            } else {
-                System.out.println("Event Creation Failed");
-                return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseResult().setCode(500).setStatus(ResponseStatus.FAIL);
+    public ResponseResult<Long> createEvent(@RequestBody Event event) {
+        Long eventId = eventService.addEvent(event);
+        if (eventId > 0) {
+            return new ResponseResult<Long>()
+                    .setStatus(ResponseStatus.SUCCESS)
+                    .setMessage("Event created successfully")
+                    .setData(eventId);
+        } else {
+            return new ResponseResult<Long>()
+                    .setStatus(ResponseStatus.FAIL)
+                    .setMessage("Event creation failed")
+                    .setData(null);
         }
     }
 

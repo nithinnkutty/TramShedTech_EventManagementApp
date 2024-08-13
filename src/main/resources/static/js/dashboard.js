@@ -18,39 +18,59 @@ new Vue({
     },
     methods: {
         fetchEvents() {
-            axios.get('/api/events')
-                .then(response => {
-                    // Sort events by date from oldest to newest
-                    this.events = response.data.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-                    this.uniqueYears = [...new Set(this.events.map(event => new Date(event.date).getFullYear().toString()))];
-                    this.filterEvents(); // Apply initial filters
-                })
-                .catch(error => {
-                    console.error("There was an error fetching the events!", error);
-                });
+                axios.get('/api/events')
+                    .then(response => {
+                        // Assuming response.data.data contains events with their schedules
+                        this.events = response.data.data.map(event => {
+                            return {
+                                ...event,
+                                date: event.schedules.length > 0 ? event.schedules[0].date : '', // use the first schedule as the main date
+                                time: event.schedules.length > 0 ? event.schedules[0].startTime + ' - ' + event.schedules[0].endTime : ''
+                            };
+                        });
+                        this.uniqueYears = [...new Set(this.events.map(event => new Date(event.date).getFullYear().toString()))];
+                        this.filterEvents(); // Apply initial filters
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the events!", error);
+                    });
         },
         filterEvents() {
-            let filtered = this.events;
+                let filtered = this.events;
 
-            if (this.selectedFilter === 'upcoming') {
-                filtered = filtered.filter(event => new Date(event.date) > new Date());
-            } else if (this.selectedFilter === 'completed') {
-                filtered = filtered.filter(event => new Date(event.date) < new Date());
-            }
+                if (this.selectedFilter === 'upcoming') {
+                    filtered = filtered.filter(event => new Date(event.date) > new Date());
+                } else if (this.selectedFilter === 'completed') {
+                    filtered = filtered.filter(event => new Date(event.date) < new Date());
+                }
 
-            if (this.selectedYear !== 'all') {
-                filtered = filtered.filter(event => new Date(event.date).getFullYear().toString() === this.selectedYear);
-            }
+                if (this.selectedYear !== 'all') {
+                    filtered = filtered.filter(event => new Date(event.date).getFullYear().toString() === this.selectedYear);
+                }
 
-            if (this.selectedMonth !== 'all') {
-                filtered = filtered.filter(event => new Date(event.date).getMonth() === this.months.indexOf(this.selectedMonth) - 1);
-            }
+                if (this.selectedMonth !== 'all') {
+                    filtered = filtered.filter(event => new Date(event.date).getMonth() === this.months.indexOf(this.selectedMonth) - 1);
+                }
 
-            this.filteredEvents = filtered;
+                // Sort by date to ensure proper order
+                filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                // Update filtered events
+                this.filteredEvents = filtered;
+
+                // Force re-render after filter update
+                this.$nextTick(() => {
+                    console.log('Filtered events updated:', this.filteredEvents);
+                    this.$forceUpdate();  // Force Vue to re-render the component
+
+                    // Optional: Manually re-trigger dropdown
+                    this.$refs.statusDropdown.blur();
+                    this.$refs.statusDropdown.focus();
+                });
         },
         viewEvent(eventId) {
-            localStorage.setItem("eventId", eventId);
-            window.location.href = `/view-event.html`;
+                localStorage.setItem("eventId", eventId);
+                window.location.href = `/view-event.html`;
         },
 
         showFeedbackForm(event) {
@@ -88,6 +108,9 @@ new Vue({
         this.fetchEvents();
         this.selectedYear = 'all';  // Set the default filter for year to 'all'
         this.selectedMonth = 'all';  // Set the default filter for month to 'all'
+        this.$nextTick(() => {
+            console.log('Mounted: Dropdowns and events initialized');
+        });
     }
 });
 

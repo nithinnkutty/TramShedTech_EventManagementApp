@@ -27,10 +27,10 @@
     justify-content: flex-start;
     padding-left: 10px;
 }
-.el-time-select {
+.el-time-select, .el-date-picker {
     margin-left: 10px;
-    width: calc(50% - 10px); /* Adjust width to account for spacing */
-    margin-right: 1px;
+    width: calc(30% - 10px);
+    margin-right: 10px;
 }
 .el-time-select:last-child {
     margin-right: 0; /* Make sure the last selector has no right margin */
@@ -90,4 +90,12 @@
     justify-content: center;
     align-items: center;
     margin-top: 40px;
+}
+
+.add-schedule-button, .remove-schedule-button {
+    margin: 10px 0;
+}
+
+.schedule-entry {
+    margin-bottom: 10px;
 }
