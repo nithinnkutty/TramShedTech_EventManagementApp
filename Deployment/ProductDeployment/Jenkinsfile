@@ -49,7 +49,7 @@ pipeline {
                         fi
                         EOF
                         '''
-                        # sh 'echo "Environment check completed on the instance."'
+                        sh 'echo "Environment check completed on the instance."'
                     } else {
                         error "Instance IP is not available."
                     }
