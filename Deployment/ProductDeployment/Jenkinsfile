@@ -32,19 +32,19 @@ pipeline {
                     if (env.INSTANCE_IP) {
                         sh '''
                         ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        // Check if Git is installed
+                        # Check if Git is installed
                         if ! type git >/dev/null 2>&1; then
                             echo "Git is not installed on the instance."
                             exit 1
                         fi
 
-                        // Check if Java is installed
+                        # Check if Java is installed
                         if ! type java >/dev/null 2>&1; then
                             echo "Java is not installed on the instance."
                             exit 1
                         fi
 
-                        // Check if Gradle is installed
+                        # Check if Gradle is installed
                         if ! type gradle >/dev/null 2>&1; then
                             echo "Gradle is not installed on the instance."
                             exit 1
@@ -73,7 +73,7 @@ pipeline {
                         fi
 
                         # Clone the repository
-                        // git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
+                        # git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
                         cd eventmanagement
                         EOF
                         '''
