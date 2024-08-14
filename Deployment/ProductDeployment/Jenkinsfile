@@ -165,10 +165,10 @@ EOF
 
                     // Clean up log files
                     sh '''
-                    ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                    rm -rf ${PROJECT_DIR}/*.log
-                    EOF
-                    '''
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+rm -rf ${PROJECT_DIR}/*.log
+EOF
+'''
                 } else {
                     echo "Instance IP is not available, skipping cleanup."
                 }
