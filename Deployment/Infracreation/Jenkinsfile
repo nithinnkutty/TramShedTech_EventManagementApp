@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         OS_PASSWORD = credentials('openstackpass_nithin')
-        OS_SSH_KEY = credentials('OS_SSH_KEY')
     }
 
     stages {
@@ -22,7 +21,6 @@ pipeline {
                             terraform apply -auto-approve
                         '''
                         env.INSTANCE_IP = sh(script: "terraform output -raw instance_ip", returnStdout: true).trim()
-                        // Save the instance IP to a file
                         writeFile file: 'instance_ip.txt', text: env.INSTANCE_IP
                         archiveArtifacts artifacts: 'instance_ip.txt', allowEmptyArchive: true
                     }
@@ -34,10 +32,9 @@ pipeline {
             steps {
                 script {
                     if (env.INSTANCE_IP) {
-                        // Retry mechanism to check instance readiness
                         timeout(time: 2, unit: 'MINUTES') {
                             waitUntil {
-                                def ready = sh(script: "ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} 'echo ready'", returnStatus: true) == 0
+                                def ready = sh(script: "ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} 'echo ready'", returnStatus: true) == 0
                                 return ready
                             }
                         }
@@ -51,29 +48,25 @@ pipeline {
         stage('Install Java and Gradle') {
             steps {
                 script {
-                    sh 'echo "Install Java and Gradle after infra creation"'
-                    sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-sudo yum update -y
-sudo yum install wget -y
-echo "Installing Git"
-sudo yum install git -y
-echo "Adding git.cardiff.ac.uk public key to jenkins known_hosts"
-ssh-keyscan git.cardiff.ac.uk >> ~/.ssh/known_hosts
-chmod 644 ~/.ssh/known_hosts
-echo "Installing Java"
-sudo yum install -y java-17-openjdk
-java -version
-echo "Installing unzip and Gradle"
-sudo yum install unzip -y
-wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
-sudo mkdir /opt/gradle
-sudo unzip -d /opt/gradle gradle-8.0-bin.zip
-echo "export PATH=\$PATH:/opt/gradle/gradle-8.0/bin" >> ~/.bash_profile
-source ~/.bash_profile
-gradle -v
-EOF
-"""
+                    withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh """
+                            ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                            sudo yum update -y
+                            sudo yum install wget -y
+                            sudo yum install git -y
+                            ssh-keyscan git.cardiff.ac.uk >> ~/.ssh/known_hosts
+                            chmod 644 ~/.ssh/known_hosts
+                            sudo yum install -y java-17-openjdk
+                            sudo yum install unzip -y
+                            wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
+                            sudo mkdir /opt/gradle
+                            sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+                            echo "export PATH=\$PATH:/opt/gradle/gradle-8.0/bin" >> ~/.bash_profile
+                            source ~/.bash_profile
+                            gradle -v
+                            EOF
+                        """
+                    }
                 }
             }
         }
@@ -81,19 +74,18 @@ EOF
         stage('Install and Start MinIO') {
             steps {
                 script {
-                    sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-echo "Downloading and Installing MinIO"
-wget https://dl.min.io/server/minio/release/linux-amd64/minio
-chmod +x minio
-sudo mv minio /usr/local/bin/
-echo "Creating MinIO directories"
-sudo mkdir -p /data/minio
-sudo mkdir -p /etc/minio
-echo "Starting MinIO"
-nohup minio server /data/minio --console-address ":9001" &
-EOF
-"""
+                    withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh """
+                            ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                            wget https://dl.min.io/server/minio/release/linux-amd64/minio
+                            chmod +x minio
+                            sudo mv minio /usr/local/bin/
+                            sudo mkdir -p /data/minio
+                            sudo mkdir -p /etc/minio
+                            nohup minio server /data/minio --console-address ":9001" &
+                            EOF
+                        """
+                    }
                 }
             }
         }
@@ -101,14 +93,15 @@ EOF
         stage('Install MinIO Client mc') {
             steps {
                 script {
-                    sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-echo "Downloading and Installing MinIO Client mc"
-wget https://dl.min.io/client/mc/release/linux-amd64/mc
-chmod +x mc
-sudo mv mc /usr/local/bin/
-EOF
-"""
+                    withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh """
+                            ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+                            chmod +x mc
+                            sudo mv mc /usr/local/bin/
+                            EOF
+                        """
+                    }
                 }
             }
         }
@@ -116,14 +109,15 @@ EOF
         stage('Create MinIO Bucket and Set Public Access') {
             steps {
                 script {
-                    sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-echo "Creating avatar bucket in MinIO"
-mc alias set myminio http://${env.INSTANCE_IP}:9000 minioadmin minioadmin
-mc mb myminio/avatar
-mc policy set public myminio/avatar
-EOF
-"""
+                    withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh """
+                            ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                            mc alias set myminio http://${env.INSTANCE_IP}:9000 minioadmin minioadmin
+                            mc mb myminio/avatar
+                            mc policy set public myminio/avatar
+                            EOF
+                        """
+                    }
                 }
             }
         }
@@ -138,12 +132,11 @@ EOF
                     minio.bucketName=avatar
                     """
                     writeFile file: 'minio.properties', text: configContent
-                    sh """
-                    ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-                    sudo mkdir -p /etc/minio
-                    sudo mv ${WORKSPACE}/minio.properties /etc/minio/minio.properties
-                    EOF
-                    """
+                    withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                        sh """
+                            scp -i \$SSH_KEY_PATH ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties
+                        """
+                    }
                 }
             }
         }
@@ -152,7 +145,6 @@ EOF
     post {
         success {
             script {
-                // Trigger the Build and Run Project pipeline
                 build job: 'TramshedTechProject_Deployment', wait: false
                 sh 'echo "Instance Creation Completed..!!"'
             }
