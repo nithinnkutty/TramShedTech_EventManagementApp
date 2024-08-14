@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         OS_SSH_KEY = credentials('GIT_SSH_CREDS')
-        REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
         PROJECT_DIR = 'eventmanagement'
     }
 
@@ -22,70 +21,6 @@ pipeline {
                     echo 'Artifacts copied. Reading instance IP...'
                     env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
                     sh 'echo "Instance IP: $INSTANCE_IP"'
-                }
-            }
-        }
-
-        stage('Clone Project to Instance') {
-            steps {
-                script {
-                    if (env.INSTANCE_IP) {
-                        // Clone the repository to the instance
-                        sh '''
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        # Remove existing directory if it exists
-                        if [ -d "teamatramshedtech" ]; then
-                            rm -rf teamatramshedtech
-                        fi
-
-                        # Clone the repository
-                        git clone ${REPO_URL}
-                        cd ${PROJECT_DIR}
-                        EOF
-                        '''
-                        sh 'echo "Project cloned to the instance."'
-                    } else {
-                        error "Instance IP is not available."
-                    }
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    if (env.INSTANCE_IP) {
-                        // Build commands on the instance
-                        sh '''
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        cd ${PROJECT_DIR}
-                        chmod +x gradlew
-                        ./gradlew build
-                        EOF
-                        '''
-                        sh 'echo "Build Project on the instance."'
-                    } else {
-                        error "Instance IP is not available."
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                script {
-                    if (env.INSTANCE_IP) {
-                        // Test commands on the instance
-                        sh '''
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        cd ${PROJECT_DIR}
-                        ./gradlew test
-                        EOF
-                        '''
-                        sh 'echo "Test Project on the instance."'
-                    } else {
-                        error "Instance IP is not available."
-                    }
                 }
             }
         }
