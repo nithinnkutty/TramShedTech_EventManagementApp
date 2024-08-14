@@ -61,7 +61,7 @@ public class MinioUtil {
 
     /**
      * Creating a storage bucket
-     * @param bucketName
+     * @param bucketName Store the bucket name
      * @return Boolean
      */
     public Boolean makeBucket(String bucketName) {
@@ -78,7 +78,7 @@ public class MinioUtil {
 
     /**
      * Deleting a storage bucket
-     * @param bucketName
+     * @param bucketName Store the bucket name
      * @return Boolean
      */
     public Boolean removeBucket(String bucketName) {
@@ -144,7 +144,7 @@ public class MinioUtil {
             in = minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(fileName).build());
             out = new ByteArrayOutputStream();
             IOUtils.copy(in, out);
-            //Encapsulating the return value
+            // Encapsulating the return value
             byte[] bytes = out.toByteArray();
             HttpHeaders headers = new HttpHeaders();
             try {
@@ -179,7 +179,7 @@ public class MinioUtil {
 
     /**
      * View File Objects
-     * @param bucketName
+     * @param bucketName Store the bucket name
      * @return Storing information about file objects in a bucket
      */
     public List<FileDetail> listObjects(String bucketName) {
@@ -203,7 +203,7 @@ public class MinioUtil {
 
     /**
      * Batch Delete File Objects
-     * @param bucketName
+     * @param bucketName Store the bucket name
      * @param objects Object Name Collection
      */
     public void removeObjects(String bucketName, List<String> objects) {
@@ -219,8 +219,8 @@ public class MinioUtil {
     /**
      * Delete file
      *
-     * @param bucketName
-     * @param objectName
+     * @param bucketName bucket name
+     * @param objectName Name of the document
      */
     public void removeObject(String bucketName, String objectName) throws Exception {
         minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
@@ -229,7 +229,7 @@ public class MinioUtil {
     /**
      * Get information based on bucketName
      *
-     * @param bucketName
+     * @param bucketName bucket name
      */
     public  Optional<Bucket> getBucket(String bucketName) throws Exception {
         return minioClient.listBuckets().stream().filter(b -> b.name().equals(bucketName)).findFirst();

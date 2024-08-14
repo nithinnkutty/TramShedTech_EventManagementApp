@@ -28,7 +28,7 @@
     </update>
 
     <select id="findbyId" resultMap="findbyIdMap">
-        select u.id, u.account, d.name department, p.name position, u.sex, u.birthday, u.email, u.phone, u.wechat, u.avatar
+        select u.id, u.account, d.name department, p.name position, u.sex, u.entrydate, u.email, u.phone, u.wechat, u.avatar
         FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id AND u.id = #{uid}
     </select>
 
@@ -38,7 +38,7 @@
         <result column="department" property="did" />
         <result column="position" property="pid" />
         <result column="sex" property="sex" />
-        <result column="birthday" property="birthday" />
+        <result column="entrydate" property="entrydate" />
         <result column="email" property="email" />
         <result column="phone" property="phone" />
         <result column="wechat" property="wechat" />
@@ -46,6 +46,112 @@
     </resultMap>
 
     <update id="updateInfo">
-        update user set account=#{user.account}, birthday=#{user.birthday}, sex=#{user.sex}, email=#{user.email}, wechat=#{user.wechat}, phone=#{user.phone} where id = #{uid}
+        update user set account=#{user.account}, entrydate=#{user.entrydate}, sex=#{user.sex}, email=#{user.email}, wechat=#{user.wechat}, phone=#{user.phone} where id = #{uid}
     </update>
+
+    <select id="findPositionDepartment" resultMap="PositionDepartmentMap">
+        select did, pid
+        FROM user WHERE id = #{uid}
+    </select>
+
+    <resultMap id="PositionDepartmentMap" type="com.tramshedtech.eventmanagement.Vo.UserPositionAndDepartmentVo">
+        <result property="position" column="pid"/>
+        <result property="department" column="did"/>
+    </resultMap>
+
+    <select id="findAllUser" resultMap="user_map">
+        select u.id, u.account, d.name department, p.name position, u.sex, u.entrydate, u.email, u.phone, u.wechat
+        FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id AND u.status = '0'
+    </select>
+
+    <resultMap id="user_map" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="entrydate" property="entrydate" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+    </resultMap>
+
+    <select id="findAllDepartment" resultType="com.tramshedtech.eventmanagement.entity.Department">
+        SELECT * from department
+    </select>
+
+    <select id="findAllPosition" resultType="com.tramshedtech.eventmanagement.entity.Position">
+        SELECT * from position
+    </select>
+
+    <select id="search" resultMap="userSearch_map">
+        SELECT u.id, u.account, d.name department, p.name position, u.sex, DATE_FORMAT( `entrydate`, "%Y-%m-%d" ), u.entrydate, u.status, u.email, u.phone, u.wechat
+        from user u, department d, position p WHERE u.status = '0' AND u.did = d.id AND u.pid = p.id
+        <if test="account!=null and account.length()!=0">
+            and u.account like concat('%',#{account},'%')
+        </if>
+
+        <if test="pid!=null and pid.length()!=0">
+            and p.id = #{pid}
+        </if>
+
+        <if test="did!=null and did.length()!=0">
+            and d.id = #{did}
+        </if>
+
+        <if test="sex!=null and sex.length()!=0">
+            and u.sex = #{sex}
+        </if>
+
+        <if test="entrydate!=null and entrydate.length()!=0">
+            and DATE_FORMAT( `entrydate`, "%Y-%m-%d" ) = #{entrydate}
+        </if>
+    </select>
+
+    <resultMap id="userSearch_map" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="entrydate" property="entrydate" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+    </resultMap>
+
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user(account,password,email,did,pid,sex,entrydate,phone,wechat,status) VALUES (#{account}, #{password},#{email},#{did},#{pid},#{sex},#{entrydate},#{phone},#{wechat},0)
+    </insert>
+
+    <select id="findbyIdModify" resultType="com.tramshedtech.eventmanagement.Vo.UserVo">
+        select id, account, did, pid, sex, entrydate, email, phone, wechat
+        FROM user WHERE status = '0' AND id = #{id}
+    </select>
+
+    <update id="findbyIdDel">
+        update user set status = 1 where id = #{id}
+    </update>
+
+    <update id="modifyUser">
+        update user set account=#{account}, email=#{email} ,did=#{did},pid=#{pid},sex=#{sex},entrydate=#{entrydate},phone=#{phone},wechat=#{wechat},status=0 where id = #{id}
+    </update>
+
+    <select id="allUsersExcel" resultMap="userExcelMap">
+        select u.id, u.account, d.name department, p.name position, u.sex, u.entrydate, u.email, u.phone, u.wechat
+        FROM user u, department d, position p WHERE u.did = d.id AND u.pid = p.id AND status = 0
+    </select>
+
+    <resultMap id="userExcelMap" type="com.tramshedtech.eventmanagement.entity.User">
+        <id column="id" property="id" />
+        <result column="account" property="account" />
+        <result column="department" property="did" />
+        <result column="position" property="pid" />
+        <result column="sex" property="sex" />
+        <result column="entrydate" property="entrydate" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="wechat" property="wechat" />
+    </resultMap>
+
 </mapper>
