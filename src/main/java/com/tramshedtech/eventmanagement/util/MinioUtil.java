@@ -33,7 +33,7 @@ public class MinioUtil {
     @Resource
     private MinioConfiguration minioConfiguration;
 
-    // 桶名
+    // bucket name
     @Value("avatar")
     private String bucketName;
 
@@ -44,7 +44,7 @@ public class MinioUtil {
     }
 
     /**
-     * description: 判断bucket是否存在，不存在则创建
+     * description: Determine if the bucket exists, if it doesn't, create it.
      *
      * @return: void
      */
@@ -60,8 +60,8 @@ public class MinioUtil {
     }
 
     /**
-     * 创建存储bucket
-     * @param bucketName 存储bucket名称
+     * Creating a storage bucket
+     * @param bucketName
      * @return Boolean
      */
     public Boolean makeBucket(String bucketName) {
@@ -77,8 +77,8 @@ public class MinioUtil {
     }
 
     /**
-     * 删除存储bucket
-     * @param bucketName 存储bucket名称
+     * Deleting a storage bucket
+     * @param bucketName
      * @return Boolean
      */
     public Boolean removeBucket(String bucketName) {
@@ -93,7 +93,7 @@ public class MinioUtil {
         return true;
     }
     /**
-     * description: 上传文件
+     * description: Uploading files
      */
     public List<String> upload(MultipartFile[] multipartFile) {
         List<String> names = new ArrayList<>(multipartFile.length);
@@ -126,7 +126,7 @@ public class MinioUtil {
                     }
                 }
             }
-            // 得到文件完整URL
+            // Get the full URL of the file
             fileName = minioConfiguration.getEndpoint() + "/" + bucketName + "/" + fileName;
             names.add(fileName);
         }
@@ -134,7 +134,7 @@ public class MinioUtil {
     }
 
     /**
-     * description: 下载文件
+     * description: Download file
      */
     public ResponseEntity<byte[]> download(String fileName) {
         ResponseEntity<byte[]> responseEntity = null;
@@ -144,7 +144,7 @@ public class MinioUtil {
             in = minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(fileName).build());
             out = new ByteArrayOutputStream();
             IOUtils.copy(in, out);
-            //封装返回值
+            //Encapsulating the return value
             byte[] bytes = out.toByteArray();
             HttpHeaders headers = new HttpHeaders();
             try {
@@ -178,9 +178,9 @@ public class MinioUtil {
     }
 
     /**
-     * 查看文件对象
-     * @param bucketName 存储bucket名称
-     * @return 存储bucket内文件对象信息
+     * View File Objects
+     * @param bucketName
+     * @return Storing information about file objects in a bucket
      */
     public List<FileDetail> listObjects(String bucketName) {
         Iterable<Result<Item>> results = minioClient.listObjects(
@@ -202,9 +202,9 @@ public class MinioUtil {
     }
 
     /**
-     * 批量删除文件对象
-     * @param bucketName 存储bucket名称
-     * @param objects 对象名称集合
+     * Batch Delete File Objects
+     * @param bucketName
+     * @param objects Object Name Collection
      */
     public void removeObjects(String bucketName, List<String> objects) {
         List<DeleteObject> dos =
@@ -217,19 +217,19 @@ public class MinioUtil {
     }
 
     /**
-     * 删除文件
+     * Delete file
      *
-     * @param bucketName bucket名称
-     * @param objectName 文件名称
+     * @param bucketName
+     * @param objectName
      */
     public void removeObject(String bucketName, String objectName) throws Exception {
         minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
     }
 
     /**
-     * 根据bucketName获取信息
+     * Get information based on bucketName
      *
-     * @param bucketName bucket名称
+     * @param bucketName
      */
     public  Optional<Bucket> getBucket(String bucketName) throws Exception {
         return minioClient.listBuckets().stream().filter(b -> b.name().equals(bucketName)).findFirst();
