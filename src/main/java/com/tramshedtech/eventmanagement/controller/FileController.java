@@ -24,7 +24,7 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseResult upload(MultipartFile file, HttpSession httpSession){
-        System.out.println("该方法被调用了");
+
         System.out.println(file);
         int uid = (int)httpSession.getAttribute("uid");
         MultipartFile[] multipartFiles = {file};

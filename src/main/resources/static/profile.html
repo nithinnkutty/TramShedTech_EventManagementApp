@@ -47,10 +47,10 @@
                             <el-radio :label="2">Female</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="Birthday" prop="birthday">
+                    <el-form-item label="EntryDate" prop="entrydate">
                         <el-date-picker
                                 size="medium"
-                                v-model="ruleForm.birthday"
+                                v-model="ruleForm.entrydate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 placeholder="Range of options">
@@ -88,7 +88,7 @@
                     did: '',
                     pid: '',
                     sex: 1,
-                    birthday: '',
+                    entrydate: '',
                     email:'',
                     phone:'',
                     wechat:'',
@@ -103,8 +103,8 @@
                     sex: [
                         { required: true, message: 'Please select gender', trigger: 'change' }
                     ],
-                    birthday: [
-                        { type: 'string', required: true, message: 'Please select date of birth', trigger: 'blur' }
+                    entrydate: [
+                        { type: 'string', required: true, message: 'Please select date of entry', trigger: 'blur' }
                     ],
                     email: [
                         {  type: 'email' , required: true, message: 'Please enter the your email address', trigger: 'blur' },

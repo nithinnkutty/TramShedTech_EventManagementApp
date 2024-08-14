@@ -1,9 +1,11 @@
-package com.tramshedtech.eventmanagement.entity;
+package com.tramshedtech.eventmanagement.Vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
-public class User {
+public class UserVo {
     private int id;
     private String account;
     private String password;
@@ -13,7 +15,7 @@ public class User {
     private String did;
     private String pid;
     private String sex;
-    private String entrydate;
+    private Date entrydate;
     private String phone;
     private String wechat;
 }
