@@ -78,7 +78,7 @@ EOF
             }
         }
 
-        stage('Install and Start MinIO') {
+                stage('Install and Start MinIO') {
                     steps {
                         script {
                             withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
