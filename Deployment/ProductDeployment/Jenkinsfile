@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
+        OS_SSH_KEY = credentials('OS_SSH_KEY')
         REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
         PROJECT_DIR = 'eventmanagement'
     }
@@ -26,20 +26,51 @@ pipeline {
             }
         }
 
-        stage('Clone Project to Instance') {
+        stage('Environment Check on Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        sh '''
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+# Check if Git is installed
+if ! type git >/dev/null 2>&1; then
+    echo "Git is not installed on the instance."
+    exit 1
+fi
+# Check if Java is installed
+if ! type java >/dev/null 2>&1; then
+    echo "Java is not installed on the instance."
+    exit 1
+fi
+# Check if Gradle is installed
+if ! type gradle >/dev/null 2>&1; then
+    echo "Gradle is not installed on the instance."
+    exit 1
+fi
+EOF
+'''
+                        sh 'echo "Environment check completed on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+         stage('Clone Project to Instance') {
             steps {
                 script {
                     if (env.INSTANCE_IP) {
                         // Clone the repository to the instance
                         sh '''
                         ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        # Remove existing directory if it exists
+                        Remove existing directory if it exists
                         if [ -d "teamatramshedtech" ]; then
                             rm -rf teamatramshedtech
                         fi
 
                         # Clone the repository
-                        git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
+                        # git clone git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git
                         cd eventmanagement
                         EOF
                         '''
@@ -51,7 +82,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+         stage('Build') {
             steps {
                 script {
                     if (env.INSTANCE_IP) {
@@ -121,6 +152,33 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            script {
+                if (env.INSTANCE_IP) {
+                    // Archived log files
+                    archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
+                    sh 'echo "Logs have been archived."'
+
+                    // Clean up log files
+                    sh '''
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+rm -rf ${PROJECT_DIR}/*.log
+EOF
+'''
+                } else {
+                    echo "Instance IP is not available, skipping cleanup."
+                }
+            }
+        }
+        success {
+            sh 'echo "Pipeline completed successfully!"'
+        }
+        failure {
+            sh 'echo "Pipeline failed!"'
         }
     }
 }
