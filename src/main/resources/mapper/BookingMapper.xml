@@ -74,7 +74,7 @@
 
     <!-- Select room name in DB -->
     <select id="getAllRoomName" resultType="string">
-        SELECT DISTINCT CONCAT(b.room_name, ' ', l.locationName, ' ', b.postcode) AS fullAddress
+        SELECT DISTINCT CONCAT(b.room_name, ' ', locationName, ' ', b.postcode) AS fullAddress
         FROM bookings b
                  JOIN location l ON b.location = l.id;
     </select>
@@ -96,7 +96,8 @@
         b.message,
         b.av,
         b.payment,
-        b.del
+        b.del,
+        b.status
         FROM
         bookings b
         JOIN

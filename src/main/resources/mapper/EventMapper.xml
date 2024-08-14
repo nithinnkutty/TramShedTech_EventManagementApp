@@ -8,7 +8,7 @@
     <select id="getAllEvents" resultType="com.tramshedtech.eventmanagement.entity.Event">
         SELECT e.*,
         GROUP_CONCAT(CONCAT(es.date, ' ', es.start_time, '-', es.end_time) ORDER BY es.date, es.start_time SEPARATOR ', ') AS schedules,
-        CONCAT(b.room_name, '-', l.location, '-', b.postcode) AS roomName,
+        CONCAT(b.room_name, ' ', l.location, ' ', b.postcode) AS roomName,
         l.location AS locationName
         FROM events e
         LEFT JOIN bookings b ON e.room = b.id
