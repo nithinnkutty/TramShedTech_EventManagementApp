@@ -1,0 +1,125 @@
+pipeline {
+    agent any
+
+    environment {
+        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
+        REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
+        PROJECT_DIR = 'eventmanagement'
+    }
+
+    stages {
+        stage('Get instance IP') {
+            steps {
+                script {
+                    echo 'Attempting to copy artifacts from InfraCreation job...'
+                    // Copy the instance_ip.txt file from the previous job
+                    copyArtifacts(
+                        projectName: 'TramshedTechProject_InfraCreation',
+                        filter: 'instance_ip.txt',
+                        target: 'artifacts',
+                        selector: lastSuccessful()
+                    )
+                    echo 'Artifacts copied. Reading instance IP...'
+                    env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
+                    sh 'echo "Instance IP: $INSTANCE_IP"'
+                }
+            }
+        }
+
+        stage('Clone Project to Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Clone the repository to the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        # Remove existing directory if it exists
+                        if [ -d "teamatramshedtech" ]; then
+                            rm -rf teamatramshedtech
+                        fi
+
+                        # Clone the repository
+                        git clone ${REPO_URL}
+                        cd ${PROJECT_DIR}
+                        EOF
+                        '''
+                        sh 'echo "Project cloned to the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Build commands on the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        cd ${PROJECT_DIR}
+                        chmod +x gradlew
+                        ./gradlew build
+                        EOF
+                        '''
+                        sh 'echo "Build Project on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Test commands on the instance
+                        sh '''
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        cd ${PROJECT_DIR}
+                        ./gradlew test
+                        EOF
+                        '''
+                        sh 'echo "Test Project on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Retrieve JAR from Jenkins Workspace') {
+            steps {
+                script {
+                    // Retrieve the JAR file from the Jenkins workspace
+                    def jarFile = 'build/libs/eventmanagement-0.0.1-SNAPSHOT.jar'
+                    archiveArtifacts artifacts: jarFile, allowEmptyArchive: false
+                    echo "JAR file archived in Jenkins workspace: ${jarFile}"
+                }
+            }
+        }
+
+        stage('Copy JAR to AWS Instance and Run') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Copy the JAR file to the AWS instance and run it
+                        sh '''
+                        scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/${PROJECT_DIR}/build/libs/eventmanagement-0.0.1-SNAPSHOT.jar rocky@${INSTANCE_IP}:/home/rocky/eventmanagement.jar
+
+                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                        nohup java -jar /home/rocky/eventmanagement.jar > /home/rocky/app.log 2>&1 &
+                        echo $! > /home/rocky/app.pid
+                        EOF
+                        '''
+                        sh 'echo "Application started in the background on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+    }
+}
