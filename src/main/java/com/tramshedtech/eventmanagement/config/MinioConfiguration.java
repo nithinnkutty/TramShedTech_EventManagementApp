@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 // @ConfigurationProperties Configuration information in the yml starting with the specified prefix can be automatically assigned to the corresponding attribute.
 @ConfigurationProperties(prefix = "minio")
-@PropertySource("file:/etc/minio/minio.properties")
+//@PropertySource("file:/etc/minio/minio.properties")
 public class MinioConfiguration {
     //
     private String endpoint;    // Connection url

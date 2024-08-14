@@ -147,7 +147,7 @@ ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 sudo mkdir -p /etc/minio
 EOF
 """
-                              sh "scp -i $OS_SSH_KEY ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
+                              sh "scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
                                }
                            }
                     }
