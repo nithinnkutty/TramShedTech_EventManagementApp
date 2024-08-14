@@ -19,8 +19,6 @@ public interface EventMapper {
 
     int softDelete(Long id);
     
-    
-
     @Select("SELECT title FROM events")
     List<String> getAllEventTitles();
 

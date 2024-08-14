@@ -68,6 +68,15 @@
                             <i class="el-icon-setting"></i>
                             <span slot="title" data-i18n-key="resources_management">Resources Management</span>
                         </el-menu-item>
+                        <el-menu-item index="5" @click="change('userManagement.html')" v-if="position >= 4" class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">User Management</span>
+                        </el-menu-item>
+                        <el-menu-item index="5" disabled v-else class="custom-menu-item">
+                            <i class="el-icon-setting"></i>
+                            <span slot="title">User Management</span>
+                        </el-menu-item>
+
                     </el-menu>
                 </div>
             </el-aside>
@@ -141,6 +150,8 @@
         height: 100%;
     }
     .custom-menu {
+        padding: 10px;
+        background-color: #F9B117;
         padding: 10px; /* Adjust menu padding */
         background-color: #F9B117; /* Menu background color */
     }
@@ -149,6 +160,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 10px 0;
+        border-radius: 8px;
+        background-color: white;
         margin: 10px 0; /* Adjust menu item margin */
         border-radius: 8px; /* Adjust menu item border radius */
         background-color: white; /* Menu item background color */
@@ -156,6 +170,8 @@
 
     /* Override Element UI styles */
     .custom-menu-item > .el-menu-item {
+        width: 100%;
+        text-align: center;
         width: 100%; /* Ensure menu items fill the parent container width */
         text-align: center; /* Center menu item content */
     }
@@ -176,6 +192,7 @@
     }
 
     .user-avatar {
+        margin-right: 10px;
         margin-right: 10px; /* Adjust spacing between avatar and button */
     }
 
@@ -231,25 +248,45 @@
             imageUrl:'',
             token: '',
             username: '',
+            position: 3,
+            department: '',
             currentLanguage: 'EN',
             currentFlag: 'https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg', // default to UK flag
             translations: {}
         },
         mounted() {
             this.token = JSON.parse(window.localStorage.getItem('token'));
+            console.log(this.token);
             const savedLanguage = window.localStorage.getItem('language') || 'en';
             this.loadTranslations(savedLanguage.toLowerCase());
             this.currentLanguage = savedLanguage.toUpperCase();
             if (!this.token) {
+                return; // If there is no token, end the method
                 return; // End method if no token
             } else {
                 this.fetchAvatar();
                 this.getUsername();
+                this.getUserPosition();
             }
         },
         methods: {
             change: function (uri) {
                 this.currentPage = uri
+            },
+            getUserPosition() {
+                axios.get('/user/findPositionDepartment', {
+                })
+                    .then(response => {
+                        this.position = response.data.data.position;
+                        this.department = response.data.data.department;
+                        console.log(this.position);
+                        console.log(this.department);
+                        localStorage.setItem('position', JSON.stringify(this.position));
+                        localStorage.setItem('department', JSON.stringify(this.department));
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch position:', error);
+                    });
             },
             fetchAvatar() {
                 console.log("Method called successfully")
@@ -258,6 +295,7 @@
                     .then(response => {
                         console.log(response.data);
                         this.imageUrl = response.data.data; // Assuming the response contains avatarUrl
+                        this.imageUrl = response.data.data; // Assuming the returned data contains avatarUrl
                     })
                     .catch(error => {
                         console.error('Failed to fetch avatar:', error);

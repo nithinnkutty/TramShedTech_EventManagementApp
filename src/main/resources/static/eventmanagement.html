@@ -174,6 +174,7 @@
   <div style="margin-top: 20px">
     <el-button class="custom-clear-button" @click="clearSelection()">Clear selection</el-button>
     <el-button class="custom-delete-button" type="danger" @click="deleteSelectedRows">Delete Selected</el-button>
+    <el-button class="custom-delete-button" style="background-color: #45b4ed; color: white" @click="goToDashboard">Back to Dashboard</el-button>
   </div>
 </div>
 </body>
@@ -211,6 +212,9 @@
       this.fetchLocations();
     },
     methods: {
+      goToDashboard() {
+        window.location.href = 'dashboard.html';
+      },
       fetchTableData() {
         axios.get('/api/events')
                 .then(response => {
@@ -338,9 +342,39 @@
           this.$refs.multipleTable.clearSelection();
       },
       deleteSelectedRows() {
-        const selectedRows = this.$refs.multipleTable.selection;
-        this.tableData = this.tableData.filter(row => !selectedRows.includes(row));
-        this.$refs.multipleTable.clearSelection();
+          const selectedRows = this.multipleSelection;
+
+          // Create an array of promises to delete each selected row
+          const deletePromises = selectedRows.map(row => {
+              return axios.post(`/api/events/delete/${row.id}`);
+          });
+
+          // Execute all delete requests
+          Promise.all(deletePromises)
+              .then(responses => {
+                  const failedDeletions = responses.filter(response => response.data.status !== 'SUCCESS');
+                  if (failedDeletions.length > 0) {
+                      this.$message({
+                          type: 'error',
+                          message: 'Some deletions failed'
+                      });
+                  } else {
+                      // Filter out deleted rows from the tableData
+                      this.tableData = this.tableData.filter(row => !selectedRows.includes(row));
+                      this.$refs.multipleTable.clearSelection();
+                      this.$message({
+                          type: 'success',
+                          message: 'Selected events deleted successfully'
+                      });
+                  }
+              })
+              .catch(error => {
+                  console.error('Error during deletion:', error);
+                  this.$message({
+                      type: 'error',
+                      message: 'An error occurred while deleting selected events'
+                  });
+              });
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;

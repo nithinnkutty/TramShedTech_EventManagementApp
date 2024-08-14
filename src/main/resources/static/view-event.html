@@ -9,51 +9,55 @@
     <title>View Event</title>
 </head>
 <body>
-    <div id="view-event">
-        <el-col :span="24"><div class="title">{{eventForm.title}}</div></el-col>
-        <div class="information">
-                <el-col :span="8" :offset="4"><div class="grid-content left"></div>
-                    <el-card  :body-style="{ padding: '0px' }" shadow="hover">
-                        <img :src="getImgUrls(eventForm.img)[0]" class="image" alt="Event Image">
-                        <div class="image-caption">
-                            <span v-if="eventForm.fullRoomName">{{eventForm.fullRoomName}}</span>
-                            <span v-else>Loading...</span>
-                        </div>
-                    </el-card>
-                </el-col>
-                <el-col :span="8" :offset="1"><div class="grid-content right"></div>
-                    <el-card :body-style="{ padding: '0px' }" shadow="hover">
-                        <div style="padding: 14px;">
-                            <div class="event-id">Event ID:{{eventForm.id}}</div>
-                            <i class="el-icon-user-solid"></i>
-                            <div class="speaker-info">
-                                <a href="javascript:void(0);" @click="handleSpeakerClick('eventForm.speaker')">Speaker: {{eventForm.speaker}}</a>
-                            </div>
-                            <div class="time-display">
-                                <span>Time: {{eventForm.date}} {{ eventForm.time }}</span>
-                            </div>
-                        </div>
-                    </el-card>
-                </el-col>
-                    <el-col :span="17" :offset="4"><div class="grid-content bottom"></div>
-                        <div class="event-display">
-                            <span>Responsible: {{eventForm.responsible}} </span>
-                            <el-divider></el-divider>
-                            <span>Support Staff: {{eventForm.staff}}</span>
-                            <el-divider></el-divider>
-                            <div class="company-contact">
-                                <span>Company: {{eventForm.company}}</span>
-                                <span class="contact-email">Contact Email: {{eventForm.email}}</span>
-                            </div>
-                        </div>
-                    </el-col>
-        </div>
-
-        <div class="edit-button" style="text-align: center; margin-top: 20px;">
-            <el-button type="primary" round @click="goToEventManagement">Edit Event</el-button>
-        </div>
+<div id="view-event">
+    <el-col :span="24"><div class="title">{{eventForm.title || 'Loading...'}}</div></el-col>
+    <div class="information">
+        <el-col :span="8" :offset="4">
+            <div class="grid-content left"></div>
+            <el-card  :body-style="{ padding: '0px' }" shadow="hover">
+                <img :src="getImgUrls(eventForm.img)[0]" class="image" alt="Event Image">
+                <div class="image-caption">
+                    <span v-if="eventForm.fullRoomName">{{eventForm.fullRoomName}}</span>
+                    <span v-else>Loading...</span>
+                </div>
+            </el-card>
+        </el-col>
+        <el-col :span="8" :offset="1">
+            <div class="grid-content right"></div>
+            <el-card :body-style="{ padding: '0px' }" shadow="hover">
+                <div style="padding: 14px;">
+                    <div class="event-id">Event ID: {{eventForm.id || 'Loading...'}}</div>
+                    <i class="el-icon-user-solid"></i>
+                    <div class="speaker-info">
+                        <a href="javascript:void(0);" @click="handleSpeakerClick(eventForm.speaker)">
+                            Speaker: {{eventForm.speaker || 'Loading...'}}
+                        </a>
+                    </div>
+                    <div class="time-display">
+                        <span>Time: {{eventForm.date}} {{ eventForm.time || 'Loading...' }}</span>
+                    </div>
+                </div>
+            </el-card>
+        </el-col>
+        <el-col :span="17" :offset="4">
+            <div class="grid-content bottom"></div>
+            <div class="event-display">
+                <span v-if="eventForm.responsible">Responsible: {{eventForm.responsible}}</span>
+                <el-divider v-if="eventForm.responsible"></el-divider>
+                <span v-if="eventForm.staff">Support Staff: {{eventForm.staff}}</span>
+                <el-divider v-if="eventForm.staff"></el-divider>
+                <div class="company-contact">
+                    <span v-if="eventForm.company">Company: {{eventForm.company}}</span>
+                    <span v-if="eventForm.email" class="contact-email">Contact Email: {{eventForm.email}}</span>
+                </div>
+            </div>
+        </el-col>
     </div>
 
+    <div class="edit-button" style="text-align: center; margin-top: 20px;">
+        <el-button type="primary" round @click="goToEventManagement">Edit Event</el-button>
+    </div>
+</div>
 </body>
 <script>
     new Vue({
@@ -64,7 +68,7 @@
                     id: '',
                     title: '',
                     room: '',
-                    time: '',
+                    times: [],
                     responsible: '',
                     staff: '',
                     company: '',
@@ -77,7 +81,6 @@
         },
         mounted() {
             this.fetchEventData();
-            this.fetchRooms();
         },
         methods: {
             handleSpeakerClick(name) {
@@ -99,19 +102,11 @@
                         const eventData = response.data.data;
                         this.eventForm = {
                             ...eventData,
+                            times: eventData.times || [],
                             img: eventData.img || ''
                         };
-                        return this.fetchRooms(eventId);
-                        // this.eventForm = response.data.data;
-                        // this.eventForm.id = response.data.data.id;
-                        // this.eventForm.title = response.data.data.title;
-                        // this.eventForm.time = response.data.data.time;
-                        // this.eventForm.responsible = response.data.data.responsible;
-                        // this.eventForm.staff = response.data.data.staff;
-                        // this.eventForm.company = response.data.data.company;
-                        // this.eventForm.email = response.data.data.email;
-                        // this.eventForm.speaker = response.data.data.speaker;
-                        // localStorage.removeItem('eventId');
+                        console.log("Event data:", this.eventForm);
+                        this.fetchRooms(eventId);
                     })
                     .catch(error => {
                         console.error("There was an error fetching the event data!", error);
@@ -126,16 +121,13 @@
                 console.log("Fetching rooms for event:", eventId);
                 axios.get(`/api/events/getRoom/${eventId}`)
                     .then(response => {
-                        console.log("Received room name:", response.data);
-                        this.eventForm.fullRoomName = response.data;
-                        console.log("Room name:", this.eventForm.fullRoomName);
+                        this.eventForm.fullRoomName = response.data || 'No room info';
                         this.$forceUpdate();
                     })
                     .catch(error => {
                         console.error("There was an error fetching the room details!", error);
                     });
-
-            },
+            }
         }
     });
 </script>
