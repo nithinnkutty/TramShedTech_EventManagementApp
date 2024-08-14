@@ -374,4 +374,14 @@ public class UserController {
         //调用导出工具类
         ExportExcel.exportExcel("UserList", column, data, request, response);
     }
+
+    @PostMapping("/logout")
+    public void logout(HttpSession session) {
+        session.removeAttribute("uid");
+
+        session.removeAttribute("uname");
+
+        session.removeAttribute("token");
+
+    }
 }
