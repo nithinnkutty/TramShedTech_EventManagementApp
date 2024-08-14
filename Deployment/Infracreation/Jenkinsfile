@@ -91,7 +91,7 @@ sudo mkdir -p /data/minio
 sudo mkdir -p /etc/minio
 sudo chown -R rocky:rocky /data/minio
 sudo chmod -R u+rwX /data/minio
-sudo nohup minio server /data/minio --console-address ":9001" &
+sudo nohup /usr/local/bin/minio server /data/minio --console-address ":9001" &
 EOF
 """
                             }
