@@ -83,13 +83,15 @@ EOF
                         script {
                             withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                                 sh """
-                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
-                                    wget https://dl.min.io/server/minio/release/linux-amd64/minio
-                                    chmod +x minio
+                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+                                    sudo wget https://dl.min.io/server/minio/release/linux-amd64/minio
+                                    sudo chmod +x minio
                                     sudo mv minio /usr/local/bin/
                                     sudo mkdir -p /data/minio
                                     sudo mkdir -p /etc/minio
-                                    nohup minio server /data/minio --console-address ":9001" &
+                                    sudo chown -R rocky:rocky /data/minio
+                                    sudo chmod -R u+rwX /data/minio
+                                    sudo nohup minio server /data/minio --console-address ":9001" &
                                     EOF
                                 """
                             }
@@ -102,7 +104,7 @@ EOF
                         script {
                             withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                                 sh """
-                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
                                     wget https://dl.min.io/client/mc/release/linux-amd64/mc
                                     chmod +x mc
                                     sudo mv mc /usr/local/bin/
@@ -118,7 +120,7 @@ EOF
                         script {
                             withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
                                 sh """
-                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << 'EOF'
+                                    ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
                                     mc alias set myminio http://${env.INSTANCE_IP}:9000 minioadmin minioadmin
                                     mc mb myminio/avatar
                                     mc policy set public myminio/avatar
