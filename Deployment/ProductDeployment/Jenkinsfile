@@ -8,6 +8,14 @@ pipeline {
         GIT_CREDS = credentials('NITHIN_GIT_CREDS')
     }
 
+    parameters {
+        booleanParam(
+                name: 'KEEP_RUNNING',
+                defaultValue: true,
+                description: 'Check the box to keep the project running after it starts, or Uncheck to stop it after a few minutes.'
+        )
+    }
+
     stages {
         stage('Get instance IP') {
             steps {
@@ -139,20 +147,22 @@ EOF
 """
                         sh 'echo "Application started in the background on the instance."'
 
-                        // Wait for 30 seconds to let the application start
-                        sleep 30
+                        // Conditionally stop the application based on the KEEP_RUNNING parameter
+                        if (!params.KEEP_RUNNING) {
+                            sh 'sleep 60'  // Wait for 60 seconds to let the application run
 
-                        // Stop the application
-                        sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech
-if [ -f app.pid ]; then
-    kill \$(cat app.pid)
-    echo "Application stopped."
-    rm app.pid
-fi
-EOF
-                """
+                            // Stop the application
+                            sh """
+                            ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+                            cd teamatramshedtech/eventmanagement
+                            if [ -f app.pid ]; then
+                                kill \$(cat app.pid)
+                                echo "Application stopped."
+                                rm app.pid
+                            fi
+                            EOF
+                            """
+                        }
                     } else {
                         error "Instance IP is not available."
                     }
@@ -166,9 +176,9 @@ EOF
             script {
                 if (env.INSTANCE_IP) {
                     // Archive the test results
-                    junit 'build/test-results/test/*.xml'
+                    junit '**/build/test-results/**/*.xml'
                     // Archived log files
-                    archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'eventmanagement/app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
 
                     // Clean up log files
