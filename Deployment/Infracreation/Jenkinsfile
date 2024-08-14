@@ -149,7 +149,7 @@ sudo chown -R rocky:rocky /etc/minio
 sudo chmod -R u+rwX /etc/minio
 EOF
 """
-                              sh "sudo scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
+                              sh "scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
                                }
                            }
                     }
