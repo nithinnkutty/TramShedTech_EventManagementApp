@@ -132,7 +132,7 @@ EOF
                         // Run project on the instance in the background
                         sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech/eventmanagement
+cd teamatramshedtech
 nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
@@ -145,7 +145,7 @@ EOF
                         // Stop the application
                         sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech/eventmanagement
+cd teamatramshedtech
 if [ -f app.pid ]; then
     kill \$(cat app.pid)
     echo "Application stopped."
@@ -165,6 +165,8 @@ EOF
         always {
             script {
                 if (env.INSTANCE_IP) {
+                    // Archive the test results
+                    junit 'build/test-results/test/*.xml'
                     // Archived log files
                     archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
