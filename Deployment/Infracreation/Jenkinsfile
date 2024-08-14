@@ -134,24 +134,24 @@ EOF
                 stage('Configure MinIO') {
                     steps {
                         script {
-                            sh "mkdir -p /etc/minio/"
-                            sh """
-cat >> /etc/minio/minio.properties << EOF
+                           withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
+                              def configContent = """
 minio.endpoint=http://${env.INSTANCE_IP}:9000
 minio.accessKey=minioadmin
 minio.secretKey=minioadmin
 minio.bucketName=avatar
-EOF
 """
-                            sh """
+                              writeFile file: 'minio.properties', text: configContent
+                              sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 sudo mkdir -p /etc/minio
 EOF
 """
-                            sh "scp -i \$OS_SSH_KEY /etc/minio/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
-                            }
-                       }
-                }
+                              sh "scp -i $OS_SSH_KEY ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
+                               }
+                           }
+                    }
+               }
     }
 
     post {
