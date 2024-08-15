@@ -103,7 +103,7 @@ git clone https://${encodedUsername}:${encodedPassword}@git.cardiff.ac.uk/c23051
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 chmod +x gradlew
-./gradlew build
+./gradlew clean build 
 EOF
 """
                         sh 'echo "Build Project on the instance."'
@@ -123,6 +123,7 @@ EOF
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 ./gradlew test
+./gradlew jacocoTestReport 
 EOF
 """
                         sh 'echo "Test Project on the instance."'
@@ -175,8 +176,11 @@ EOF
         always {
             script {
                 if (env.INSTANCE_IP) {
-                    // Archive the test results
-                    junit '**/build/test-results/**/*.xml'
+                    junit '**/build/test-results/test/*.xml' // For publishing unit test results
+                    jacoco  classPattern: '**/build/classes',
+                            exclusionPattern: '**/Test*.class',
+                            execPattern: '**/build/jacoco/**.exec',
+                            sourceInclusionPattern: '**/*.java'  // For publishing JaCoCo coverage results
                     // Archived log files
                     archiveArtifacts artifacts: 'eventmanagement/app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
