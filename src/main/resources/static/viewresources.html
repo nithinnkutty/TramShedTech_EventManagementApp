@@ -70,7 +70,22 @@
             margin-bottom: 20px;
         }
 
-        .el-carousel__item h3 {
+        .el-carousel-item {
+            height: 100%; /* 确保每个轮播项的高度填满父容器 */
+            display: flex; /* 使内容能够垂直居中 */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .el-carousel-item img {
+            width: 100%; /* 宽度填满容器 */
+            height: 100%; /* 高度填满容器 */
+            object-fit: cover; /* 保持图片的比例，裁剪以适应容器 */
+            object-position: center; /* 确保图片居中对齐 */
+            border-radius: 8px; /* 保持图片的圆角与容器一致 */
+        }
+
+        .el-carousel-item {
             color: #475669;
             font-size: 18px;
             opacity: 0.75;
@@ -93,17 +108,6 @@
             display: block;
         }
 
-        .carousel-container {
-            margin-bottom: 20px;
-        }
-
-        .carousel-item img {
-            width: 100%; /* 图片宽度设置为框的100% */
-            height: auto; /* 高度自动调整以保持图片比例 */
-            object-fit: cover; /* 将图片裁剪以适应框的大小 */
-        }
-
-
         .book-resource-button {
             margin-top: 10px;
         }
@@ -119,6 +123,11 @@
 
         .dialog-footer {
             text-align: right;
+        }
+
+        .image{
+            width: 100%;
+            height: auto;
         }
     </style>
 
@@ -149,7 +158,7 @@
                     <div class="carousel-container">
                         <el-carousel :interval="5000" arrow="always">
                             <el-carousel-item v-for="imgUrl in getImgUrls(item.img)" :key="imgUrl">
-                                <img :src="imgUrl" alt="Carousel Image">
+                                <img :src="imgUrl" alt="Carousel Image" class="image">
                             </el-carousel-item>
                         </el-carousel>
                         <el-descriptions :title="'Room Name: ' + item.roomName">
@@ -174,7 +183,7 @@
                 <el-form-item label="Images">
                     <el-carousel :interval="5000" arrow="always">
                         <el-carousel-item v-for="imgUrl in getImgUrlsFromEditForm(editForm.img)" :key="imgUrl">
-                            <img :src="imgUrl" alt="Image">
+                            <img :src="imgUrl" alt="Image" class="image">
                         </el-carousel-item>
                     </el-carousel>
                 </el-form-item>
