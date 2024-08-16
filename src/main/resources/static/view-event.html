@@ -113,8 +113,9 @@
                     });
             },
             getImgUrls(imgString) {
-                const baseUrl = "http://127.0.0.1:8082/uploads/";
-                return imgString.split(',').map(img => baseUrl + img.trim());
+                // const baseUrl = "http://127.0.0.1:8082/uploads/";
+                // return imgString.split(',').map(img => baseUrl + img.trim());
+                return imgString.split(',').map(img => img.trim());
             },
             fetchRooms() {
                 const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;
