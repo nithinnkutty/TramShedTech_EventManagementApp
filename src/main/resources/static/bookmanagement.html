@@ -471,7 +471,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         // Convert the img field to a comma-separated string before committing
-                        const imgNames = this.editForm.img.map(item => item.name).join(',');
+                        const imgNames = this.editForm.img.map(item => item.url).join(',');
                         const updatedForm = { ...this.editForm, img: imgNames, location: this.editForm.locationId };
                         debugger
                         axios.post(`/booking/update`, updatedForm)
