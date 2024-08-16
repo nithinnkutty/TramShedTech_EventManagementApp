@@ -50,7 +50,7 @@ public class BookingController {
             // copy the file to the target location
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             // create the file URL
-            String fileUrl = "/img/uploads/" + fileName; // use relative URL
+            String fileUrl = "/uploads/" + fileName; // use relative URL
             // create a response object
             Map<String, String> response = new HashMap<>();
             response.put("url", fileUrl);
