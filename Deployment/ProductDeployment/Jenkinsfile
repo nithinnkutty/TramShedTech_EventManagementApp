@@ -85,6 +85,12 @@ fi
 
 # Clone the repository
 git clone https://${encodedUsername}:${encodedPassword}@git.cardiff.ac.uk/c23051986/teamatramshedtech.git
+
+# Navigate to the repository directory
+cd teamatramshedtech
+
+# Checkout to the specific branch
+git checkout 9_deployment_of_the_project
 """
                         sleep 30
                         sh 'echo "Project cloned to the instance."'
