@@ -105,7 +105,8 @@ git clone https://${encodedUsername}:${encodedPassword}@git.cardiff.ac.uk/c23051
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 chmod +x gradlew
-./gradlew clean build 
+./gradlew clean 
+./gradlew build 
 EOF
 """
                         sh 'echo "Build Project on the instance."'
