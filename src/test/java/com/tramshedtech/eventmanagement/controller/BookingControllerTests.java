@@ -1,4 +1,4 @@
-package com.tramshedtech.eventmanagement;
+package com.tramshedtech.eventmanagement.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
