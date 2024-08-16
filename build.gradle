@@ -14,10 +14,6 @@ java {
 	}
 }
 
-jacoco {
-	toolVersion = "0.8.8"
-}
-
 repositories {
 	mavenCentral()
 }
@@ -45,16 +41,11 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	finalizedBy(jacocoTestReport)
 }
 
-//tasks.jacocoTestReport {
-//	dependsOn(tasks.test)
-//	reports {
-//		xml.required = true
-//		html.required = true
-//	}
-//}
+test {
+	useJUnitPlatform()
+}
 
 tasks.withType(JavaCompile) {
 	options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
