@@ -6,6 +6,8 @@ pipeline {
         REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
         PROJECT_DIR = 'eventmanagement'
         GIT_CREDS = credentials('NITHIN_GIT_CREDS')
+        AWS_CREDS = credentials('AWS_CREDS')
+        AWS_INSTANCE_IP = '16.171.36.15'
     }
 
     parameters {
@@ -198,6 +200,12 @@ EOF
         }
         success {
             sh 'echo "Pipeline completed successfully!"'
+            // Copy the jar file to the AWS instance
+            sh """
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+scp -i $AWS_CREDS  -o StrictHostKeyChecking=no teamatramshedtech/build/libs/eventmanagement-0.0.1-SNAPSHOT.jar ec2-user@${AWS_INSTANCE_IP}:~
+EOF
+"""
         }
         failure {
             sh 'echo "Pipeline failed!"'
