@@ -35,8 +35,7 @@ public class UserController {
 
     @Resource
     private UserService userService;
-    @Autowired
-    private ConfigurationPropertiesAutoConfiguration configurationPropertiesAutoConfiguration;
+
 
     @PostMapping("/login")
     public ResponseResult login(@RequestBody User user, HttpSession session, HttpServletResponse response) throws SQLException, IOException {
@@ -336,10 +335,10 @@ public class UserController {
     @ResponseBody
     public void export(HttpServletRequest request, HttpServletResponse response) {
 
-        //查询数据库中需要导出的数据
+        // Query the database for the data to be exported
         List<User> userList = userService.allUsersExcel();
 
-        //创建excel表头
+        // Create excel sheet header
         List<String> column = new ArrayList<>();
         column.add("id");
         column.add("Account");
@@ -351,10 +350,10 @@ public class UserController {
         column.add("Phone");
         column.add("Wechat");
 
-        //表头对应的数据
+        // Data corresponding to the table header
         List<Map<String, Object>> data = new ArrayList<>();
 
-        //遍历获取到的需要导出的数据，k要和表头一样
+        // Iterate over the acquired data to be exported, k should be the same as the table header
         for (int i = 0; i < userList.size(); i++) {
             Map<String, Object> dataMap = new HashMap<>();
             User user = userList.get(i);
@@ -371,7 +370,17 @@ public class UserController {
             data.add(dataMap);
         }
 
-        //调用导出工具类
+        // Calling the export tool class
         ExportExcel.exportExcel("UserList", column, data, request, response);
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpSession session) {
+        session.removeAttribute("uid");
+
+        session.removeAttribute("uname");
+
+        session.removeAttribute("token");
+
     }
 }
