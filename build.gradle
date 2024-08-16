@@ -45,7 +45,7 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-//	finalizedBy(tasks.jacocoTestReport)
+	finalizedBy(jacocoTestReport)
 }
 
 //tasks.jacocoTestReport {
