@@ -256,7 +256,7 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        const imgNames = this.ruleForm.img.map(item => item.name).join(',');
+                        const imgNames = this.ruleForm.img.map(item => item.url).join(',');
                         const formData = {
                             ...this.ruleForm,
                             startDate: this.ruleForm.daterange[0],

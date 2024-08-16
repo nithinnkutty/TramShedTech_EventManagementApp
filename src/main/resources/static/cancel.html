@@ -155,9 +155,8 @@
                 console.log("rooms ",this.rooms)
             },
             getImgUrl(imgString) {
-                const baseUrl = "http://127.0.0.1:8082/uploads/";
                 const imgArray = imgString ? imgString.split(',') : [];
-                return imgArray.length > 0 ? baseUrl + imgArray[0].trim() : '';
+                return imgArray.length > 0 ?   imgArray[0].trim() : '';
             },
             confirmCancel(room) {
                 this.$confirm(`Are you sure you want to cancel the booking for ${room.roomName}?`, 'Warning', {

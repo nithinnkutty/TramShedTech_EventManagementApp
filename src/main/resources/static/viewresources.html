@@ -70,22 +70,7 @@
             margin-bottom: 20px;
         }
 
-        .el-carousel-item {
-            height: 100%; /* Make sure the height of each carousel item fills the parent container */
-            display: flex; /* Center content vertically */
-            align-items: center;
-            justify-content: center;
-        }
-
-        .el-carousel-item img {
-            width: 100%; /* width of each carousel item fills the parent container */
-            height: 100%; /* height of each carousel item fills the parent container */
-            object-fit: cover; /* Keep the picture proportional and crop to fit the container */
-            object-position: center; /* Center content vertically */
-            border-radius: 8px; /* Keep the rounded corners of the picture consistent with the container */
-        }
-
-        .el-carousel-item {
+        .el-carousel__item h3 {
             color: #475669;
             font-size: 18px;
             opacity: 0.75;
@@ -108,6 +93,17 @@
             display: block;
         }
 
+        .carousel-container {
+            margin-bottom: 20px;
+        }
+
+        .carousel-item img {
+            width: 100%; /* The image width is set to 100% of the frame*/
+            height: auto; /* The picture is highly adaptive */
+            object-fit: cover; /* Crop the picture to fit the size of the box */
+        }
+
+
         .book-resource-button {
             margin-top: 10px;
         }
@@ -124,10 +120,19 @@
         .dialog-footer {
             text-align: right;
         }
-
-        .image{
+        .image-wrapper {
             width: 100%;
-            height: auto;
+            height: 400px; /* Specify a specific height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .carousel-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover; /* Fill the entire container while maintaining the aspect ratio of the image */
         }
     </style>
 
@@ -158,7 +163,9 @@
                     <div class="carousel-container">
                         <el-carousel :interval="5000" arrow="always">
                             <el-carousel-item v-for="imgUrl in getImgUrls(item.img)" :key="imgUrl">
-                                <img :src="imgUrl" alt="Carousel Image" class="image">
+                                <div class="image-wrapper">
+                                    <img :src="imgUrl" :alt="`Carousel Image ${imgUrl}`" class="carousel-image">
+                                </div>
                             </el-carousel-item>
                         </el-carousel>
                         <el-descriptions :title="'Room Name: ' + item.roomName">
@@ -183,7 +190,9 @@
                 <el-form-item label="Images">
                     <el-carousel :interval="5000" arrow="always">
                         <el-carousel-item v-for="imgUrl in getImgUrlsFromEditForm(editForm.img)" :key="imgUrl">
-                            <img :src="imgUrl" alt="Image" class="image">
+                            <div class="image-wrapper">
+                                <img :src="imgUrl" :alt="`Carousel Image ${imgUrl}`" class="carousel-image">
+                            </div>
                         </el-carousel-item>
                     </el-carousel>
                 </el-form-item>
@@ -280,13 +289,11 @@
                 return location ? location.location : 'Unknown Location';
             },
             getImgUrls(imgString) {
-                const baseUrl = "http://127.0.0.1:8082/uploads/";
-                return imgString.split(',').map(img => baseUrl + img.trim());
+                return imgString.split(',').map(img =>  img.trim());
             },
             getImgUrlsFromEditForm(imgArray) {
                 if (imgArray.length !== 0) {
-                    const baseUrl = "http://127.0.0.1:8082";
-                    return imgArray.split(',').map(img => baseUrl + img.trim());
+                    return imgArray.split(',').map(img =>   img.trim());
                 }
             },
             view(id) {
