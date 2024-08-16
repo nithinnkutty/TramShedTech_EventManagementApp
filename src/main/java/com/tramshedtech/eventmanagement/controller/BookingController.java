@@ -165,10 +165,10 @@ public class BookingController {
         ResponseResult responseResult = new ResponseResult();
         if (result) {
             responseResult.setCode(200);
-            responseResult.setMessage("Booking deleted successfully");
+            responseResult.setMessage("Booking update successfully");
         } else {
             responseResult.setCode(400);
-            responseResult.setMessage("Booking deletion failed");
+            responseResult.setMessage("Booking update failed");
         }
         return responseResult;
     }
