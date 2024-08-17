@@ -78,12 +78,11 @@ EOF
             }
         }
 
-                stage('Install and Start MinIO') {
-                    steps {
-                        script {
-                            withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
-                                sh """
-ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+        stage('Install and Start MinIO') {
+            steps {
+                script {
+                    sh """
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 sudo wget https://dl.min.io/server/minio/release/linux-amd64/minio
 sudo chmod +x minio
 sudo mv minio /usr/local/bin/
@@ -91,69 +90,64 @@ sudo mkdir -p /data/minio
 sudo mkdir -p /etc/minio
 sudo chown -R rocky:rocky /data/minio
 sudo chmod -R u+rwX /data/minio
-sudo nohup /usr/local/bin/minio server /data/minio --console-address ":9001" &
+# Run MinIO in the background
+sudo nohup /usr/local/bin/minio server /data/minio --console-address ":9001" > /tmp/minio.log 2>&1 &
 EOF
-"""
-                            }
-                        }
-                    }
-                }
 
-                stage('Install MinIO Client mc') {
-                    steps {
-                        script {
-                            withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
-                                sh """
-ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+"""
+                }
+            }
+        }
+
+        stage('Install MinIO Client mc') {
+            steps {
+                script {
+                    sh """
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 sudo mv mc /usr/local/bin/
 EOF
 """
-                            }
-                        }
-                    }
                 }
+            }
+        }
 
-                stage('Create MinIO Bucket and Set Public Access') {
-                    steps {
-                        script {
-                            withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
-                                sh """
+        stage('Create MinIO Bucket and Set Public Access') {
+            steps {
+                script {
+                    sh """
 ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 mc alias set myminio http://${env.INSTANCE_IP}:9000 minioadmin minioadmin
 mc mb myminio/avatar
 mc policy set public myminio/avatar
 EOF
 """
-                            }
-                        }
-                    }
                 }
+            }
+        }
 
-                stage('Configure MinIO') {
-                    steps {
-                        script {
-                           withCredentials([sshUserPrivateKey(credentialsId: 'OS_SSH_KEY', keyFileVariable: 'SSH_KEY_PATH')]) {
-                              def configContent = """
+        stage('Configure MinIO') {
+            steps {
+                script {
+                    def configContent = """
 minio.endpoint=http://${env.INSTANCE_IP}:9000
 minio.accessKey=minioadmin
 minio.secretKey=minioadmin
 minio.bucketName=avatar
 """
-                              writeFile file: 'minio.properties', text: configContent
-                              sh """
+                    writeFile file: 'minio.properties', text: configContent
+                    sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
 sudo mkdir -p /etc/minio
 sudo chown -R rocky:rocky /etc/minio
 sudo chmod -R u+rwX /etc/minio
 EOF
 """
-                              sh "scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
-                               }
-                           }
-                    }
-               }
+                    sh "scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties rocky@${env.INSTANCE_IP}:/etc/minio/minio.properties"
+                }
+            }
+        }
     }
 
     post {
