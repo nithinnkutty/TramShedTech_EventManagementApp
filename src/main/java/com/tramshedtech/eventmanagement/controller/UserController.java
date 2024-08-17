@@ -374,4 +374,19 @@ public class UserController {
         //调用导出工具类
         ExportExcel.exportExcel("UserList", column, data, request, response);
     }
+
+    @GetMapping("/getUserRole")
+    public ResponseResult<String> getUserRole(HttpSession session) {
+        int uid = (int) session.getAttribute("uid");
+        User user = userService.findbyId(uid);
+
+        // Assuming getPid() returns the role name directly
+        String roleName = user.getPid();
+
+        // Return the role directly without attempting to parse it
+        return new ResponseResult<String>().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(roleName);
+    }
+
+
+
 }
