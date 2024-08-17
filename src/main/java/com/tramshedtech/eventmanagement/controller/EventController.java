@@ -1,10 +1,11 @@
 package com.tramshedtech.eventmanagement.controller;
 
-import com.tramshedtech.eventmanagement.entity.*;
+import com.tramshedtech.eventmanagement.entity.Bookings;
 import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.service.EventService;
 import com.tramshedtech.eventmanagement.service.FeedbackService;
-import com.tramshedtech.eventmanagement.service.UserService;
+import com.tramshedtech.eventmanagement.entity.Event;
+import com.tramshedtech.eventmanagement.entity.Feedback;
 import jakarta.annotation.Resource;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
@@ -45,9 +46,6 @@ public class EventController {
 
     @Autowired
     private BookingService bookingService;
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping
     public ResponseResult<List<Event>> getAllEvents() {

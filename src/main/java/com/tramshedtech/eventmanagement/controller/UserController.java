@@ -383,5 +383,4 @@ public class UserController {
         session.removeAttribute("token");
 
     }
-
 }
