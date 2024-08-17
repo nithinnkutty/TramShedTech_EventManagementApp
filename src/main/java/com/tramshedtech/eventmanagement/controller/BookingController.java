@@ -3,8 +3,10 @@ package com.tramshedtech.eventmanagement.controller;
 import com.tramshedtech.eventmanagement.Vo.BookingsVo;
 import com.tramshedtech.eventmanagement.entity.Bookings;
 import com.tramshedtech.eventmanagement.service.BookingService;
+import com.tramshedtech.eventmanagement.util.MinioUtil;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -33,33 +35,20 @@ public class BookingController {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
-
+    @Autowired
+    private MinioUtil minioUtil;
     @Resource
     private BookingService bookingService;
 
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            System.out.println("Received file: " + file.getOriginalFilename()); // add debug info
-            // get the original file name
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            // create a Path object
-            Path path = Paths.get(uploadDir + "/" + fileName);
-            // create directories if they don't exist
-            Files.createDirectories(path.getParent());
-            // copy the file to the target location
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            // create the file URL
-            String fileUrl = "/uploads/" + fileName; // use relative URL
-            // create a response object
-            Map<String, String> response = new HashMap<>();
-            response.put("url", fileUrl);
-            // return the response object
-            return ResponseEntity.ok(response);
-        } catch (IOException ex) {
-            // log the error
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<Map<String, String>> upload(MultipartFile file) {
+        minioUtil.existBucket("avatar");
+        MultipartFile[] multipartFiles = {file};
+        List<String> urls = minioUtil.upload(multipartFiles);
+        String url = urls.get(0);
+        Map<String, String> response = new HashMap<>();
+        response.put("url", url);
+        return ResponseEntity.ok(response);
     }
 
 
@@ -165,10 +154,10 @@ public class BookingController {
         ResponseResult responseResult = new ResponseResult();
         if (result) {
             responseResult.setCode(200);
-            responseResult.setMessage("Booking deleted successfully");
+            responseResult.setMessage("Booking update successfully");
         } else {
             responseResult.setCode(400);
-            responseResult.setMessage("Booking deletion failed");
+            responseResult.setMessage("Booking update failed");
         }
         return responseResult;
     }
@@ -213,13 +202,6 @@ public class BookingController {
     public ResponseResult getBooking(@PathVariable Integer id) {
         Bookings booking = bookingService.getBookingById(id);
         if (booking != null) {
-            List<String> imgUrls = new ArrayList<>();
-            for (String img : booking.getImg().split(",")) {
-                imgUrls.add("/uploads/" + img);
-            }
-            booking.setImg(String.join(",", imgUrls));
-            System.out.println("Booking imgUrls: " + imgUrls); // add debug info
-
             ResponseResult responseResult = new ResponseResult();
             responseResult.setCode(200);
             responseResult.setMessage("Booking fetched successfully");
@@ -232,8 +214,6 @@ public class BookingController {
             return responseResult;
         }
     }
-
-
 
 
     @PostMapping("/update")
