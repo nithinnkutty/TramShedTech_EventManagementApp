@@ -169,6 +169,8 @@ EOF
         always {
             script {
                 if (env.INSTANCE_IP) {
+                    //Publish JUnit Test results
+                    junit stdioRetention: '', testResults: '**/build/test-results/test/*.xml'
                     // Archived log files
                     archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
