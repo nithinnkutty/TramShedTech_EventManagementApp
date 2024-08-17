@@ -122,6 +122,7 @@ cd teamatramshedtech
 ./gradlew test
 EOF
 """
+                        sh "scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP}:${PROJECT_DIR}/build/test-results/test/*.xml ${WORKSPACE}"
                         sh 'echo "Test Project on the instance."'
                     } else {
                         error "Instance IP is not available."
@@ -170,7 +171,7 @@ EOF
             script {
                 if (env.INSTANCE_IP) {
                     //Publish JUnit Test results
-                    junit stdioRetention: '', testResults: '**/build/test-results/test/*.xml'
+                    junit stdioRetention: '', testResults: '**/*.xml'
                     // Archived log files
                     archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
