@@ -4,6 +4,7 @@ pipeline {
     environment {
         OS_PASSWORD = credentials('openstackpass_nithin')
         OS_SSH_KEY = credentials('OS_SSH_KEY')
+        MINIO_CREDS = credentials('MINIO_CREDS')
     }
 
     stages {
@@ -117,8 +118,8 @@ EOF
             steps {
                 script {
                     sh """
-ssh -i \$SSH_KEY_PATH -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
-mc alias set myminio http://${env.INSTANCE_IP}:9000 minioadmin minioadmin
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+mc alias set myminio http://${env.INSTANCE_IP}:9000 $MINIO_CREDS_USR $MINIO_CREDS_PSW
 mc mb myminio/avatar
 mc policy set public myminio/avatar
 EOF
