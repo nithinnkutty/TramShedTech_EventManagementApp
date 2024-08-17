@@ -164,10 +164,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}/feedback")
-    public ResponseResult<List<Feedback>> getFeedbackByEventId(@PathVariable Long eventId, HttpSession session) {
-        int uid = (int) session.getAttribute("uid");
-        User user = userService.findbyId(uid);
-        Position userPosition = userService.findPositionById(user.getPid());
+    public ResponseResult<List<Feedback>> getFeedbackByEventId(@PathVariable Long eventId) {
         List<Feedback> feedbackList = feedbackService.getFeedbackByEventId(eventId);
         return new ResponseResult<List<Feedback>>()
                 .setStatus(ResponseStatus.SUCCESS)
