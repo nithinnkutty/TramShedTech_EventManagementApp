@@ -14,32 +14,31 @@
 <div id="app">
     <!-- Filter dropdown -->
     <el-row class="filter-row">
-        <!-- Filter for event status -->
-        <el-select v-model="selectedFilter" placeholder="Select Status" @change="filterEvents">
-            <el-option label="All Events" value="all"></el-option>
-            <el-option label="Upcoming" value="upcoming"></el-option>
-            <el-option label="Completed" value="completed"></el-option>
-        </el-select>
+    <!-- Filter for event status -->
+    <el-select v-model="selectedFilter" placeholder="Select Status" @change="filterEvents">
+        <el-option label="All Events" value="all"></el-option>
+        <el-option label="Upcoming" value="upcoming"></el-option>
+        <el-option label="Completed" value="completed"></el-option>
+    </el-select>
 
-        <!-- Filter for event year with default 'All' option -->
-        <el-select v-model="selectedYear" placeholder="Select Year" @change="filterEvents">
-            <el-option label="All Years" value="all"></el-option> <!-- Default option to ignore year filter -->
-            <el-option v-for="year in uniqueYears" :key="year" :label="year" :value="year"></el-option>
-        </el-select>
+    <!-- Filter for event year with default 'All' option -->
+    <el-select v-model="selectedYear" placeholder="Select Year" @change="filterEvents">
+        <el-option label="All Years" value="all"></el-option> <!-- Default option to ignore year filter -->
+        <el-option v-for="year in uniqueYears" :key="year" :label="year" :value="year"></el-option>
+    </el-select>
 
-        <!-- Filter for event month with default 'All' option -->
-        <el-select v-model="selectedMonth" placeholder="Select Month" @change="filterEvents">
-            <el-option label="All Months" value="all"></el-option> <!-- Default option to ignore month filter -->
-            <el-option v-for="month in months" :key="month" :label="month" :value="month"></el-option>
-        </el-select>
-    </el-row>
-
+    <!-- Filter for event month with default 'All' option -->
+    <el-select v-model="selectedMonth" placeholder="Select Month" @change="filterEvents">
+        <el-option label="All Months" value="all"></el-option> <!-- Default option to ignore month filter -->
+        <el-option v-for="month in months" :key="month" :label="month" :value="month"></el-option>
+    </el-select>
+</el-row>
     <div class="container">
         <div class="content">
             <!-- Event tiles -->
             <el-row class="event-row">
                 <el-col class="event-col" v-for="event in filteredEvents" :key="event.id">
-                    <el-card class="event-card">
+                    <el-card class="event-card" @click.native="viewEvent(event.id)">
                         <div class="event-card-img">
                             <img src="/img/Eventicon.png" alt="Event Image">
                         </div>
@@ -52,7 +51,6 @@
                         </div>
                         <div v-if="new Date(event.date) < new Date()" class="feedback-button">
                             <el-button type="primary" @click.stop="showFeedbackForm(event)">Leave Feedback</el-button>
-                            <el-button type="success" @click.stop="viewFeedback(event.id)" v-if="canViewFeedback()">View Feedback</el-button>
                         </div>
                     </el-card>
                 </el-col>
@@ -60,19 +58,8 @@
         </div>
     </div>
 
-    <!-- Feedback Modal -->
-    <el-dialog :title="feedbackMode === 'view' ? 'Event Feedback' : 'Leave Feedback'" :visible.sync="showFeedbackModal">
-        <div v-if="feedbackMode === 'view'">
-            <div v-if="feedbackList.length > 0">
-                <div v-for="fb in feedbackList" :key="fb.id">
-                    <p><strong>{{ fb.name }}:</strong> {{ fb.comments }} (Rating: {{ fb.rating }})</p>
-                </div>
-            </div>
-            <div v-else>
-                <p>No feedback available for this event.</p>
-            </div>
-        </div>
-        <div v-else>
+    <el-dialog title="Leave Feedback" :visible.sync="showFeedbackModal">
+        <div>
             <h3>{{ selectedEvent.title }}</h3>
             <el-form @submit.prevent="submitFeedback">
                 <el-form-item label="Your Name">
@@ -92,7 +79,6 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-button @click="showFeedbackModal = false">Close</el-button>
     </el-dialog>
 </div>
 

@@ -8,7 +8,6 @@ import com.tramshedtech.eventmanagement.entity.CustomPage;
 import com.tramshedtech.eventmanagement.entity.Department;
 import com.tramshedtech.eventmanagement.entity.Position;
 import com.tramshedtech.eventmanagement.entity.User;
-import com.tramshedtech.eventmanagement.mapper.PositionMapper;
 import com.tramshedtech.eventmanagement.mapper.UserMapper;
 import com.tramshedtech.eventmanagement.service.UserService;
 import jakarta.annotation.Resource;
@@ -23,9 +22,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     @Resource
     private UserMapper userMapper;
-
-    @Resource
-    private PositionMapper positionMapper;
 
     @Override
     public User findByAccount(String account) {
@@ -158,8 +154,5 @@ public class UserServiceImpl implements UserService {
         return allUsers;
     }
 
-    @Override
-    public Position findPositionById(int pid) {
-        return positionMapper.findById(pid);
-    }
+
 }

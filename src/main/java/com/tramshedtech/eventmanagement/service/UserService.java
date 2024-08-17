@@ -46,6 +46,4 @@ public interface UserService {
     boolean modifyUser(UserVo user);
 
     List<User> allUsersExcel();
-
-    Position findPositionById(int pid);
 }

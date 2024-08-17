@@ -15,7 +15,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public List<Feedback> getFeedbackByEventId(Long eventId) {
-        return feedbackMapper.findByEventId(eventId);
+        return feedbackMapper.getFeedbackByEventId(eventId);
     }
 
     @Override
