@@ -170,8 +170,12 @@ EOF
         always {
             script {
                 if (env.INSTANCE_IP) {
-                    //Publish JUnit Test results
-                    junit stdioRetention: '', testResults: '**/*.xml'
+                    junit stdioRetention: '', testResults: '**/*.xml' //for publishing JUnit Test results
+                    jacoco  classPattern: '**/build/classes',
+                            exclusionPattern: '**/Test*.class',
+                            execPattern: '**/build/jacoco/**.exec',
+                            sourceInclusionPattern: '**/*.java'  // For publishing JaCoCo coverage results
+
                     // Archived log files
                     archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
                     sh 'echo "Logs have been archived."'
