@@ -2,7 +2,7 @@ package com.tramshedtech.eventmanagement.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class ParticipantSpeaker {
@@ -15,7 +15,7 @@ public class ParticipantSpeaker {
     private String eventName;
     private String relationshipWithCompany;
     private String bio;
-    private Date eventDateTime;
+    private String  eventDateTime;
     private String role; // Speaker, Panelist, etc.
     private Long scheduleId;
 }

@@ -10,7 +10,10 @@
     </insert>
 
     <select id="getSchedulesByEventId" parameterType="long" resultType="com.tramshedtech.eventmanagement.entity.EventSchedule">
-        SELECT * FROM event_schedule WHERE event_id = #{eventId}
+        SELECT id, event_id AS eventId, date, start_time AS startTime, end_time AS endTime
+        FROM event_schedule
+        WHERE event_id = #{eventId}
     </select>
+
 
 </mapper>

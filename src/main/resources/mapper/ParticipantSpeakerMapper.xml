@@ -7,8 +7,8 @@
     <!-- Retrieve all participants/speakers -->
     <select id="getAll" resultType="ParticipantSpeaker">
         SELECT ps.id, ps.name, ps.email, ps.company, ps.role, ps.status, ps.event_id AS eventId,
-        e.title AS eventName, es.start_time AS eventDateTime, ps.schedule_id AS scheduleId,
-        ps.relationshipWithCompany, ps.bio
+        e.title AS eventName, CONCAT(es.date, ' ', es.start_time, '-', es.end_time) AS eventDateTime,
+        ps.schedule_id AS scheduleId, ps.relationshipWithCompany, ps.bio
         FROM participant_speaker ps
         JOIN events e ON ps.event_id = e.id
         JOIN event_schedule es ON ps.schedule_id = es.id
@@ -17,8 +17,8 @@
     <!-- Retrieve a participant/speaker by ID -->
     <select id="getById" resultType="ParticipantSpeaker" parameterType="int">
         SELECT ps.id, ps.name, ps.email, ps.company, ps.role, ps.status, ps.event_id AS eventId,
-        e.title AS eventName, es.start_time AS eventDateTime, ps.schedule_id AS scheduleId,
-        ps.relationshipWithCompany, ps.bio
+        e.title AS eventName, CONCAT(es.date, ' ', es.start_time, '-', es.end_time) AS eventDateTime,
+        ps.schedule_id AS scheduleId, ps.relationshipWithCompany, ps.bio
         FROM participant_speaker ps
         JOIN events e ON ps.event_id = e.id
         JOIN event_schedule es ON ps.schedule_id = es.id
@@ -27,9 +27,9 @@
 
     <!-- Insert a new participant/speaker -->
     <insert id="insert" parameterType="ParticipantSpeaker">
-        INSERT INTO participant_speaker (name, email, company, role, status, event_id, schedule_id,
+        INSERT INTO participant_speaker (name, email, company, role, status, event_id, event_name, schedule_id,
         relationshipWithCompany, bio, event_date_time)
-        VALUES (#{name}, #{email}, #{company}, #{role}, #{status}, #{eventId}, #{scheduleId},
+        VALUES (#{name}, #{email}, #{company}, #{role}, #{status}, #{eventId}, #{eventName}, #{scheduleId},
         #{relationshipWithCompany}, #{bio}, #{eventDateTime})
     </insert>
 

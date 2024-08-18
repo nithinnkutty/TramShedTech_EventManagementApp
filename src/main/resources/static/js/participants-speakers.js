@@ -14,7 +14,7 @@ new Vue({
             scheduleId: '',
             relationshipWithCompany: '',
             bio: '',
-            eventDateTime: '' // Add this to store the selected date value
+            eventDateTime: ''
         },
         currentParticipantSpeaker: {},
         editMode: false
@@ -51,17 +51,27 @@ new Vue({
                 });
         },
         fetchSchedules() {
-            axios.get(`/api/events/${this.newParticipantSpeaker.eventId}/schedules`)
-                .then(response => {
-                    if (response.data.status === 'SUCCESS') {
-                        this.schedules = response.data.data;
-                    } else {
-                        alert('Failed to fetch event schedules');
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to fetch event schedules:', error);
-                });
+            if (this.newParticipantSpeaker.eventId) {
+                axios.get(`/api/events/${this.newParticipantSpeaker.eventId}/schedules`)
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.schedules = response.data.data.map(schedule => {
+                                return {
+                                    ...schedule,
+                                    startTime: schedule.startTime || 'N/A',
+                                    endTime: schedule.endTime || 'N/A'
+                                };
+                            });
+                        } else {
+                            alert('Failed to fetch event schedules');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch event schedules:', error);
+                    });
+            } else {
+                console.error('No eventId provided to fetch schedules');
+            }
         },
         addParticipantSpeaker() {
             const selectedEvent = this.events.find(event => event.id === this.newParticipantSpeaker.eventId);
@@ -72,12 +82,13 @@ new Vue({
                 return;
             }
 
-            const eventDateTime = selectedSchedule.date; // Only the date value is selected here
+            // Combine the date and time as a string
+            const eventDateTime = `${selectedSchedule.date} ${selectedSchedule.startTime} - ${selectedSchedule.endTime}`;
 
             const newParticipantSpeaker = {
                 ...this.newParticipantSpeaker,
                 eventName: selectedEvent.title,
-                eventDateTime: eventDateTime // Use only the selected date value
+                eventDateTime: eventDateTime,
             };
 
             axios.post('/participants-speakers', newParticipantSpeaker)
@@ -86,10 +97,6 @@ new Vue({
                         this.participantSpeakers.push({
                             ...newParticipantSpeaker,
                             id: response.data.data.id,
-                            eventName: selectedEvent.title,
-                            eventDateTime: eventDateTime,
-                            relationshipWithCompany: this.newParticipantSpeaker.relationshipWithCompany,
-                            bio: this.newParticipantSpeaker.bio
                         });
                         this.resetNewParticipantSpeaker();
                     } else {
@@ -103,9 +110,24 @@ new Vue({
         editParticipantSpeaker(participantSpeaker) {
             this.currentParticipantSpeaker = { ...participantSpeaker };
             this.editMode = true;
-            this.fetchSchedules(); // Populate schedules when editing
+
+            console.log('Editing participant speaker:', this.currentParticipantSpeaker);
+
+            // Ensure that the correct eventId and scheduleId are set for fetching schedules
+            if (this.currentParticipantSpeaker.eventId) {
+                this.newParticipantSpeaker.eventId = this.currentParticipantSpeaker.eventId;
+                this.fetchSchedules();
+            } else {
+                console.error('No eventId available for this participant/speaker');
+            }
         },
         updateParticipantSpeaker() {
+            // Check if currentParticipantSpeaker has a valid ID
+            if (!this.currentParticipantSpeaker.id) {
+                alert('No participant/speaker ID found');
+                return;
+            }
+
             const selectedEvent = this.events.find(event => event.id === this.currentParticipantSpeaker.eventId);
             const selectedSchedule = this.schedules.find(schedule => schedule.id === this.currentParticipantSpeaker.scheduleId);
 
@@ -114,15 +136,15 @@ new Vue({
                 return;
             }
 
-            const eventDateTime = selectedSchedule.date; // Only the date value is selected here
+            const eventDateTime = `${selectedSchedule.date} ${selectedSchedule.startTime} - ${selectedSchedule.endTime}`;
 
             const updatedParticipantSpeaker = {
                 ...this.currentParticipantSpeaker,
                 eventName: selectedEvent.title,
-                eventDateTime: eventDateTime, // Use only the selected date value
-                relationshipWithCompany: this.currentParticipantSpeaker.relationshipWithCompany,
-                bio: this.currentParticipantSpeaker.bio
+                eventDateTime: eventDateTime,
             };
+
+            console.log('Updating participant speaker with ID:', this.currentParticipantSpeaker.id);
 
             axios.put(`/participants-speakers/${this.currentParticipantSpeaker.id}`, updatedParticipantSpeaker)
                 .then(response => {
@@ -140,6 +162,11 @@ new Vue({
                 });
         },
         deleteParticipantSpeaker(id) {
+            if (!id) {
+                alert('No participant/speaker ID found');
+                return;
+            }
+
             axios.delete(`/participants-speakers/${id}`)
                 .then(response => {
                     if (response.data.status === 'SUCCESS') {
@@ -190,7 +217,7 @@ new Vue({
     watch: {
         'newParticipantSpeaker.eventId': function(newEventId) {
             if (newEventId) {
-                this.fetchSchedules(); // Fetch schedules when event changes
+                this.fetchSchedules(newEventId); // Fetch schedules when event changes
             }
         }
     }

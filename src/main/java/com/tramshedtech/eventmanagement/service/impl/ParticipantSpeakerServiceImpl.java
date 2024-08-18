@@ -29,6 +29,9 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
 
     @Override
     public boolean insert(ParticipantSpeaker participantSpeaker) {
+        String formattedEventDateTime = participantSpeaker.getEventDateTime();
+        logger.info("Formatted eventDateTime before insert: {}", formattedEventDateTime);
+        participantSpeaker.setEventDateTime(formattedEventDateTime);
         return participantSpeakerMapper.insert(participantSpeaker);
     }
 

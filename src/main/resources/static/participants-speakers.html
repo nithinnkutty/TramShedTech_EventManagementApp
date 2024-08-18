@@ -46,7 +46,7 @@
             <th>Email</th>
             <th>Company</th>
             <th>Event Name</th>
-            <th>Event Date Slot</th>
+            <th>Event Date Time</th>
             <th>Role</th>
             <th>Status</th>
             <th>Relationship with Company</th>
@@ -59,7 +59,7 @@
             <td>{{ participantSpeaker.email }}</td>
             <td>{{ participantSpeaker.company }}</td>
             <td>{{ participantSpeaker.eventName }}</td>
-            <td>{{ participantSpeaker.eventDateTime || 'N/A' }}</td> <!-- Handle possible undefined value -->
+            <td>{{ participantSpeaker.eventDateTime || 'N/A' }}</td>
             <td>{{ participantSpeaker.role }}</td>
             <td>{{ participantSpeaker.status }}</td>
             <td>{{ participantSpeaker.relationshipWithCompany || 'N/A' }}</td>
