@@ -1,6 +1,7 @@
 package com.tramshedtech.eventmanagement.controller;
 
 import com.tramshedtech.eventmanagement.entity.Bookings;
+import com.tramshedtech.eventmanagement.entity.EventSchedule;
 import com.tramshedtech.eventmanagement.service.BookingService;
 import com.tramshedtech.eventmanagement.service.EventService;
 import com.tramshedtech.eventmanagement.service.FeedbackService;
@@ -169,5 +170,15 @@ public class EventController {
                 .setMessage("Feedback retrieved successfully")
                 .setData(feedbackList);
     }
+
+    @GetMapping("/{eventId}/schedules")
+    public ResponseResult<List<EventSchedule>> getEventSchedules(@PathVariable Long eventId) {
+        List<EventSchedule> schedules = eventService.getSchedulesByEventId(eventId);
+        return new ResponseResult<List<EventSchedule>>()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage("Event schedules retrieved successfully")
+                .setData(schedules);
+    }
+
 
 }

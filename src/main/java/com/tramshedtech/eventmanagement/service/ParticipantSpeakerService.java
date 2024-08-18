@@ -11,4 +11,6 @@ public interface ParticipantSpeakerService {
     boolean update(ParticipantSpeaker participantSpeaker);
     boolean delete(int id);
     String publish(int id);
+    String getEventNameById(Long eventId);
+    String getEventDateTimeByEventId(Long eventId);
 }

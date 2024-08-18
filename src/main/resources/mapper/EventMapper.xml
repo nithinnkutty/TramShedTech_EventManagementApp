@@ -69,4 +69,13 @@
         JOIN location l ON b.location = l.id
         WHERE e.id = #{eventId}
     </select>
+
+    <!-- Retrieve all upcoming events -->
+    <select id="getAllUpcomingEvents" resultType="Event">
+        SELECT e.id, e.title
+        FROM events e
+        JOIN event_schedule es ON e.id = es.event_id
+        WHERE CONCAT(es.date, ' ', es.start_time) >= NOW()
+    </select>
+
 </mapper>
