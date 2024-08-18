@@ -93,4 +93,15 @@ public class EventServiceImpl implements EventService {
         int result = eventMapper.update(event);
         return result > 0;
     }
+
+    @Override
+    public List<Event> getAllUpcomingEvents() {
+        return eventMapper.getAllUpcomingEvents();
+    }
+
+    @Override
+    public List<EventSchedule> getSchedulesByEventId(Long eventId) {
+        return eventScheduleMapper.getSchedulesByEventId(eventId);
+    }
+
 }

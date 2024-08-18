@@ -1,6 +1,7 @@
 package com.tramshedtech.eventmanagement.service;
 
 import com.tramshedtech.eventmanagement.entity.Event;
+import com.tramshedtech.eventmanagement.entity.EventSchedule;
 
 import java.util.List;
 
@@ -18,4 +19,9 @@ public interface EventService {
     int softDeleteEvent(Long id);
 
     boolean updateEvent(Event event);
+
+    List<Event> getAllUpcomingEvents();
+
+    List<EventSchedule> getSchedulesByEventId(Long eventId);
+
 }

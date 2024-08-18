@@ -24,6 +24,7 @@ new Vue({
                         note: ' '
                     }],
                 },
+                speakers: [],
                 room: [{
                     value: '',
                     label: ''
@@ -65,6 +66,7 @@ new Vue({
         },
         created(){
             this.fecthRooms();
+            this.fetchSpeakers();
         },
         methods: {
             fecthRooms() {
@@ -107,6 +109,22 @@ new Vue({
                     .catch(error => {
                         console.error('Failed to fetch corresponding rooms:', error);
                     });
+            },
+            fetchSpeakers() {
+                        axios.get('/participants-speakers')  // Assuming this endpoint returns the list of speakers
+                            .then(response => {
+                                if (response.data.status === 'SUCCESS' && Array.isArray(response.data.data)) {
+                                    this.speakers = response.data.data.map(speaker => ({
+                                        value: speaker.id,
+                                        label: `${speaker.name} (${speaker.company})`
+                                    }));
+                                } else {
+                                    console.error('Failed to fetch speakers:', response);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching speakers:', error);
+                            });
             },
             addSchedule() {
                 this.formData.schedules.push({ date: '', startTime: '', endTime: '' });

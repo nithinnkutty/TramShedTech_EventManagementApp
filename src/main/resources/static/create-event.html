@@ -105,12 +105,20 @@
 
         <el-row :gutter="20">
             <el-col :span="4" :offset="6"><div class="grid-content information">Speaker</div></el-col>
-            <el-col :span="8" :offset="1"><div class="grid-content">
-                <div class="grid-content input">
-                    <el-input v-model="formData.speaker" placeholder="speaker"></el-input>
+            <el-col :span="8" :offset="1">
+                <div class="grid-content">
+                    <el-select v-model="formData.speaker" clearable placeholder="Select Speaker">
+                        <el-option
+                                v-for="speaker in speakers"
+                                :key="speaker.value"
+                                :label="speaker.label"
+                                :value="speaker.value">
+                        </el-option>
+                    </el-select>
                 </div>
-            </div></el-col>
+            </el-col>
         </el-row>
+
 
         <!-- Form fields for catering -->
         <el-row :gutter="20">

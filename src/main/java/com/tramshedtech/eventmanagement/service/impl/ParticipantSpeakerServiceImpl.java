@@ -29,6 +29,9 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
 
     @Override
     public boolean insert(ParticipantSpeaker participantSpeaker) {
+        String formattedEventDateTime = participantSpeaker.getEventDateTime();
+        logger.info("Formatted eventDateTime before insert: {}", formattedEventDateTime);
+        participantSpeaker.setEventDateTime(formattedEventDateTime);
         return participantSpeakerMapper.insert(participantSpeaker);
     }
 
@@ -54,5 +57,15 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
         // Generate URL for published page (for simplicity, using a static base URL)
         String publishUrl = "http://yourdomain.com/participants-speakers/" + id;
         return publishUrl;
+    }
+
+    @Override
+    public String getEventNameById(Long eventId) {
+        return participantSpeakerMapper.getEventNameById(eventId);
+    }
+
+    @Override
+    public String getEventDateTimeByEventId(Long eventId) {
+        return participantSpeakerMapper.getEventDateTimeByEventId(eventId);
     }
 }

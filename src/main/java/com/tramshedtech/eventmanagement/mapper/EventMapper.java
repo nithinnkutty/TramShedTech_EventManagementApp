@@ -23,4 +23,6 @@ public interface EventMapper {
     List<String> getAllEventTitles();
 
     int update(Event event);
+
+    List<Event> getAllUpcomingEvents();
 }

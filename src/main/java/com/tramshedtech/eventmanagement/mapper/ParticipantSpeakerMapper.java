@@ -13,4 +13,7 @@ public interface ParticipantSpeakerMapper {
     boolean insert(ParticipantSpeaker participantSpeaker);
     boolean update(ParticipantSpeaker participantSpeaker);
     boolean delete(@Param("id") int id);
+
+    String getEventNameById(@Param("eventId") Long eventId);
+    String getEventDateTimeByEventId(@Param("eventId") Long eventId);
 }
