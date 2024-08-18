@@ -108,8 +108,11 @@ EOF
                         sh """
                         // Copy JaCoCo files back to Jenkins server
                         scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/build/jacoco/*.exec ${WORKSPACE}/build/jacoco/
+                        echo "First copy done"
                         scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/build/classes ${WORKSPACE}/build/classes/
+                        echo "Second copy done"
                         scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/src ${WORKSPACE}/src/
+                        echo "Third copy done"
                         """
                         sh 'echo "Build Project on the instance."'
                     } else {
