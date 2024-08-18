@@ -195,16 +195,16 @@ EOF
                     junit stdioRetention: '', testResults: '**/*.xml' //for publishing JUnit Test results
                     jacoco execPattern: '**/build/jacoco/**.exec', sourceInclusionPattern: '**/*.java' // For publishing JaCoCo coverage results
 
-                    // Archived log files
-                    archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
-                    sh 'echo "Logs have been archived."'
-
-                    // Clean up log files
-                    sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-rm -rf ${PROJECT_DIR}/*.log
-EOF
-"""
+//                    // Archived log files
+//                    archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
+//                    sh 'echo "Logs have been archived."'
+//
+//                    // Clean up log files
+//                    sh """
+//ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+//rm -rf ${PROJECT_DIR}/*.log
+//EOF
+//"""
                 } else {
                     echo "Instance IP is not available, skipping cleanup."
                 }
