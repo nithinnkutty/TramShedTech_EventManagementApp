@@ -100,8 +100,16 @@ git checkout 82_Deploy_project_to_production_environment
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 chmod +x gradlew
+./gradlew clean
 ./gradlew build
+./gradlew jacocoTestReport
 EOF
+                        """
+                        sh """
+                        // Copy JaCoCo files back to Jenkins server
+                        scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/build/jacoco/*.exec ${WORKSPACE}/build/jacoco/
+                        scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/build/classes ${WORKSPACE}/build/classes/
+                        scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/eventmanagement/src ${WORKSPACE}/src/
                         """
                         sh 'echo "Build Project on the instance."'
                     } else {
@@ -171,10 +179,7 @@ EOF
             script {
                 if (env.INSTANCE_IP) {
                     junit stdioRetention: '', testResults: '**/*.xml' //for publishing JUnit Test results
-                    jacoco  classPattern: '**/build/classes',
-                            exclusionPattern: '**/Test*.class',
-                            execPattern: '**/build/jacoco/**.exec',
-                            sourceInclusionPattern: '**/*.java'  // For publishing JaCoCo coverage results
+                    jacoco execPattern: '**/build/jacoco**.exec', sourceInclusionPattern: '**/*.java' // For publishing JaCoCo coverage results
 
                     // Archived log files
                     archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
