@@ -68,7 +68,7 @@
                 <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
                 <button class="btn email-btn" @click="sendEmail(participantSpeaker.email)"><i class="fas fa-envelope"></i> Email</button>
-                <button class="btn publish-btn" @click="publishParticipantSpeaker(participantSpeaker)"><i class="fas fa-share-square"></i> Publish</button>
+                <button class="btn publish-btn" @click="publishParticipantSpeaker(participantSpeaker.email)"><i class="fas fa-share-square"></i> Publish</button>
             </td>
         </tr>
         <tr v-if="participantSpeakers.length === 0">

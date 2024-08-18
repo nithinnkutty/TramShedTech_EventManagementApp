@@ -186,18 +186,8 @@ new Vue({
         sendEmail(email) {
             window.location.href = `mailto:${email}`;
         },
-        publishParticipantSpeaker(participantSpeaker) {
-            axios.post(`/participants-speakers/${participantSpeaker.id}/publish`)
-                .then(response => {
-                    if (response.data.status === 'SUCCESS') {
-                        alert(`Published ${participantSpeaker.name} at ${response.data.data}`);
-                    } else {
-                        alert('Failed to publish participant/speaker');
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to publish participant/speaker:', error);
-                });
+        publishParticipantSpeaker(email) {
+            window.location.href = `mailto:${email}`;
         },
         cancelEdit() {
             this.editMode = false;
