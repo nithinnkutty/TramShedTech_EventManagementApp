@@ -138,7 +138,7 @@
             location l ON b.location = l.id
         WHERE
             b.location = #{locationId}
-          AND b.status = 1
+          AND b.del = 0
     </select>
 
     <select id="searchNotCancel" resultMap="bookingsNotCancel">
