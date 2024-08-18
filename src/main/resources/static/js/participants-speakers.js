@@ -51,8 +51,9 @@ new Vue({
                 });
         },
         fetchSchedules() {
-            if (this.newParticipantSpeaker.eventId) {
-                axios.get(`/api/events/${this.newParticipantSpeaker.eventId}/schedules`)
+            const eventId = this.newParticipantSpeaker.eventId;
+            if (eventId) {
+                axios.get(`/api/events/${eventId}/schedules`)
                     .then(response => {
                         if (response.data.status === 'SUCCESS') {
                             this.schedules = response.data.data.map(schedule => {
@@ -111,11 +112,14 @@ new Vue({
             this.currentParticipantSpeaker = { ...participantSpeaker };
             this.editMode = true;
 
+            // Set the eventId and scheduleId to ensure correct fetching of schedules
+            this.newParticipantSpeaker.eventId = this.currentParticipantSpeaker.eventId;
+            this.newParticipantSpeaker.scheduleId = this.currentParticipantSpeaker.scheduleId;
+
             console.log('Editing participant speaker:', this.currentParticipantSpeaker);
 
-            // Ensure that the correct eventId and scheduleId are set for fetching schedules
-            if (this.currentParticipantSpeaker.eventId) {
-                this.newParticipantSpeaker.eventId = this.currentParticipantSpeaker.eventId;
+            // Fetch the schedules only if eventId is available
+            if (this.newParticipantSpeaker.eventId) {
                 this.fetchSchedules();
             } else {
                 console.error('No eventId available for this participant/speaker');
@@ -123,7 +127,8 @@ new Vue({
         },
         updateParticipantSpeaker() {
             // Check if currentParticipantSpeaker has a valid ID
-            if (!this.currentParticipantSpeaker.id) {
+            const participantId = this.currentParticipantSpeaker.id;
+            if (!participantId) {
                 alert('No participant/speaker ID found');
                 return;
             }
@@ -144,22 +149,21 @@ new Vue({
                 eventDateTime: eventDateTime,
             };
 
-            console.log('Updating participant speaker with ID:', this.currentParticipantSpeaker.id);
+            console.log('Updating participant speaker with ID:', participantId);
 
-            axios.put(`/participants-speakers/${this.currentParticipantSpeaker.id}`, updatedParticipantSpeaker)
-                .then(response => {
-                    if (response.data.status === 'SUCCESS') {
-                        const index = this.participantSpeakers.findIndex(ps => ps.id === this.currentParticipantSpeaker.id);
-                        this.$set(this.participantSpeakers, index, updatedParticipantSpeaker);
-                        this.editMode = false;
-                        this.currentParticipantSpeaker = {};
-                    } else {
-                        alert('Failed to update participant/speaker');
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to update participant/speaker:', error);
-                });
+            axios.put(`/participants-speakers/${participantId}`, updatedParticipantSpeaker)
+                    .then(response => {
+                        if (response.data.status === 'SUCCESS') {
+                            this.fetchParticipantSpeakers(); // Re-fetch to ensure data is up-to-date
+                            this.editMode = false;
+                            this.currentParticipantSpeaker = {};
+                        } else {
+                            alert('Failed to update participant/speaker');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to update participant/speaker:', error);
+                    });
         },
         deleteParticipantSpeaker(id) {
             if (!id) {
