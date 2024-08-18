@@ -1,6 +1,8 @@
 package com.tramshedtech.eventmanagement.controller;
 
+import com.tramshedtech.eventmanagement.entity.Event;
 import com.tramshedtech.eventmanagement.entity.ParticipantSpeaker;
+import com.tramshedtech.eventmanagement.service.EventService;
 import com.tramshedtech.eventmanagement.service.ParticipantSpeakerService;
 import com.tramshedtech.eventmanagement.util.ResponseResult;
 import com.tramshedtech.eventmanagement.util.ResponseStatus;
@@ -16,6 +18,9 @@ public class ParticipantSpeakerController {
     @Resource
     private ParticipantSpeakerService participantSpeakerService;
 
+    @Resource
+    private EventService eventService;
+
     @GetMapping
     public ResponseResult<List<ParticipantSpeaker>> getAll() {
         List<ParticipantSpeaker> list = participantSpeakerService.getAll();
@@ -26,6 +31,12 @@ public class ParticipantSpeakerController {
     public ResponseResult<ParticipantSpeaker> getById(@PathVariable int id) {
         ParticipantSpeaker participantSpeaker = participantSpeakerService.getById(id);
         return new ResponseResult<ParticipantSpeaker>().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(participantSpeaker);
+    }
+
+    @GetMapping("/events")
+    public ResponseResult<List<Event>> getAllEvents() {
+        List<Event> events = eventService.getAllUpcomingEvents();
+        return new ResponseResult<List<Event>>().setCode(200).setStatus(ResponseStatus.SUCCESS).setData(events);
     }
 
     @PostMapping

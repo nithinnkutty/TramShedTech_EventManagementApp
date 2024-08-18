@@ -55,4 +55,14 @@ public class ParticipantSpeakerServiceImpl implements ParticipantSpeakerService 
         String publishUrl = "http://yourdomain.com/participants-speakers/" + id;
         return publishUrl;
     }
+
+    @Override
+    public String getEventNameById(Long eventId) {
+        return participantSpeakerMapper.getEventNameById(eventId);
+    }
+
+    @Override
+    public String getEventDateTimeByEventId(Long eventId) {
+        return participantSpeakerMapper.getEventDateTimeByEventId(eventId);
+    }
 }

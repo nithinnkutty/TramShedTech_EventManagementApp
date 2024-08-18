@@ -3,23 +3,55 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tramshedtech.eventmanagement.mapper.ParticipantSpeakerMapper">
+
+    <!-- Retrieve all participants/speakers -->
     <select id="getAll" resultType="ParticipantSpeaker">
-        SELECT * FROM participant_speaker
+        SELECT ps.id, ps.name, ps.email, ps.company, ps.role, ps.status, ps.event_id AS eventId,
+        e.title AS eventName, es.start_time AS eventDateTime, ps.schedule_id AS scheduleId,
+        ps.relationshipWithCompany, ps.bio
+        FROM participant_speaker ps
+        JOIN events e ON ps.event_id = e.id
+        JOIN event_schedule es ON ps.schedule_id = es.id
     </select>
+
+    <!-- Retrieve a participant/speaker by ID -->
     <select id="getById" resultType="ParticipantSpeaker" parameterType="int">
-        SELECT * FROM participant_speaker WHERE id = #{id}
+        SELECT ps.id, ps.name, ps.email, ps.company, ps.role, ps.status, ps.event_id AS eventId,
+        e.title AS eventName, es.start_time AS eventDateTime, ps.schedule_id AS scheduleId,
+        ps.relationshipWithCompany, ps.bio
+        FROM participant_speaker ps
+        JOIN events e ON ps.event_id = e.id
+        JOIN event_schedule es ON ps.schedule_id = es.id
+        WHERE ps.id = #{id}
     </select>
+
+    <!-- Insert a new participant/speaker -->
     <insert id="insert" parameterType="ParticipantSpeaker">
-        INSERT INTO participant_speaker (name, email, company, role, status, event_id, eventParticipation, relationshipWithCompany, bio, multipleRoles)
-        VALUES (#{name}, #{email}, #{company}, #{role}, #{status}, #{eventId}, #{eventParticipation}, #{relationshipWithCompany}, #{bio}, #{multipleRoles})
+        INSERT INTO participant_speaker (name, email, company, role, status, event_id, schedule_id,
+        relationshipWithCompany, bio, event_date_time)
+        VALUES (#{name}, #{email}, #{company}, #{role}, #{status}, #{eventId}, #{scheduleId},
+        #{relationshipWithCompany}, #{bio}, #{eventDateTime})
     </insert>
+
+    <!-- Update an existing participant/speaker -->
     <update id="update" parameterType="ParticipantSpeaker">
         UPDATE participant_speaker
         SET name = #{name}, email = #{email}, company = #{company}, role = #{role}, status = #{status},
-        event_id = #{eventId}, eventParticipation = #{eventParticipation}, relationshipWithCompany = #{relationshipWithCompany}, bio = #{bio}, multipleRoles = #{multipleRoles}
+        event_id = #{eventId}, schedule_id = #{scheduleId},
+        relationshipWithCompany = #{relationshipWithCompany}, bio = #{bio}
         WHERE id = #{id}
     </update>
+
     <delete id="delete" parameterType="int">
         DELETE FROM participant_speaker WHERE id = #{id}
     </delete>
+
+    <!-- New queries to fetch event details -->
+    <select id="getEventNameById" resultType="string" parameterType="long">
+        SELECT title FROM events WHERE id = #{eventId}
+    </select>
+
+    <select id="getEventDateTimeByEventId" resultType="string" parameterType="long">
+        SELECT start_time FROM event_schedule WHERE event_id = #{eventId}
+    </select>
 </mapper>
