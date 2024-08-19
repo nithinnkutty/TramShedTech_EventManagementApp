@@ -23,6 +23,9 @@ resource "aws_instance" "web" {
   tags = {
     Name = var.name
   }
+  root_block_device {
+    volume_size = 30
+  }
 
 #  user_data = file(var.user_data_script)
 }
