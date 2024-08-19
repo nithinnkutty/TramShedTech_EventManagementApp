@@ -1,4 +1,4 @@
-package com.tramshedtech.eventmanagement;
+package com.tramshedtech.eventmanagement.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

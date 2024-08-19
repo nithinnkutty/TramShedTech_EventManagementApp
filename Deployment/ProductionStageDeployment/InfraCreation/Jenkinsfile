@@ -2,30 +2,30 @@ pipeline {
     agent any
 
     environment {
-        OS_PASSWORD = credentials('openstackpass_nithin')
-        OS_SSH_KEY = credentials('OS_SSH_KEY')
+        AWS_SSH_KEY = credentials('AWS_CREDS')
         MINIO_CREDS = credentials('MINIO_CREDS')
+        AWS_ACCESS_KEY = credentials('AWS_ACCESS_KEY')
     }
 
     stages {
         stage('Create Infrastructure') {
             steps {
-                script {
-                    dir("${WORKSPACE}/Deployment/Infracreation/Terraform/") {
-                        sh '''
-                            ls
-                            pwd
-                            chmod +x GROUP-1-TGD-2425-openrc.sh
-                            source ${PWD}/GROUP-1-TGD-2425-openrc.sh
-
-                            terraform init -input=false
-                            terraform plan
-                            terraform apply -auto-approve
-                        '''
-                        env.INSTANCE_IP = sh(script: "terraform output -raw instance_ip", returnStdout: true).trim()
-                        // Save the instance IP to a file
-                        writeFile file: 'instance_ip.txt', text: env.INSTANCE_IP
-                        archiveArtifacts artifacts: 'instance_ip.txt', allowEmptyArchive: true
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY']]) {
+                    script {
+                        dir("${WORKSPACE}/Deployment/ProductionStageDeployment/InfraCreation/Terraform/") {
+                            sh '''
+                                ls
+                                pwd
+    
+                                terraform init -input=false
+                                terraform plan
+                                terraform apply -auto-approve
+                            '''
+                            env.INSTANCE_IP = sh(script: "terraform output -raw instance_public_ip", returnStdout: true).trim()
+                            // Save the instance IP to a file
+                            writeFile file: 'instance_ip.txt', text: env.INSTANCE_IP
+                            archiveArtifacts artifacts: 'instance_ip.txt', allowEmptyArchive: true
+                        }
                     }
                 }
             }
@@ -38,7 +38,7 @@ pipeline {
                         // Retry mechanism to check instance readiness
                         timeout(time: 2, unit: 'MINUTES') {
                             waitUntil {
-                                def ready = sh(script: "ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} 'echo ready'", returnStatus: true) == 0
+                                def ready = sh(script: "ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} 'echo ready'", returnStatus: true) == 0
                                 return ready
                             }
                         }
@@ -54,22 +54,27 @@ pipeline {
                 script {
                     sh 'echo "Install Java and Gradle after infra creation"'
                     sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << EOF
 sudo yum update -y
 sudo yum install wget -y
 echo "Installing Git"
 sudo yum install git -y
-echo "Adding git.cardiff.ac.uk public key to jenkins known_hosts"
+echo "Adding git.cardiff.ac.uk public key to known_hosts"
 ssh-keyscan git.cardiff.ac.uk >> ~/.ssh/known_hosts
 chmod 644 ~/.ssh/known_hosts
 echo "Installing Java"
-sudo yum install -y java-17-openjdk
+sudo yum install java-17-amazon-corretto-devel -y
 java -version
 echo "Installing unzip and Gradle"
 sudo yum install unzip -y
+sudo rm -f gradle-8.0-bin.zip
 wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
-sudo mkdir /opt/gradle
-sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+if [ ! -d "/opt/gradle" ]; then
+  sudo mkdir /opt/gradle
+  sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+else
+  echo "/opt/gradle directory already exists. Skipping creation and unzip."
+fi
 echo "export PATH=\$PATH:/opt/gradle/gradle-8.0/bin" >> ~/.bash_profile
 source ~/.bash_profile
 gradle -v
@@ -83,13 +88,13 @@ EOF
             steps {
                 script {
                     sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << EOF
 sudo wget https://dl.min.io/server/minio/release/linux-amd64/minio
 sudo chmod +x minio
 sudo mv minio /usr/local/bin/
 sudo mkdir -p /data/minio
 sudo mkdir -p /etc/minio
-sudo chown -R rocky:rocky /data/minio
+sudo chown -R ec2-user:ec2-user /data/minio
 sudo chmod -R u+rwX /data/minio
 # Run MinIO in the background
 sudo nohup /usr/local/bin/minio server /data/minio --console-address ":9001" > /tmp/minio.log 2>&1 &
@@ -104,7 +109,7 @@ EOF
             steps {
                 script {
                     sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << EOF
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 sudo mv mc /usr/local/bin/
@@ -118,7 +123,7 @@ EOF
             steps {
                 script {
                     sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${env.INSTANCE_IP} << EOF
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << EOF
 mc alias set myminio http://${env.INSTANCE_IP}:9000 $MINIO_CREDS_USR $MINIO_CREDS_PSW
 mc mb myminio/avatar
 mc policy set public myminio/avatar
@@ -133,7 +138,7 @@ EOF
         success {
             script {
                 // Trigger the Build and Run Project pipeline
-                build job: 'TramshedTechProject_Deployment', wait: false
+                build job: 'TramShedTech_Production_Deployment_AWS', wait: false
                 sh 'echo "Instance Creation Completed..!!"'
             }
         }
