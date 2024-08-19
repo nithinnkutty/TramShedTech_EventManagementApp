@@ -72,9 +72,15 @@ ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
 set -e
 cd ${PROJECT_DIR}
 chmod +x gradlew
-./gradlew clean
-./gradlew build --info
-./gradlew bootjar
+
+# Run the Gradle build and redirect output to a log file
+./gradlew clean build --no-daemon  >> gradle_build.log 2>&1
+
+# Check if the build was successful by looking for the JAR file
+if [ ! -f build/libs/eventmanagement-0.0.1-SNAPSHOT.jar ]; then
+    echo "Build failed. JAR file not found." >> gradle_build.log 2>&1
+    exit 1
+fi
 EOF
 """
                             sh 'echo "Project built on the AWS instance."'
@@ -96,12 +102,6 @@ ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
 # Fail the script on any error
 set -e
 cd ${PROJECT_DIR}
-
-# Check if the jar file exists
-if [ ! -f build/libs/eventmanagement-0.0.1-SNAPSHOT.jar ]; then
-    echo "Jar file not found! Exiting."
-    exit 1
-fi
 nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
