@@ -1,0 +1,161 @@
+pipeline {
+    agent any
+
+    environment {
+        OS_SSH_KEY = credentials('OS_SSH_KEY')
+    }
+
+    parameters {
+        booleanParam(
+                name: 'KEEP_RUNNING',
+                defaultValue: true,
+                description: 'SCheck the box to keep the project running after it starts, or Uncheck to stop it after a few minutes.'
+        )
+    }
+
+    stages {
+        stage('Get instance IP') {
+            steps {
+                script {
+                    echo 'Attempting to copy artifacts from InfraCreation job...'
+                    // Copy the instance_ip.txt file from the previous job
+                    copyArtifacts(
+                        projectName: 'TramshedTechProject_InfraCreation',
+                        filter: 'instance_ip.txt',
+                        target: 'artifacts',
+                        selector: lastSuccessful()
+                    )
+                    echo 'Artifacts copied. Reading instance IP...'
+                    env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
+                    sh 'echo "Instance IP: $INSTANCE_IP"'
+
+                    // Set the build description to include the instance IP
+                    currentBuild.description = "Deployed to Instance with IP: http://${env.INSTANCE_IP}:8082"
+                }
+            }
+        }
+
+        stage('Environment Check on Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        sh '''
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+# Check if Git is installed
+if ! type git >/dev/null 2>&1; then
+    echo "Git is not installed on the instance."
+    exit 1
+fi
+# Check if Java is installed
+if ! type java >/dev/null 2>&1; then
+    echo "Java is not installed on the instance."
+    exit 1
+fi
+# Check if Gradle is installed
+if ! type gradle >/dev/null 2>&1; then
+    echo "Gradle is not installed on the instance."
+    exit 1
+fi
+EOF
+'''
+                        sh 'echo "Environment check completed on the instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Build the Project') {
+            steps {
+                script {
+                    dir("${WORKSPACE}"){
+                        if (env.INSTANCE_IP) {
+                            // Build commands on the instance
+                            sh '''
+                                chmod +x gradlew
+                                ./gradlew clean build
+                            '''
+                            sh 'echo "Build Project Completed."'
+                        } else {
+                            error "Instance IP is not available."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    dir("${WORKSPACE}") {
+                        if (env.INSTANCE_IP) {
+                            // Test commands on the instance
+                            sh './gradlew test jacocoTestReport'
+                            sh 'echo "Test Completed."'
+                        } else {
+                            error "Instance IP is not available."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Run Project') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Run project on the instance in the background
+                        sh """
+scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no build/libs/eventmanagement-0.0.1-SNAPSHOT.jar rocky@${INSTANCE_IP}:~ 
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+
+#Kill the previously running process
+pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
+
+nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+echo \$! > app.pid
+EOF
+"""
+                        sh 'echo "Application started in the background on the instance."'
+
+                        if (!params.KEEP_RUNNING) {
+                            // Wait for 30 seconds to let the application start
+                            sleep 30
+
+                            // Stop the application
+                            sh """
+ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
+EOF
+"""
+                        }
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                if (env.INSTANCE_IP) {
+                    junit testResults: '**/build/test-results/test/*.xml' //for publishing JUnit Test results
+                    jacoco execPattern: '**/build/jacoco/**.exec', sourceInclusionPattern: '**/*.java' // For publishing JaCoCo coverage results
+
+                } else {
+                    echo "Instance IP is not available, skipping cleanup."
+                }
+            }
+        }
+        success {
+            sh 'echo "Pipeline completed successfully!"'
+        }
+        failure {
+            sh 'echo "Pipeline failed!"'
+        }
+    }
+}
+

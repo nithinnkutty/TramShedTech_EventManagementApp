@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <div class="event-details">
+    <h1>Event Details</h1>
+    <p><strong>ID:</strong> {{ event.id }}</p>
+    <p><strong>Title:</strong> {{ event.title }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Room:</strong> {{ event.room }}</p>
+    <h2>Schedules</h2>
+    <ul v-if="event.schedules.length">
+      <li v-for="schedule in event.schedules" :key="schedule.id">
+        {{ schedule.date }}: {{ schedule.start_time }} - {{ schedule.end_time }}
+      </li>
+    </ul>
+    <p v-else>No schedules available.</p>
+  </div>
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      event: {
+        schedules: [] // Initialize with an empty array
+      }
+    },
+    methods: {
+      fetchEvent() {
+        // Get event ID from query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        // Fetch event details from the server, including schedules
+        axios.get(`/api/events/${eventId}`)
+          .then(response => {
+            this.event = response.data.data;
+          })
+          .catch(error => {
+            console.error("There was an error fetching the event details!", error);
+          });
+      }
+    },
+    mounted() {
+      this.fetchEvent();
+    }
+  });
+</script>
+</body>
+</html>

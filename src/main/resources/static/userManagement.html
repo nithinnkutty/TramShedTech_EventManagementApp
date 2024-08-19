@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-container style="justify-content: center; align-items: center; text-align: center; padding: 20px;">
+        <el-col :span="24">
+            <div class="grid-content bg-purple-light" style="display: flex; justify-content: center; align-items: center;">
+                <el-col :span="3" style="margin-right: 20px;">
+                    <el-input size="medium" v-model="account" placeholder="Search by account"></el-input>
+                </el-col>
+                <el-col :span="3" style="margin-right: 20px;">
+                    <el-select size="medium" v-model="did" placeholder="Search by department">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="3" style="margin-right: 20px;">
+                    <el-select size="medium" v-model="pid" placeholder="Search by Position">
+                        <el-option
+                                v-for="item in options2"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="3" style="margin-right: 20px;">
+                    <el-input
+                            size="medium"
+                            placeholder="Search by gender"
+                            suffix-icon="el-icon-user"
+                            v-model="sex">
+                    </el-input>
+                </el-col>
+                <el-col :span="3" style="margin-right: 20px;">
+                    <el-date-picker
+                            size="medium"
+                            v-model="entrydate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="Search by entrydate">
+                    </el-date-picker>
+                </el-col>
+                <el-button
+                        style="margin-left: 20px;"
+                        type="primary"
+                        size="medium"
+                        icon="el-icon-search"
+                        @click="search()">Search</el-button>
+                <el-button size="medium" icon="el-icon-refresh-right" @click="reset()">Reset</el-button>
+            </div>
+        </el-col>
+    </el-container>
+    <el-container class="custom-container">
+        <el-main class="custom-main">
+            <div>
+                <el-row class="custom-row">
+                    <el-col>
+                        <el-button type="primary" icon="el-icon-plus" size="medium" @click="showAddUserDialog" class="custom-button">Add user</el-button>
+
+                        <el-upload action="/excel/upload" :show-file-list="false" :on-success="handleUploadSuccess2" class="custom-upload">
+                            <el-button icon="el-icon-upload2" size="medium">Import</el-button>
+                        </el-upload>
+                        <download-excel class="export-excel-wrapper" :data="userList" name="UsersTable.xls">
+                            <el-button icon="el-icon-download" size="medium" @click="exportExcel">Derive</el-button>
+                        </download-excel>
+                        <el-popover placement="top" width="160" v-model="visible" class="custom-popover">
+                            <p>Selection rules</p>
+                            <div style="text-align: right; margin: 0">
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('beginDate')">By entrydates</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('orderStatus')">By Position</el-button>
+                                <el-button size="medium" type="primary" style="margin-top: 10px;" @click="findBy('submitter')">By Department</el-button>
+                            </div>
+                            <el-button slot="reference" icon="el-icon-s-data" size="medium">Order</el-button>
+                        </el-popover>
+                        <el-button icon="el-icon-s-grid" size="medium" class="custom-list">List</el-button>
+                    </el-col>
+                </el-row>
+                <el-row class="custom-row">
+                    <el-table :stripe="true" :border="true" style="width: 100%" ref="multipleTable" :data="userList" tooltip-effect="dark" @selection-change="handleSelectionChange">
+                        <el-table-column type="selection" width="55"></el-table-column>
+                        <el-table-column prop="company" label="Account" width="130">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.account}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Email" show-overflow-tooltip width="210">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.email}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Department" show-overflow-tooltip width="210">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.did}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Position" show-overflow-tooltip width="210">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.pid}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Gender" show-overflow-tooltip width="100">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.sex}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Entrydate" show-overflow-tooltip width="140">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.entrydate}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Phone" show-overflow-tooltip width="160">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.phone}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Wechat" show-overflow-tooltip width="160">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.wechat}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Operation" show-overflow-tooltip width="160">
+                            <template slot-scope="scope">
+                                <span>
+                                    <el-button type="text" size="small" icon="el-icon-arrow-right" @click="details(scope)">Modify</el-button>
+                                    <el-button type="text" size="small" icon="el-icon-delete-solid" @click="del(scope)">Delete</el-button>
+                                </span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-row>
+            </div>
+            <el-row>
+                <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10,20,30]" :page-size="pagesize" layout="prev, pager, next, jumper, sizes, total" :total="total">
+                </el-pagination>
+            </el-row>
+        </el-main>
+    </el-container>
+
+    <el-dialog
+            width="40%"
+            title="Add New User"
+            :visible.sync="innerVisibleAdd"
+            append-to-body
+            @before-close="handleBeforeClose">
+        <el-form :model="userListAdd" :rules="rules2" ref="userListAdd" label-width="120px">
+            <el-form-item label="User Account" prop="account">
+                <el-input placeholder="Please enter username" v-model="userListAdd.account"></el-input>
+            </el-form-item>
+            <el-form-item label="User Password" prop="password">
+                <el-input placeholder="Please enter password" v-model="userListAdd.password" type="password"></el-input>
+            </el-form-item>
+            <el-form-item label="User Email" prop="email">
+                <el-input placeholder="Please enter email" v-model="userListAdd.email" type="email"></el-input>
+            </el-form-item>
+            <el-form-item label="User Department" prop="department">
+                <el-select v-model="userListAdd.did" placeholder="Please select department">
+                    <el-option
+                            v-for="item in filteredDepartments"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Position" prop="position">
+                <el-select v-model="userListAdd.pid" placeholder="Please select position">
+                    <el-option
+                            v-for="item in filteredPositions"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Gender" prop="gender">
+                <el-select v-model="userListAdd.sex" placeholder="Please select gender">
+                    <el-option
+                            v-for="item in options3"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Entrydate" prop="entrydate">
+                <el-date-picker
+                        size="medium"
+                        v-model="userListAdd.entrydate"
+                        style="width: 100%;"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="Select entrydate">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="User's Phone" prop="phone">
+                <el-input placeholder="Please enter user's phone" v-model="userListAdd.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="User's WeChat" prop="wechat">
+                <el-input placeholder="Please enter user's WeChat" v-model="userListAdd.wechat"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitFormAdd('userListAdd')" :plain="true">Add</el-button>
+                <el-button @click="resetForm('userListAdd')">Reset</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+    <el-dialog
+            width="40%"
+            title="Modify User Information"
+            :visible.sync="innerVisibleModify"
+            append-to-body>
+        <el-form :model="userListModify" :rules="rules3" ref="userListModify" label-width="120px">
+            <el-form-item label="User Account" prop="account">
+                <el-input placeholder="Please enter username" v-model="userListModify.account"></el-input>
+            </el-form-item>
+            <el-form-item label="User Email" prop="email">
+                <el-input placeholder="Please enter email" v-model="userListModify.email" type="email"></el-input>
+            </el-form-item>
+            <el-form-item label="User Department" prop="did">
+                <el-select v-model="userListModify.did" placeholder="Please select department" :disabled="disableDepartmentSelect">
+                    <el-option
+                            v-for="item in options"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Position" prop="pid">
+                <el-select v-model="userListModify.pid" placeholder="Please select position">
+                    <el-option
+                            v-for="item in filteredPositions2"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                            :disabled="item.disabled">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Gender" prop="sex">
+                <el-select v-model="userListModify.sex" placeholder="Please select gender">
+                    <el-option
+                            v-for="item in options3"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="User Entrydate" prop="entrydate">
+                <el-date-picker
+                        size="medium"
+                        v-model="userListModify.entrydate"
+                        style="width: 100%;"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        placeholder="Select entrydate">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="User's Phone" prop="phone">
+                <el-input placeholder="Please enter user's phone" v-model="userListModify.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="User's WeChat" prop="wechat">
+                <el-input placeholder="Please enter user's WeChat" v-model="userListModify.wechat"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitFormModify('userListModify')" :plain="true">Modify</el-button>
+                <el-button @click="resetForm('userListModify')">Reset</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+</div>
+
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                json_meta: [
+                    [
+                        {
+                            " key ": " charset ",
+                            " value ": " utf- 8 "
+                        }
+                    ]
+                ],
+                visible: false,
+                userList:
+                    {
+                        id: "",
+                        account: "",
+                        email: "",
+                        did: "",
+                        pid: "",
+                        sex: "",
+                        entrydate: "",
+                        phone: "",
+                        wechat: "",
+                        zip: ""
+                    },
+                innerVisibleAdd: false,
+                innerVisibleModify: false,
+                outerVisible: false,
+                position: '',
+                department: '',
+                pagesize: 10, // Current Page Size
+                total: 100, // total number of articles
+                currentPage: 1, // Current Page
+                multipleSelection: [],
+                options: [{
+                    id: "1", status: "Tomioka Yoshihiro"
+                }],
+                options2: [{
+                    id: "1", type: "Kochou Shinobu"
+                }],
+                options3: [
+                    { id: "1", name: "Male" },
+                    { id: "2", name: "Female" }
+                ],
+                value: '',
+                id: '',
+                account: "",
+                did: "",
+                pid: "",
+                sex: "",
+                entrydate: "",
+                delid: 1,
+                fullscreenLoading: false,
+                userListAdd:
+                    {
+                        account: "",
+                        password: "",
+                        email: "",
+                        did: "",
+                        pid: "",
+                        sex: "",
+                        entrydate: "",
+                        phone: "",
+                        wechat: "",
+                    },
+                userListModify:
+                    {
+                        account: "",
+                        email: "",
+                        did: "",
+                        pid: "",
+                        sex: "",
+                        entrydate: "",
+                        phone: "",
+                        wechat: "",
+                    },
+                filteredDepartments: [],
+                filteredPositions: [],
+                filteredPositions2: [],
+                disableDepartmentSelect: false,
+                dialogVisible: false,
+                rules2: {
+                    account: [
+                        {required: true, message: 'User name cannot be empty', trigger: 'blur'},
+                        {min: 5, max: 15, message: '5 to 15 characters in length', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: 'User password cannot be empty', trigger: 'blur'},
+                        {min: 6, message: 'Minimum password length of 6 digits', trigger: 'blur'}
+                    ],
+                    email: [
+                        { required: true, message: 'Email cannot be empty', trigger: 'blur' },
+                        { type: 'email', message: 'Please enter a valid e-mail address', trigger: ['blur', 'change'] }
+                    ],
+                    // position: [
+                    //     {required: true, message: 'Please select the user\'s position', trigger: 'change'}
+                    // ],
+                    // department: [
+                    //     {required: true, message: 'Please select the user\'s department', trigger: 'change'}
+                    // ],
+                    // gender: [
+                    //     {required: true, message: 'Please select the user\'s gender', trigger: 'change'}
+                    // ],
+                    entrydate: [
+                        {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
+                    ],
+                    phone: [
+                        { required: true, message: 'User\'s phone cannot be empty', trigger: 'blur' },
+                        { pattern: /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/, message: 'Please enter a valid UK cell phone number', trigger: ['blur', 'change'] }
+                    ],
+                    wechat: [
+                        {required: true, message: 'Please enter the user\'s wechat', trigger: 'blur'}
+                    ],
+
+                },
+                rules3: {
+                    account: [
+                        {required: true, message: 'User name cannot be empty', trigger: 'blur'},
+                        {min: 5, max: 15, message: '1 to 25 characters in length', trigger: 'blur'}
+                    ],
+                    email: [
+                        { required: true, message: 'Email cannot be empty', trigger: 'blur' },
+                        { type: 'email', message: 'Please enter a valid e-mail address', trigger: ['blur', 'change'] }
+                    ],
+                    entrydate: [
+                        {type: 'string', required: true, message: 'Please select date', trigger: 'blur'}
+                    ],
+                    phone: [
+                        { required: true, message: 'User\'s phone cannot be empty', trigger: 'blur' },
+                        { pattern: /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/, message: 'Please enter a valid UK cell phone number', trigger: ['blur', 'change'] }
+                    ],
+                    wechat: [
+                        {required: true, message: 'Please enter the user\'s wechat', trigger: 'blur'}
+                    ],
+
+                },
+
+            }
+        },
+        mounted: function() {
+            this.showpage();
+            this.showDepartments();
+            this.showOptions();
+            this.position = JSON.parse(localStorage.getItem('position'));
+            this.department = JSON.parse(localStorage.getItem('department'));
+            console.log(this.position);
+            console.log(this.department);
+        },
+        watch: {
+            'userListModify.did'(newVal) {
+                this.adjustFormBasedOnPosition();
+            }
+        },
+        methods: {
+            handleSizeChange: function (size) {
+                console.log("Page Size Modified")
+                console.log(size)
+                this.pagesize = size;
+                this.showpage();
+            },
+            handleCurrentChange: function (page) {
+                console.log("The current page has been modified")
+                console.log(page)
+                this.currentPage = page;
+                this.showpage();
+            },
+            showpage:function () {
+                axios.get("/user/findAllUser/"+this.currentPage+"/"+this.pagesize).then(res => {
+                    console.log(res.data.data)
+                    this.userList = res.data.data.pageData;
+                    this.total = res.data.data.total;
+                })
+            },
+            showDepartments:function () {
+                axios.get("/user/findAllDepartments").then(res => {
+                    console.log(res.data)
+                    this.options = res.data.data;
+                    // this.filterOptions(); // Calling the filter method after the data has been loaded
+                })
+            },
+            showOptions:function () {
+                axios.get("/user/findAllPositions").then(res => {
+                    console.log(res.data)
+                    this.options2 = res.data.data;
+                    // this.filterOptions(); // Calling the filter method after the data has been loaded
+                })
+            },
+            search:function (params) {
+                axios.get("/user/search",{
+                    params: {
+                        page: this.currentPage,
+                        size: this.pagesize,
+                        account: this.account,
+                        did: this.did,
+                        pid: this.pid,
+                        sex: this.sex,
+                        entrydate: this.entrydate
+                    }}).then(res => {
+                    console.log(res.data)
+                    console.log(this.entrydate)
+                    this.userList = res.data.data.pageData;
+                    this.total = res.data.data.total;
+                })
+            },
+            handleSelectionChange: function(val) {
+                this.multipleSelection = val;
+                console.log(this.multipleSelection)
+            },
+            handleBeforeClose(done) {
+                this.$refs.userListAdd.resetFields();
+                done();
+            },
+            reset:function () {
+                this.account = "";
+                this.pid = "",
+                this.did = "",
+                this.sex = "",
+                this.entrydate = "";
+            },
+            submitFormAdd(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        axios.post("/user/addUser",this.userListAdd).then(res => {
+                            console.log('ytwdbz')
+                            console.log(res.data)
+                            if(res.data == true){
+                                this.innerVisibleAdd = false
+                                this.$message({
+                                    message: 'Add successfully',
+                                    type: 'success'
+                                });
+                                this.showpage()
+                                this.userListAdd = {id: "", account: "", email: "", did: "", pid: "", sex: "", entrydate: "", phone: "", wechat: ""};
+                            }
+                        })
+                    } else {
+                        this.$message({
+                            message: 'Add fail',
+                            type: 'error'
+                        });
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            showAddUserDialog() {
+                this.pid = this.position; // Assignment of position from local storage
+                this.userListAdd.pid = this.pid;
+                this.userListAdd.did = this.department; // Assigning values from locally stored departments
+                this.filterOptions();
+                this.innerVisibleAdd = true;
+            },
+            filterOptions() {
+                if (this.pid !== null && this.pid < 6) {
+                    this.filteredDepartments = this.options.filter(item => item.id === this.department);
+                    this.filteredPositions = this.options2.filter(item => item.id <= this.pid);
+                } else {
+                    this.filteredDepartments = this.options;
+                    this.filteredPositions = this.options2;
+                }
+            },
+            details: function(scope){
+                this.innerVisibleModify = true;
+                this.id = scope.row.id
+                axios.get("/user/findbyIdModify/"+this.id).then(res => {
+                    console.log(res.data.data)
+                    this.userListModify = res.data.data;
+                    this.adjustFormBasedOnPosition();
+                })
+            },
+            adjustFormBasedOnPosition() {
+                if (this.position < 6) {
+                    this.disableDepartmentSelect = true;
+                    console.log(this.userListModify.did)
+                    if (this.department === this.userListModify.did) {
+                        this.filteredPositions2 = this.options2.filter(item => item.id <= this.position);
+                    } else {
+                        this.filteredPositions2 = this.options2.map(item => ({
+                            ...item,
+                            disabled: true
+                        }));
+                    }
+                } else {
+                    this.disableDepartmentSelect = false;
+                    this.filteredPositions2 = this.options2.map(item => ({
+                        ...item,
+                        disabled: false
+                    }));
+                }
+            },
+            del:function (scope) {
+                this.id = scope.row.id
+                axios.post("/user/findbyIdDel/"+this.id).then(res => {
+                    console.log(res.data.data)
+                    if (res.data.data == true) {
+                        this.$message({
+                            message: 'Delete user successfully',
+                            type: 'success'
+                        });
+                        this.showpage();
+                    } else {
+                        this.$message({
+                            message: 'Delete user fail',
+                            type: 'error'
+                        });
+                        console.log('error delete!!');
+                        return false;
+                    }
+                })
+            },
+            submitFormModify(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log(this.userListModify)
+                        axios.post("/user/modifyUser",this.userListModify).then(res => {
+                            console.log(res.data)
+                            if(res.data == true){
+                                this.innerVisibleModify = false
+                                this.$message({
+                                    message: 'Modify User successfully',
+                                    type: 'success'
+                                });
+                                this.showpage()
+                                this.userListModify = {account: "", email: "", did: "", pid: "", sex: "", entrydate: "", phone: "", wechat: ""};
+                            }
+                        })
+                    } else {
+                        this.$message({
+                            message: 'Modify fail',
+                            type: 'error'
+                        });
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            exportExcel: function () {
+                axios({
+                    url: "/user/export",
+                    method: "post",
+                    responseType: 'blob'  // Make sure the responseType is set to blob.
+                }).then(res => {
+                    if (res) {
+                        // Extract filename from Content-Disposition
+                        let contentDisposition = res.headers["content-disposition"];
+                        let fileName = "exported_file.xls"; // Setting the default file name
+
+                        if (contentDisposition) {
+                            let temp = contentDisposition.split(";")[1].split("=")[1];
+                            fileName = decodeURIComponent(temp.replace(/['"]/g, '')); // Handle filenames
+                        }
+
+                        const blob = new Blob([res.data], {
+                            type: "application/vnd.ms-excel;charset=UTF-8",
+                        });
+
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        let a = document.createElement("a"); // Create an a tag for download
+                        a.style.display = 'none';
+                        a.href = blobUrl;
+                        a.download = fileName;  // Set the name of the downloaded file
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(blobUrl);  // Release the URL object
+                        a.remove();
+                    } else {
+                        this.$message.error("Export failed");
+                    }
+                });
+            },
+            handleUploadSuccess2(res) {
+                if (res.code === 200) {
+                    this.$message.success("Forms imported successfully")
+                    this.showpage()
+                } else {
+                    this.$message.error("Table import failed, please check column format and row size")
+                    this.showpage()
+                }
+            },
+
+
+        }
+    });
+</script>
+
+<style>
+
+    .custom-container {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+    .custom-main {
+        max-width: 1661px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+    .custom-row {
+        margin-bottom: 20px;
+    }
+    .custom-button {
+        margin-right: 10px;
+    }
+    .custom-upload,
+    .custom-export,
+    .custom-popover,
+    .custom-list {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .custom-popover .el-button {
+        margin-left: 20px;
+    }
+    .el-table {
+        margin-bottom: 20px;
+    }
+    .el-pagination {
+        margin-top: 20px;
+    }
+
+
+</style>
+</html>
+

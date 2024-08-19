@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Participants and Speakers</title>
+    <link rel="stylesheet" href="/css/participants_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="/js/vue.js" defer></script>
+    <script src="/js/axios.min.js" defer></script>
+    <script src="/js/participants-speakers.js" defer></script>
+</head>
+<body>
+<div id="app" class="main-container">
+    <h1>Participants and Speakers</h1>
+    <form @submit.prevent="addParticipantSpeaker" class="form-container">
+        <input type="text" v-model="newParticipantSpeaker.name" placeholder="Name" required>
+        <input type="email" v-model="newParticipantSpeaker.email" placeholder="Email" required>
+        <input type="text" v-model="newParticipantSpeaker.company" placeholder="Company" required>
+        <select v-model="newParticipantSpeaker.eventId" required class="placeholder">
+            <option value="" disabled selected hidden>Event</option>
+            <option v-for="event in events" :key="event.id" :value="event.id">{{ event.title }}</option>
+        </select>
+        <select v-model="newParticipantSpeaker.scheduleId" required class="placeholder">
+            <option value="" disabled selected hidden>Date & Time</option>
+            <option v-for="schedule in schedules" :key="schedule.id" :value="schedule.id">{{ schedule.date }} {{ schedule.startTime }} - {{ schedule.endTime }}</option>
+        </select>
+        <select v-model="newParticipantSpeaker.role" required class="placeholder">
+            <option value="" disabled selected hidden>Role</option>
+            <option value="Speaker">Speaker</option>
+            <option value="Panelist">Panelist</option>
+        </select>
+        <select v-model="newParticipantSpeaker.status" required class="placeholder">
+            <option value="" disabled selected hidden>Status</option>
+            <option value="Invited">Invited</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Declined">Declined</option>
+        </select>
+        <input type="text" v-model="newParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
+        <textarea v-model="newParticipantSpeaker.bio" placeholder="Professional Bio/LinkedIn Profile"></textarea>
+        <button type="submit" class="btn add-btn">Add</button>
+    </form>
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Event Name</th>
+            <th>Event Date Time</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Relationship with Company</th>
+            <th>Professional Bio/LinkedIn Profile</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="participantSpeaker in participantSpeakers" :key="participantSpeaker.id">
+            <td>{{ participantSpeaker.name }}</td>
+            <td>{{ participantSpeaker.email }}</td>
+            <td>{{ participantSpeaker.company }}</td>
+            <td>{{ participantSpeaker.eventName }}</td>
+            <td>{{ participantSpeaker.eventDateTime || 'N/A' }}</td>
+            <td>{{ participantSpeaker.role }}</td>
+            <td>{{ participantSpeaker.status }}</td>
+            <td>{{ participantSpeaker.relationshipWithCompany || 'N/A' }}</td>
+            <td>{{ participantSpeaker.bio || 'N/A' }}</td>
+            <td>
+                <button class="btn edit-btn" @click="editParticipantSpeaker(participantSpeaker)"><i class="fas fa-edit"></i> Edit</button>
+                <button class="btn delete-btn" @click="deleteParticipantSpeaker(participantSpeaker.id)"><i class="fas fa-trash-alt"></i> Delete</button>
+                <button class="btn email-btn" @click="sendEmail(participantSpeaker.email)"><i class="fas fa-envelope"></i> Email</button>
+                <button class="btn publish-btn" @click="publishParticipantSpeaker(participantSpeaker.email)"><i class="fas fa-share-square"></i> Publish</button>
+            </td>
+        </tr>
+        <tr v-if="participantSpeakers.length === 0">
+            <td colspan="8" style="text-align: center;">No data available</td>
+        </tr>
+        </tbody>
+    </table>
+    <div v-if="editMode" class="edit-form-container">
+        <h3>Edit Participant/Speaker</h3>
+        <form @submit.prevent="updateParticipantSpeaker">
+            <input type="text" v-model="currentParticipantSpeaker.name" placeholder="Name" required>
+            <input type="email" v-model="currentParticipantSpeaker.email" placeholder="Email" required>
+            <input type="text" v-model="currentParticipantSpeaker.company" placeholder="Company" required>
+            <select v-model="currentParticipantSpeaker.eventId" required>
+                <option value="" disabled selected hidden>Event</option>
+                <option v-for="event in events" :key="event.id" :value="event.id">{{ event.title }}</option> <!-- Updated to match other references -->
+            </select>
+            <select v-model="currentParticipantSpeaker.scheduleId" required class="placeholder">
+                <option value="" disabled selected hidden>Date Slot</option>
+                <option v-for="schedule in schedules" :key="schedule.id" :value="schedule.id">{{ schedule.date }} {{ schedule.startTime }} - {{ schedule.endTime }}</option>
+            </select>
+            <select v-model="currentParticipantSpeaker.role" required>
+                <option value="Speaker">Speaker</option>
+                <option value="Panelist">Panelist</option>
+            </select>
+            <select v-model="currentParticipantSpeaker.status" required>
+                <option value="Invited">Invited</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Declined">Declined</option>
+            </select>
+            <input type="text" v-model="currentParticipantSpeaker.relationshipWithCompany" placeholder="Relationship with Company">
+            <textarea v-model="currentParticipantSpeaker.bio" placeholder="Professional Bio/LinkedIn Profile"></textarea>
+            <button type="submit" class="btn update-btn">Update</button>
+            <button type="button" class="btn cancel-btn" @click="cancelEdit">Cancel</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

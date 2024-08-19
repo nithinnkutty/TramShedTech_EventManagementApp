@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/create-eventstyle.css" />
+    <script src="js/vue.js"></script>
+    <script src="js/create-event.js"></script>
+    <script src="js/element-index.js"></script>
+    <script src="js/axios.min.js"></script>
+    <title>Create Event Page</title>
+</head>
+<body>
+<div id="event">
+    <div class="title">
+        <el-col :span="24" style="padding-bottom: 20px">
+            <div class="grid-content caption">CREATE EVENT</div>
+        </el-col>
+    </div>
+    <el-row class="input-field">
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event Name</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <div class="grid-content input">
+                    <el-input v-model="formData.title" placeholder="event name"></el-input>
+                </div>
+            </div></el-col>
+        </el-row>
+
+        <!-- Dynamic date-time section -->
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Date and Time</div></el-col>
+            <el-col :span="8" :offset="1">
+                <div v-for="(schedule, index) in formData.schedules" :key="index" class="grid-content">
+                    <el-date-picker
+                            v-model="schedule.date"
+                            type="date"
+                            placeholder="Choose Date"
+                            class="el-date-picker">
+                    </el-date-picker>
+                    <el-time-select
+                            placeholder="Start Time"
+                            v-model="schedule.startTime"
+                            :picker-options="{
+                    start: '08:30',
+                    step: '00:15',
+                    end: '23:30'
+                }"
+                            class="el-time-select">
+                    </el-time-select>
+                    <el-time-select
+                            placeholder="End Time"
+                            v-model="schedule.endTime"
+                            :picker-options="{
+                    start: '08:30',
+                    step: '00:15',
+                    end: '23:30',
+                    minTime: schedule.startTime
+                }"
+                            class="el-time-select">
+                    </el-time-select>
+                    <el-button type="danger" class="remove-schedule-button" @click="removeSchedule(index)">Remove</el-button>
+                </div>
+                <el-button type="primary" class="add-schedule-button" @click="addSchedule">Add Date and Time</el-button>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Location</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.location" @change="fetchRoomsForLocation" clearable placeholder="please select">
+                <el-option label="Tramshed Tech Barry, GoodSheds" value="1"></el-option>
+                <el-option label="Tramshed Tech, Grangetown" value="2"></el-option>
+                <el-option label="Tramshed Tech Innovation Station, Newport" value="3"></el-option>
+                <el-option label="Tramshed Tech Griffin Place, Newport" value="4"></el-option>
+            </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Room</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.room" clearable placeholder="please select">
+                    <el-option
+                            v-for="item in room"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Event Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.type" clearable placeholder="please select">
+                    <el-option
+                            v-for="item in type"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.label">
+                    </el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Speaker</div></el-col>
+            <el-col :span="8" :offset="1">
+                <div class="grid-content">
+                    <el-select v-model="formData.speaker" clearable placeholder="Select Speaker">
+                        <el-option
+                                v-for="speaker in speakers"
+                                :key="speaker.value"
+                                :label="speaker.label"
+                                :value="speaker.value">
+                        </el-option>
+                    </el-select>
+                </div>
+            </el-col>
+        </el-row>
+
+
+        <!-- Form fields for catering -->
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.cateringType" clearable placeholder="Select Catering Type">
+                    <el-option label="Cold Finger Buffet" value="Cold Finger Buffet"></el-option>
+                    <el-option label="Sandwich Buffet" value="Sandwich Buffet"></el-option>
+                    <el-option label="Grazeboards" value="Grazeboards"></el-option>
+                    <el-option label="Breakfast Catering" value="Breakfast Catering"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Count</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.cateringCount" placeholder="Number of People"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Beverage Type</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-select v-model="formData.beverageType" clearable placeholder="Select Beverage Type">
+                    <el-option label="Soft Drinks" value="Soft Drinks"></el-option>
+                    <el-option label="Juices" value="Juices"></el-option>
+                    <el-option label="Tea and Coffee" value="Tea and Coffee"></el-option>
+                    <el-option label="Alcoholic Beverages" value="Alcoholic Beverages"></el-option>
+                    <el-option label="Non-Alcoholic Beverages" value="Non-Alcoholic Beverages"></el-option>
+                </el-select>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Dietary Requirements</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-input v-model="formData.dietaryRequirements" placeholder="Specify Dietary Requirements"></el-input>
+            </div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content information">Catering Serving Time</div></el-col>
+            <el-col :span="8" :offset="1"><div class="grid-content">
+                <el-time-select
+                        v-model="formData.cateringServingTime"
+                        placeholder="Select Serving Time"
+                        :picker-options="{
+                        start: '08:00',
+                        step: '00:15',
+                        end: '23:00'
+                    }">
+                </el-time-select>
+            </div></el-col>
+        </el-row>
+    </el-row>
+
+    <div class="form">
+        <el-row :gutter="20">
+            <el-col :span="4" :offset="6"><div class="grid-content operations">Operations:</div></el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+            <el-col :span="6"><div class="grid-content"></div></el-col>
+
+            <el-table :data="formData.tableData" border style="width: 55%;">
+                <el-table-column prop="tag" label="Tag" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.tag" placeholder="Tag" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="responsible" label="Responsible" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.responsible" placeholder="Responsible" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="staff" label="Support Staff" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.staff" placeholder="Support Staff" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="company" label="Company" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.company" placeholder="Company" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="contact" label="Contact" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.contact" placeholder="Contact" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="email" label="Contact Email" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.email" placeholder="Contact Email" class="table"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="notes" label="AV Notes" width="180">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.note" placeholder="AV Notes" class="table"></el-input>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-row>
+    </div>
+
+    <div class="button">
+        <el-button type="success" round @click="handleButtonClick">Create Event</el-button>
+    </div>
+</div>
+</body>
+<script src="/js/create-event.js"></script>
+</html>

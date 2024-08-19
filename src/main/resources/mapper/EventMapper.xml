@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tramshedtech.eventmanagement.mapper.EventMapper">
+
+    <!-- Select all events with schedules -->
+    <select id="getAllEvents" resultType="com.tramshedtech.eventmanagement.entity.Event">
+        SELECT e.*,
+        GROUP_CONCAT(CONCAT(es.date, ' ', es.start_time, '-', es.end_time) ORDER BY es.date, es.start_time SEPARATOR ', ') AS schedules,
+        CONCAT(b.room_name, ' ', l.location, ' ', b.postcode) AS roomName,
+        l.location AS locationName
+        FROM events e
+        LEFT JOIN bookings b ON e.room = b.id
+        LEFT JOIN location l ON e.location = l.id
+        LEFT JOIN event_schedule es ON e.id = es.event_id
+        WHERE e.del = 1
+        GROUP BY e.id
+    </select>
+
+    <!-- Select event by ID without schedules -->
+    <select id="getEventById" parameterType="long" resultType="com.tramshedtech.eventmanagement.entity.Event">
+        SELECT e.*,
+        b.room_name AS roomName,
+        l.location AS locationName,
+        b.img AS img
+        FROM events e
+        LEFT JOIN bookings b ON e.room = b.id
+        LEFT JOIN location l ON e.location = l.id
+        WHERE e.id = #{id}
+    </select>
+
+
+
+    <!-- Insert data into DB -->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO events(title, location, del, room, speaker, responsible, type, staff, company, contact, email, note, tag, cateringType, cateringCount, beverageType, dietaryRequirements, cateringServingTime)
+        VALUES (#{title}, #{location}, 1, #{room}, #{speaker}, #{responsible}, #{type}, #{staff}, #{company}, #{contact}, #{email}, #{note}, #{tag}, #{cateringType}, #{cateringCount}, #{beverageType}, #{dietaryRequirements}, #{cateringServingTime})
+    </insert>
+
+    <!-- Delete event in DB -->
+    <update id="softDelete">
+        UPDATE events SET del = 0 WHERE id = #{id}
+    </update>
+
+    <!-- Update event data in DB -->
+    <update id="update">
+        UPDATE events
+        SET title = #{title},
+        location = #{location},
+        room = #{room},
+        type = #{type},
+        speaker = #{speaker},
+        tag = #{tag},
+        responsible = #{responsible},
+        staff = #{staff},
+        company = #{company},
+        contact = #{contact},
+        email = #{email},
+        note = #{note}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Select room name in DB -->
+    <select id="getRoomById" resultType="string">
+        SELECT CONCAT(b.room_name, ' ', l.location, ' ', b.postcode) AS fullAddress
+        FROM events e
+        JOIN bookings b ON e.room = b.id
+        JOIN location l ON b.location = l.id
+        WHERE e.id = #{eventId}
+    </select>
+
+    <!-- Retrieve all upcoming events -->
+    <select id="getAllUpcomingEvents" resultType="Event">
+        SELECT e.id, e.title
+        FROM events e
+        JOIN event_schedule es ON e.id = es.event_id
+        WHERE CONCAT(es.date, ' ', es.start_time) >= NOW()
+    </select>
+
+</mapper>

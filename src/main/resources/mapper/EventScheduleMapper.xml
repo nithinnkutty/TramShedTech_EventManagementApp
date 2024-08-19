@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tramshedtech.eventmanagement.mapper.EventScheduleMapper">
+
+    <insert id="insertEventSchedule" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO event_schedule(event_id, date, start_time, end_time)
+        VALUES (#{eventId}, #{date}, #{startTime}, #{endTime})
+    </insert>
+
+    <select id="getSchedulesByEventId" parameterType="long" resultType="com.tramshedtech.eventmanagement.entity.EventSchedule">
+        SELECT id, event_id AS eventId, date, start_time AS startTime, end_time AS endTime
+        FROM event_schedule
+        WHERE event_id = #{eventId}
+    </select>
+
+
+</mapper>

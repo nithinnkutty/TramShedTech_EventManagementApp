@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Your Resource</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/element-index.js"></script>
+    <link rel="stylesheet" href="css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 10px;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px;
+            flex: 1;
+            position: relative;
+        }
+
+        .el-row {
+            margin-bottom: 20px;
+        }
+
+        .el-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .el-col {
+            border-radius: 4px;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+
+</head>
+
+
+
+<body>
+<div id="app">
+    <el-row :gutter="20">
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
+        </el-col>
+        <el-col :span="6">
+            <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
+        </el-col>
+    </el-row>
+
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="180px" class="demo-ruleForm">
+        <el-form-item label="Room Number" prop="roomNumber">
+            <el-input v-model="ruleForm.roomNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="Room Name" prop="roomName">
+            <el-input v-model="ruleForm.roomName"></el-input>
+        </el-form-item>
+        <el-form-item label="Postcode" prop="postcode">
+            <el-input v-model="ruleForm.postcode"></el-input>
+        </el-form-item>
+        <el-form-item label="Capacity" prop="roomCapacity">
+            <el-input-number v-model="ruleForm.roomCapacity" :min="1"></el-input-number>
+        </el-form-item>
+        <el-form-item label="Location" prop="location">
+            <el-select v-model="ruleForm.location" placeholder="Please select location">
+                <el-option v-for="location in locations"
+                           :key="location.id"
+                           :label="location.location"
+                           :value="location.id">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="Room opening between" prop="daterange">
+            <el-date-picker
+                    v-model="ruleForm.daterange"
+                    type="datetimerange"
+                    range-separator="to"
+                    start-placeholder="Start date"
+                    end-placeholder="End date"
+                    :disabled-date="disabledDate"
+                    style="width: 100%;">
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="AV Requirements" prop="av">
+            <el-checkbox-group v-model="ruleForm.av">
+                <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
+                <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
+                <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
+                <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
+                <el-checkbox label="Projector" name="Projector"></el-checkbox>
+                <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+        <!-- Add a warning prompt and set closable to false -->
+        <el-alert
+                title="Basic equipments we already have: a large TV screen, hybrid set-up, water."
+                type="warning"
+                :closable="false">
+        </el-alert>
+        <!-- New upload image form item -->
+        <el-form-item label="Upload Image" prop="img">
+            <el-upload
+                    action="/booking/upload"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove"
+                    :file-list="ruleForm.img"
+                    :before-upload="beforeUpload"
+                    :on-success="handleUploadSuccess"
+                    accept="image/*">
+                <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+        </el-form-item>
+        <el-form-item label="Payment method" prop="payment">
+            <el-radio-group v-model="ruleForm.payment">
+                <el-radio label="Paypal"></el-radio>
+                <el-radio label="Applepay"></el-radio>
+                <el-radio label="Credit card"></el-radio>
+                <el-radio label="Debit card"></el-radio>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Message">
+            <el-input type="textarea" v-model="ruleForm.message"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">Create Now</el-button>
+            <el-button @click="resetForm('ruleForm')">Reset</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                searchQuery: '',
+                ruleForm: {
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
+                    roomCapacity:'',
+                    location: '',
+                    daterange: [],
+                    av: [],
+                    payment: '',
+                    message: '',
+                    img: []
+                },
+                locations: [],
+                rules: {
+                    roomNumber: [
+                        { required: true, message: 'Please enter the room number', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
+                    ],
+                    roomName: [
+                        { required: true, message: 'Please enter the room name', trigger: 'blur' },
+                        { min: 1, max: 50, message: 'The length is 1 to 50 characters', trigger: 'blur' }
+                    ],
+                    postcode: [
+                        { required: true, message: 'Please enter the postcode info', trigger: 'blur' },
+                    ],
+                    location: [
+                        { required: true, message: 'Please select the location', trigger: 'change' }
+                    ],
+                    daterange: [
+                        { required: true, message: 'Please select the date range', trigger: 'change' },
+                        { validator: this.validateDateRange, trigger: 'change' }
+                    ],
+                    av: [
+                        { type: 'array', required: true, message: 'Please select at least one AV requirement', trigger: 'change' }
+                    ],
+                    payment: [
+                        { required: true, message: 'Please select a payment method', trigger: 'change' }
+                    ],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ],
+                    message: [
+                        { required: false }
+                    ]
+                },
+                dialogImageUrl: '',
+                dialogVisible: false
+            };
+        },
+        created() {
+            this.fetchLocations();
+        },
+        methods: {
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(response => {
+                        console.log(response.data);
+                        this.locations = response.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the locations!", error);
+                    });
+            },
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.ruleForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const imgNames = this.ruleForm.img.map(item => item.url).join(',');
+                        const formData = {
+                            ...this.ruleForm,
+                            startDate: this.ruleForm.daterange[0],
+                            endDate: this.ruleForm.daterange[1],
+                            img: imgNames  // Converts imgList to a comma-separated string
+                        };
+                        console.log(formData);
+                        axios.post('/booking/add', formData)
+                            .then(response => {
+                                console.log(response);
+                                if (response.status === 200 && response.data.data) {
+                                    const newBookingId = response.data.data.id;
+                                    this.$message({
+                                        message: 'Resource added successfully',
+                                        type: 'success'
+                                    });
+                                    localStorage.setItem("bookingId", newBookingId);
+                                    window.location.href = '/bookmanagement.html';
+                                } else {
+                                    alert('Resource adding failed');
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                this.$message({
+                                    message: 'Resource adding failed',
+                                    type: 'error'
+                                });
+                            });
+                        alert('submit!');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            viewResources() {
+                window.location.href = 'viewresources.html';
+            },
+            bookaResource() {
+                window.location.href = 'bookresource.html';
+            },
+            cancelBooking() {
+                window.location.href = 'cancel.html';
+            },
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
+            },
+            disabledDate(time) {
+                return time.getTime() < Date.now() - 86400000;
+            },
+            validateDateRange(rule, value, callback) {
+                const [start, end] = value;
+                if (new Date(start).getTime() < Date.now() - 86400000) {
+                    callback(new Error('This date is not optional'));
+                } else if (new Date(end).getTime() < new Date(start).getTime()) {
+                    callback(new Error('The start time cannot be after the end time'));
+                } else {
+                    callback();
+                }
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+                this.ruleForm.img = fileList.map(f => ({
+                    name: f.name,
+                    url: f.url,
+                    uid: f.uid,
+                }));
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
+            }
+        }
+    });
+
+
+
+</script>
+
+</body>
+</html>

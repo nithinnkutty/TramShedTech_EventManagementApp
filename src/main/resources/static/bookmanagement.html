@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Room Management</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element-index.js"></script>
+    <link rel="stylesheet" href="./css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 0;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-toggle-button {
+            background-color: #E6A23C; /* Custom background color */
+            color: white;
+        }
+
+        .custom-clear-button {
+            background-color: #E6A23C;
+            color: white;
+        }
+
+        .custom-delete-button {
+            background-color: #f56c6c;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li:not(.disabled) {
+            background-color: #accff6;
+            color: white;
+        }
+
+        .custom-pagination .el-pager li.active {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .book-resource-button {
+            background-color: #E6A23C; /* Custom background color */
+            color: white;
+            margin-left: auto;
+            display: block;
+        }
+    </style>
+
+
+
+</head>
+<body>
+<div id="app" class="app-container">
+    <el-container>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <div class="select-container">
+                        <el-select v-model="selectedStatus" clearable placeholder="Please select">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <el-table
+                            ref="multipleTable"
+                            :data="filteredTableData"
+                            style="width: 100%"
+                            @selection-change="handleSelectionChange"
+                            :row-class-name="tableRowClassName">
+                        <el-table-column
+                                type="selection"
+                                width="55">
+                        </el-table-column>
+                        <el-table-column
+                                label="No."
+                                width="55"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ scope.$index + 1 }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="startDate"
+                                label="Start Date"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="roomName"
+                                label="Room Name"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="locationName"
+                                label="Location">
+                        </el-table-column>
+                        <el-table-column
+                                prop="endDate"
+                                label="End Date"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column label="Operation">
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="mini"
+                                        @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                                <el-button
+                                        size="mini"
+                                        type="danger"
+                                        @click="confirmDelete(scope.$index, scope.row)">Delete</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div style="margin-top: 20px">
+                        <el-button class="custom-toggle-button" @click="toggleSelection([filteredTableData[1], filteredTableData[2]])">Toggle selection of second and third rows</el-button>
+                        <el-button class="custom-clear-button" @click="toggleSelection()">Clear selection</el-button>
+                        <el-button class="custom-delete-button" type="danger" @click="deleteSelectedRows">Delete Selected</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+
+            <el-row style="justify-content: flex-end;">
+                <el-col :span="24" style="text-align: right;">
+                    <div class="block">
+                        <el-pagination
+                                class="custom-pagination"
+                                background
+                                layout="prev, pager, next"
+                                :total="total"
+                                @size-change="handleSizeChange"
+                                @current-change="handleCurrentChange"
+                                :current-page="currentPage4"
+                                :page-sizes="[10, 20, 30, 40]"
+                                :page-size="pageSize"
+                                prev-text="Previous"
+                                next-text="Next">
+                        </el-pagination>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+
+    <!-- Dialog of edit form -->
+    <el-dialog title="Edit Booking" :visible.sync="dialogFormVisible">
+        <el-form :model="editForm" ref="editForm" :rules="rules" label-width="180px" class="demo-ruleForm">
+            <el-form-item label="Room Number" prop="roomNumber">
+                <el-input v-model="editForm.roomNumber"></el-input>
+            </el-form-item>
+            <el-form-item label="Room Name" prop="roomName">
+                <el-input v-model="editForm.roomName"></el-input>
+            </el-form-item>
+            <el-form-item label="Postcode" prop="postcode">
+                <el-input v-model="editForm.postcode"></el-input>
+            </el-form-item>
+            <el-form-item label="Capacity" prop="roomCapacity">
+                <el-input-number v-model="editForm.roomCapacity" :min="1"></el-input-number>
+            </el-form-item>
+            <el-form-item label="Location" prop="locationName">
+                <el-select v-model="editForm.locationId" placeholder="Please select location">
+                    <el-option
+                            v-for="location in locations"
+                            :key="location.id"
+                            :label="location.location"
+                            :value="location.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="Book resource between" prop="daterange">
+                <el-date-picker
+                        v-model="editForm.daterange"
+                        type="datetimerange"
+                        range-separator="to"
+                        start-placeholder="Start date"
+                        end-placeholder="End date"
+                        :disabled-date="disabledDate"
+                        style="width: 100%;">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="AV Requirements" prop="av">
+                <el-checkbox-group v-model="editForm.av">
+                    <el-checkbox label="Microphone" name="Microphones"></el-checkbox>
+                    <el-checkbox label="DVD/PC" name="DVD/PC"></el-checkbox>
+                    <el-checkbox label="Speaker" name="Speakers"></el-checkbox>
+                    <el-checkbox label="Projector" name="Projector"></el-checkbox>
+                    <el-checkbox label="Technical support" name="Technical support"></el-checkbox>
+                    <el-checkbox label="No, thanks." name="No thanks"></el-checkbox>
+                </el-checkbox-group>
+            </el-form-item>
+            <el-alert
+                    title="Basic equipments we already have: a large TV screen, hybrid set-up, water."
+                    type="warning"
+                    :closable="false">
+            </el-alert>
+            <!-- New upload image form item -->
+            <el-form-item label="Upload Image" prop="img">
+                <el-upload
+                        action="/booking/upload"
+                        list-type="picture-card"
+                        :on-preview="handlePictureCardPreview"
+                        :on-remove="handleRemove"
+                        :file-list="editForm.img"
+                        :before-upload="beforeUpload"
+                        :on-success="handleUploadSuccess"
+                        accept="image/*">
+                    <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+            </el-form-item>
+
+            <el-form-item label="Payment method" prop="payment">
+                <el-radio-group v-model="editForm.payment">
+                    <el-radio label="Paypal"></el-radio>
+                    <el-radio label="Applepay"></el-radio>
+                    <el-radio label="Credit card"></el-radio>
+                    <el-radio label="Debit card"></el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="Message">
+                <el-input type="textarea" v-model="editForm.message"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('editForm')">Save Changes</el-button>
+                <el-button @click="resetForm('editForm')">Reset</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+</div>
+
+
+
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            const validateDateRange = (rule, value, callback) => {
+                const [start, end] = value;
+                if (new Date(start).getTime() < Date.now() - 86400000) {
+                    callback(new Error('This date is not optional'));
+                } else if (new Date(end).getTime() < new Date(start).getTime()) {
+                    callback(new Error('The start time cannot be after the end time'));
+                } else {
+                    callback();
+                }
+            };
+
+            return {
+                options: [{
+                    value: 'Ongoing',
+                    label: 'Ongoing'
+                }, {
+                    value: 'Upcoming',
+                    label: 'Upcoming'
+                }, {
+                    value: 'Completed',
+                    label: 'Completed'
+                }],
+                selectedStatus: '',
+                tableData: [],
+                currentPage4: 1,
+                pageSize: 10,
+                total: 40,
+                multipleSelection: [],
+                searchQuery: '',
+                dialogFormVisible: false,
+                editForm: {
+                    id: '',
+                    roomNumber: '',
+                    roomName: '',
+                    postcode: '',
+                    locationName: '',
+                    locationId: '',
+                    daterange: [],
+                    av: [],
+                    payment: '',
+                    message: '',
+                    roomCapacity:'',
+                    img: [] // make sure it's an array
+                },
+                rules: {
+                    daterange: [{ validator: validateDateRange, trigger: 'change' }],
+                    uploadImage: [
+                        { required: true, message: 'Please upload an image', trigger: 'change' }
+                    ]
+                },
+                dialogImageUrl: '',
+                dialogVisible: false,
+                formLabelWidth: '100px'
+            };
+        },
+        computed: {
+            filteredTableData() {
+                let filteredData = this.tableData;
+                if (this.selectedStatus) {
+                    filteredData = filteredData.filter(item => item.status === this.selectedStatus);
+                }
+                if (this.searchQuery) {
+                    filteredData = filteredData.filter(item => {
+                        return Object.keys(item).some(key => String(item[key]).toLowerCase().includes(this.searchQuery.toLowerCase()));
+                    });
+                }
+                return filteredData;
+            }
+        },
+        methods: {
+            disabledDate(time) {
+                return time.getTime() < Date.now() - 86400000;
+            },
+
+            tableRowClassName({ row }) {
+                if (row.status === 'Ongoing') {
+                    return 'warning-row';
+                } else if (row.status === 'Upcoming') {
+                    return 'info-row';
+                } else if (row.status === 'Completed') {
+                    return 'success-row';
+                }
+                return '';
+            },
+
+            fetchTableData() {
+                axios.get('/booking/searchAll')
+                    .then(res => {
+                        console.log(res.data);
+                        this.tableData = res.data.filter(item => item.del === 0); // Filter out deleted records
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting booking data!", error);
+                    });
+            },
+
+            fetchLocations() {
+                axios.get('/api/locations')
+                    .then(res => {
+                        this.locations = res.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching locations!", error);
+                    });
+            },
+
+            handleSizeChange(val) {
+                this.pageSize = val;
+                console.log(`Items per page: ${val}`);
+            },
+
+            handleCurrentChange(val) {
+                this.currentPage4 = val;
+                console.log(`Current page: ${val}`);
+            },
+
+            toggleSelection(rows) {
+                if (rows) {
+                    rows.forEach(row => {
+                        this.$refs.multipleTable.toggleRowSelection(row);
+                    });
+                } else {
+                    this.$refs.multipleTable.clearSelection();
+                }
+            },
+
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            handleUploadSuccess(response, file, fileList) {
+                console.log('Upload success response:', response);
+                console.log('File:', file);
+                console.log('File list:', fileList);
+                this.editForm.img.push({
+                    name: file.name,
+                    url: response.url,
+                    uid: file.uid,
+                });
+            },
+            handleEdit(index, row) {
+                console.log("Edit button clicked", index, row);
+                axios.get(`/booking/${row.id}`)
+                    .then(response => {
+                        const data = response.data.data;
+                        // Make sure the img field is an array
+                        const imgList = data.img ? data.img.split(",").map(url => ({
+                            name: url.split("/").pop(), // Extract file name
+                            url: url,
+                            uid: url, // Use the URL as the unique identifier
+                        })) : [];
+                        console.log("imgList:", imgList);
+                        this.editForm = {
+                            id: data.id,
+                            roomNumber: data.roomNumber || '',
+                            roomName: data.roomName || '',
+                            postcode: data.postcode || '',
+                            locationName: data.locationName || '',
+                            locationId: data.location || '',
+                            daterange: [data.startDate, data.endDate],
+                            av: Array.isArray(data.av) ? data.av : (data.av ? data.av.split(",") : []), // 确保av是数组
+                            payment: data.payment || '',
+                            message: data.message || '',
+                            roomCapacity: data.roomCapacity || '',
+                            img: imgList // set img is an array
+                        };
+                        this.dialogFormVisible = true; // display edit form
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the booking data!", error);
+                    });
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        // Convert the img field to a comma-separated string before committing
+                        const imgNames = this.editForm.img.map(item => item.url).join(',');
+                        const updatedForm = { ...this.editForm, img: imgNames, location: this.editForm.locationId };
+                        debugger
+                        axios.post(`/booking/update`, updatedForm)
+                            .then(response => {
+                                this.$message({
+                                    message: 'Successfully updated!',
+                                    type: 'success'
+                                });
+                                this.dialogFormVisible = false; // Close the dialog box
+                                this.fetchTableData(); // Refresh the table data
+                            })
+                            .catch(error => {
+                                console.error("There was an error updating the booking data!", error);
+                            });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+            handleDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+
+            confirmDelete(index, row) {
+                this.$confirm('This operation will delete the file permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/booking/delete', { id: row.id })
+                        .then(response => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+
+            deleteSelectedRows() {
+                if (this.multipleSelection.length === 0) {
+                    this.$message({
+                        type: 'warning',
+                        message: 'No rows selected for deletion'
+                    });
+                    return;
+                }
+                this.$confirm('This operation will delete the selected files permanently. Do you want to continue?', 'Tips', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning'
+                }).then(() => {
+                    const deletePromises = this.multipleSelection.map(row => axios.post('/booking/delete', { id: row.id }));
+
+                    Promise.all(deletePromises)
+                        .then(() => {
+                            this.$message({
+                                type: 'success',
+                                message: 'Selected rows deleted successfully!'
+                            });
+                            this.fetchTableData(); // Refresh the table data
+                        })
+                        .catch(error => {
+                            console.error("There was an error deleting the booking data!", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Deletion cancelled'
+                    });
+                });
+            },
+
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
+            },
+
+            viewResources() {
+                window.location.href = 'viewresources.html';
+            },
+
+            bookaResource() {
+                window.location.href = 'bookresource.html';
+            },
+
+            cancelBooking() {
+                window.location.href = 'cancel.html';
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+                // Remove the file from the img array
+                this.editForm.img = this.editForm.img.filter(item => item.uid !== file.uid);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            beforeUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG && !isPNG) {
+                    this.$message.error('Upload image must be JPG or PNG format!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('Upload image size must be less than 2MB!');
+                }
+                return (isJPG || isPNG) && isLt2M;
+            }
+        },
+
+        mounted() {
+            this.fetchTableData();
+            this.fetchLocations();
+        }
+    });
+</script>
+
+
+</body>
+</html>

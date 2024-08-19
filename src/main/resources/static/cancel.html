@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Booking</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/element-index.js"></script>
+    <link rel="stylesheet" href="css/element-index.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            margin: 10px;
+        }
+
+        .app-container {
+            margin: 20px;
+        }
+
+        .el-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .el-header, .el-footer {
+            background-color: #E9EEF3;
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            height: 120px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            margin-top: 20px;
+            padding: 30px; /* Add internal margins to adjust the position */
+            flex: 1; /* Make the main part fill the remaining space */
+            position: relative;
+        }
+
+        .result-wrapper {
+            display: flex;
+            flex-wrap: wrap; /* Enable wrapping to the next line */
+            gap: 20px; /* Add spacing between the items */
+        }
+
+        .result-container {
+            display: inline-block;
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            background-color: #fff;
+            margin-bottom: 20px; /* Add some spacing between containers */
+            width: calc(33% - 20px); /* Adjust width to fit 3 items per row, considering the gap */
+            box-sizing: border-box;
+        }
+
+        .custom-button {
+            width: 80%;
+            height: 40px;
+            margin: 10px 0;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-cancel-button {
+            background-color: #45b4ed; /* Custom background color */
+            color: white;
+        }
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .location-text {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+
+
+</head>
+<body>
+<div id="app" class="app-container">
+    <el-container>
+        <el-header>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="viewResources">View Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookaResource">Create a Resource</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="cancelBooking">Cancel Resources</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button type="warning" class="custom-button" @click="bookingRecord">Check Record</el-button>
+                </el-col>
+            </el-row>
+        </el-header>
+        <el-main>
+            <el-row :gutter="20">
+                <el-col :span="8" v-for="(room, index) in rooms" :key="index">
+                    <el-card shadow="hover">
+                        <el-image
+                                :src="getImgUrl(room.img)"
+                                alt="Room Image"
+                                style="width: 100%; height: 200px; object-fit: cover;">
+                        </el-image>
+                        <div class="card-content">
+                            <h3>{{ room.roomName }}</h3>
+                            <p>Room Number: {{ room.roomNumber }}</p>
+                            <p class="location-text">Location: {{ room.location }}</p>
+                            <el-button type="primary" @click="confirmCancel(room)">Off Shelf Room</el-button>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+        </el-main>
+    </el-container>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                rooms: [],
+            };
+        },
+        mounted() {
+            this.fetchRooms();
+        },
+        methods: {
+            handleSearch() {
+                // Add logic to handle search
+            },
+            fetchRooms() {
+                axios.get('/booking/searchNotCancel')
+                    .then(res => {
+                        this.rooms = res.data.filter(item => item.status===1); // Filter out deleted records
+                    })
+                    .catch(error => {
+                        console.error("There was an error when getting booking data!", error);
+                    });
+                console.log("rooms ",this.rooms)
+            },
+            getImgUrl(imgString) {
+                const imgArray = imgString ? imgString.split(',') : [];
+                return imgArray.length > 0 ?   imgArray[0].trim() : '';
+            },
+            confirmCancel(room) {
+                this.$confirm(`Are you sure you want to cancel the booking for ${room.roomName}?`, 'Warning', {
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('/booking/updateStatus', {
+                        id: room.id,
+                        status: 0 // Set status to 0 to cancel the booking
+                    })
+                        .then(() => {
+                            this.$message({
+                                type: 'success',
+                                message: `Booking for ${room.roomName} has been successfully cancelled!`
+                            });
+                            // update room list
+                            this.fetchRooms();
+                        })
+                        .catch(error => {
+                            this.$message.error('There was an error when canceling the booking!');
+                            console.error("Error updating status:", error);
+                        });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'Cancel operation has been cancelled.'
+                    });
+                });
+            },
+            bookingRecord() {
+                window.location.href = 'bookmanagement.html';
+            },
+            viewResources() {
+                // Redirect to the view resources page
+                window.location.href = 'viewresources.html';
+            },
+            bookaResource() {
+                // Redirect to the book a resource page
+                window.location.href = 'bookresource.html';
+            },
+            cancelBooking() {
+                // Redirect to the cancel booking page
+                window.location.href = 'cancel.html';
+            }
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

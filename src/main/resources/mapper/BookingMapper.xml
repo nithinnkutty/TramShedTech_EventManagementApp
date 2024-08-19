@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tramshedtech.eventmanagement.mapper.BookingMapper">
+
+    <update id="softDeleteBooking">
+        UPDATE bookings
+        SET del = 1
+        WHERE id = #{id}
+    </update>
+
+    <select id="getBookingById" resultMap="bookingMapById">
+        SELECT
+            b.*,
+            l.location AS locationName
+        FROM
+            bookings b
+                JOIN
+            location l
+            ON
+                b.location = l.id
+        WHERE
+            b.id = #{id}
+    </select>
+
+    <resultMap id="bookingMapById" type="com.tramshedtech.eventmanagement.entity.Bookings">
+        <id column="id" property="id" />
+        <result column="room_number" property="roomNumber" />
+        <result column="room_name" property="roomName" />
+        <result column="postcode" property="postcode" />
+        <result column="location" property="location" />
+        <result column="start_date" property="startDate" />
+        <result column="start_time" property="startTime" />
+        <result column="end_date" property="endDate" />
+        <result column="end_time" property="endTime" />
+        <result column="img" property="img" />
+        <result column="message" property="message" />
+        <result column="av" property="av" />
+        <result column="payment" property="payment" />
+        <result column="room_capacity" property="roomCapacity" />
+        <result column="status" property="status" />
+        <result column="del" property="del" />
+    </resultMap>
+
+    <update id="updateBooking">
+        UPDATE bookings
+        SET room_number = #{roomNumber},
+            room_name = #{roomName},
+            postcode = #{postcode},
+            location = #{location},
+            start_date = #{startDate},
+            start_time = #{startTime},
+            end_date = #{endDate},
+            end_time = #{endTime},
+            message = #{message},
+            img = #{img},
+            av = #{av},
+            payment = #{payment},
+            room_capacity = #{roomCapacity},
+            del = #{del,jdbcType=INTEGER}
+        WHERE id = #{id}
+    </update>
+    <update id="updateBookingStatus">
+        UPDATE bookings
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="addBooking" >
+        INSERT INTO bookings(room_number, room_name, postcode, location, message, payment, av, start_date, start_time, end_date, end_time, img,room_capacity,status, del)
+        VALUES (#{roomNumber}, #{roomName}, #{postcode}, #{location}, #{message}, #{payment}, #{av}, #{startDate}, #{startTime}, #{endDate}, #{endTime}, #{img}, #{roomCapacity}, #{status}, #{del})
+    </insert>
+
+    <!-- Select room name in DB -->
+    <select id="getAllRoomName" resultType="string">
+        SELECT DISTINCT CONCAT(b.room_name, ' ', locationName, ' ', b.postcode) AS fullAddress
+        FROM bookings b
+                 JOIN location l ON b.location = l.id;
+    </select>
+
+
+    <select id="searchAll"  resultMap="bookingsMap">
+        SELECT
+        b.id,
+        b.room_number,
+        b.room_name,
+        b.postcode,
+        l.location AS locationName,
+        b.location AS locationId,
+        b.start_date,
+        b.start_time,
+        b.end_date,
+        b.end_time,
+        b.img,
+        b.message,
+        b.av,
+        b.payment,
+        b.del,
+        b.status
+        FROM
+        bookings b
+        JOIN
+        location l ON b.location = l.id
+        WHERE
+        b.del = 0
+    </select>
+
+    <resultMap id="bookingsMap" type="com.tramshedtech.eventmanagement.entity.Bookings">
+        <id column="id" property="id" />
+        <result column="room_number" property="roomNumber" />
+        <result column="room_name" property="roomName" />
+        <result column="postcode" property="postcode" />
+        <result column="locationId" property="location" />
+        <result column="locationName" property="locationName"/>
+        <result column="start_date" property="startDate" />
+        <result column="start_time" property="startTime" />
+        <result column="end_date" property="endDate" />
+        <result column="end_time" property="endTime" />
+        <result column="img" property="img" />
+        <result column="message" property="message" />
+        <result column="av" property="av" />
+        <result column="payment" property="payment" />
+        <result column="room_capacity" property="roomCapacity" />
+        <result column="status" property="status" />
+        <result column="del" property="del" />
+    </resultMap>
+
+    <select id="findRoomsByLocationId" resultType="com.tramshedtech.eventmanagement.entity.Bookings">
+        SELECT
+            b.id,
+            b.room_name AS roomName,
+            l.location AS locationName,
+            b.postcode
+        FROM
+            bookings b
+                JOIN
+            location l ON b.location = l.id
+        WHERE
+            b.location = #{locationId}
+          AND b.del = 0
+    </select>
+
+    <select id="searchNotCancel" resultMap="bookingsNotCancel">
+        SELECT *
+        FROM bookings
+        WHERE del = 0
+          and id not in (select room from `events`)
+    </select>
+
+    <resultMap id="bookingsNotCancel" type="com.tramshedtech.eventmanagement.Vo.BookingsVo">
+        <id column="id" property="id" />
+        <result column="room_number" property="roomNumber" />
+        <result column="room_name" property="roomName" />
+        <result column="postcode" property="postcode" />
+        <result column="location" property="location" />
+        <result column="start_date" property="startDate" />
+        <result column="start_time" property="startTime" />
+        <result column="end_date" property="endDate" />
+        <result column="end_time" property="endTime" />
+        <result column="img" property="img" />
+        <result column="message" property="message" />
+        <result column="av" property="av" />
+        <result column="payment" property="payment" />
+        <result column="room_capacity" property="roomCapacity" />
+        <result column="status" property="status" />
+        <result column="del" property="del" />
+    </resultMap>
+
+</mapper>
