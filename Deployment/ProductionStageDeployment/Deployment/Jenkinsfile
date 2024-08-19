@@ -74,7 +74,6 @@ set -e
 pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
 
 nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-echo \$! > app.pid
 EOF
 """
                             sh 'echo "Application started in the background on the AWS instance."'
