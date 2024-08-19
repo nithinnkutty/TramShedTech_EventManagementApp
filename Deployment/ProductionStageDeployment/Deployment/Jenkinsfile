@@ -64,16 +64,20 @@ EOF
             steps {
                 script {
                     if (env.INSTANCE_IP) {
-                        // Build commands on the AWS instance
-                        sh """
+                        timeout(time: 10, unit: 'MINUTES') {
+                            // Build commands on the AWS instance
+                            sh """
 ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
+# Fail the script on any error
+set -e
 cd ${PROJECT_DIR}
 chmod +x gradlew
 ./gradlew clean
-./gradlew build
+./gradlew build --no-daemon
 EOF
 """
-                        sh 'echo "Project built on the AWS instance."'
+                            sh 'echo "Project built on the AWS instance."'
+                        }
                     } else {
                         error "Instance IP is not available."
                     }
@@ -88,7 +92,15 @@ EOF
                         // Run project on the AWS instance in the background
                         sh """
 ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
+# Fail the script on any error
+set -e
 cd ${PROJECT_DIR}
+
+# Check if the jar file exists
+if [ ! -f build/libs/eventmanagement-0.0.1-SNAPSHOT.jar ]; then
+    echo "Jar file not found! Exiting."
+    exit 1
+fi
 nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
