@@ -10,7 +10,7 @@ variable "ami" {
 
 variable "instance_type" {
   description = "Type of the instance"
-  default     = "t3.micro"
+  default     = "t3.large"
 }
 
 variable "key_name" {
