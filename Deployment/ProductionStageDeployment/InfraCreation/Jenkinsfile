@@ -63,14 +63,13 @@ echo "Adding git.cardiff.ac.uk public key to known_hosts"
 ssh-keyscan git.cardiff.ac.uk >> ~/.ssh/known_hosts
 chmod 644 ~/.ssh/known_hosts
 echo "Installing Java"
-sudo amazon-linux-extras install java-openjdk11 -y
-sudo yum install -y java-17-openjdk
+sudo yum install java-17-amazon-corretto-devel -y
 java -version
 echo "Installing unzip and Gradle"
 sudo yum install unzip -y
 wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
 sudo mkdir /opt/gradle
-sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+sudo unzip -d /opt/gradle gradle-8.0-bin.zip -y
 echo "export PATH=\$PATH:/opt/gradle/gradle-8.0/bin" >> ~/.bash_profile
 source ~/.bash_profile
 gradle -v
@@ -156,7 +155,7 @@ EOF
         success {
             script {
                 // Trigger the Build and Run Project pipeline
-                // build job: 'TramshedTech_Production_Deployment', wait: false
+                build job: 'TramShedTech_Production_Deployment_AWS', wait: false
                 sh 'echo "Instance Creation Completed..!!"'
             }
         }
