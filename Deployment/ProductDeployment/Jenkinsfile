@@ -9,7 +9,7 @@ pipeline {
         booleanParam(
                 name: 'KEEP_RUNNING',
                 defaultValue: true,
-                description: 'SCheck the box to keep the project running after it starts, or Uncheck to stop it after a few minutes.'
+                description: 'Check the box to keep the project running after it starts, or Uncheck to stop it after a few minutes.'
         )
     }
 
@@ -114,7 +114,6 @@ ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
 
 nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-echo \$! > app.pid
 EOF
 """
                         sh 'echo "Application started in the background on the instance."'
