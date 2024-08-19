@@ -7,6 +7,14 @@ pipeline {
         MINIO_CREDS = credentials('MINIO_CREDS')
     }
 
+    parameters {
+        booleanParam(
+                name: 'DESTROY',
+                defaultValue: false,
+                description: 'Check the box to destroy the existing infrastructure before applying the new one.'
+        )
+    }
+
     stages {
         stage('Create Infrastructure') {
             steps {
@@ -19,6 +27,11 @@ pipeline {
                             source ${PWD}/GROUP-1-TGD-2425-openrc.sh
 
                             terraform init -input=false
+                            
+                            # Optionally destroy existing infrastructure
+                            if [ "$DESTROY" = "true" ]; then
+                                terraform destroy -auto-approve
+                            fi
                             terraform plan
                             terraform apply -auto-approve
                         '''
