@@ -109,6 +109,10 @@ EOF
                         sh """
 scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no build/libs/eventmanagement-0.0.1-SNAPSHOT.jar rocky@${INSTANCE_IP}:~ 
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
+
+#Kill the previously running process
+pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
+
 nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
@@ -122,11 +126,7 @@ EOF
                             // Stop the application
                             sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech
-if [ -f app.pid ]; then
-    kill \$(cat app.pid)
-    echo "Application stopped."
-fi
+pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
 EOF
 """
                         }

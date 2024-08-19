@@ -70,6 +70,9 @@ ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
 # Fail the script on any error
 set -e
 
+#Kill the previously running process
+pkill -f eventmanagement-0.0.1-SNAPSHOT.jar && echo "Application stopped." || echo "No application process was running."
+
 nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
