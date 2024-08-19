@@ -34,8 +34,15 @@
                         </a>
                     </div>
                     <div class="time-display">
-                        <span>Time: {{eventForm.date}} {{ eventForm.time || 'Loading...' }}</span>
+                        <span>Time:</span>
+                        <ul>
+                            <!-- Iterate through each schedule to display date and time -->
+                            <li v-for="schedule in eventForm.schedules" :key="schedule.id">
+                                {{ formatEventSchedule(schedule) }}
+                            </li>
+                        </ul>
                     </div>
+
                 </div>
             </el-card>
         </el-col>
@@ -68,7 +75,7 @@
                     id: '',
                     title: '',
                     room: '',
-                    times: [],
+                    schedules: [],
                     responsible: '',
                     staff: '',
                     company: '',
@@ -116,6 +123,13 @@
                 // const baseUrl = "http://127.0.0.1:8082/uploads/";
                 // return imgString.split(',').map(img => baseUrl + img.trim());
                 return imgString.split(',').map(img => img.trim());
+            },
+            formatEventSchedule(schedule) {
+                // Format the schedule to display date and time in a readable format
+                const date = new Date(schedule.date).toLocaleDateString();
+                const startTime = schedule.startTime || 'N/A';
+                const endTime = schedule.endTime || 'N/A';
+                return `${date} ${startTime} - ${endTime}`;
             },
             fetchRooms() {
                 const eventId = localStorage.getItem("eventId") || this.$route.params.eventId;
