@@ -51,6 +51,7 @@ cd ${PROJECT_DIR}
 git checkout 82_Deploy_project_to_production_environment
 EOF
 """
+                        sleep 30
                         sh 'echo "Project cloned to the AWS instance."'
                     } else {
                         error "Instance IP is not available."
