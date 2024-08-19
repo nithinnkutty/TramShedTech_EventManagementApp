@@ -69,8 +69,12 @@ echo "Installing unzip and Gradle"
 sudo yum install unzip -y
 sudo rm -f gradle-8.0-bin.zip
 wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
-sudo mkdir /opt/gradle
-sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+if [ ! -d "/opt/gradle" ]; then
+  sudo mkdir /opt/gradle
+  sudo unzip -d /opt/gradle gradle-8.0-bin.zip
+else
+  echo "/opt/gradle directory already exists. Skipping creation and unzip."
+fi
 echo "export PATH=\$PATH:/opt/gradle/gradle-8.0/bin" >> ~/.bash_profile
 source ~/.bash_profile
 gradle -v
