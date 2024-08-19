@@ -23,6 +23,9 @@ pipeline {
                     echo 'Artifacts copied. Reading instance IP...'
                     env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
                     sh 'echo "Instance IP: $INSTANCE_IP"'
+
+                    // Set the build description to include the instance IP
+                    currentBuild.description = "Deployed to Instance with IP: http://${env.INSTANCE_IP}:8082"
                 }
             }
         }
