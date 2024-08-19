@@ -73,7 +73,8 @@ set -e
 cd ${PROJECT_DIR}
 chmod +x gradlew
 ./gradlew clean
-./gradlew build --no-daemon
+./gradlew build --info
+./gradlew bootjar
 EOF
 """
                             sh 'echo "Project built on the AWS instance."'
