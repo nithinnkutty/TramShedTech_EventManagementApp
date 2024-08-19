@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        OS_SSH_KEY = credentials('GIT_SSH_CREDS')
-        PROJECT_DIR = 'eventmanagement'
+        AWS_SSH_KEY = credentials('AWS_CREDS')  // Use the AWS PEM file for SSH access
+        PROJECT_DIR = 'teamatramshedtech'
+        GIT_CREDS = credentials('NITHIN_GIT_CREDS')
     }
 
     stages {
@@ -13,10 +14,10 @@ pipeline {
                     echo 'Attempting to copy artifacts from InfraCreation job...'
                     // Copy the instance_ip.txt file from the previous job
                     copyArtifacts(
-                        projectName: 'TramshedTechProject_InfraCreation',
-                        filter: 'instance_ip.txt',
-                        target: 'artifacts',
-                        selector: lastSuccessful()
+                            projectName: 'TramShedTech_Production_Infracreation',
+                            filter: 'instance_ip.txt',
+                            target: 'artifacts',
+                            selector: lastSuccessful()
                     )
                     echo 'Artifacts copied. Reading instance IP...'
                     env.INSTANCE_IP = readFile('artifacts/instance_ip.txt').trim()
@@ -25,36 +26,87 @@ pipeline {
             }
         }
 
-        stage('Retrieve JAR from Jenkins Workspace') {
-            steps {
-                script {
-                    // Retrieve the JAR file from the Jenkins workspace
-                    def jarFile = 'build/libs/eventmanagement-0.0.1-SNAPSHOT.jar'
-                    archiveArtifacts artifacts: jarFile, allowEmptyArchive: false
-                    echo "JAR file archived in Jenkins workspace: ${jarFile}"
-                }
-            }
-        }
-
-        stage('Copy JAR to AWS Instance and Run') {
+        stage('Clone Project to AWS Instance') {
             steps {
                 script {
                     if (env.INSTANCE_IP) {
-                        // Copy the JAR file to the AWS instance and run it
-                        sh '''
-                        scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/${PROJECT_DIR}/build/libs/eventmanagement-0.0.1-SNAPSHOT.jar rocky@${INSTANCE_IP}:/home/rocky/eventmanagement.jar
+                        def encodedUsername = URLEncoder.encode(GIT_CREDS_USR, "UTF-8")
+                        def encodedPassword = URLEncoder.encode(GIT_CREDS_PSW, "UTF-8")
 
-                        ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-                        nohup java -jar /home/rocky/eventmanagement.jar > /home/rocky/app.log 2>&1 &
-                        echo $! > /home/rocky/app.pid
-                        EOF
-                        '''
-                        sh 'echo "Application started in the background on the instance."'
+                        // Clone the repository to the instance
+                        sh """
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
+# Remove existing directory if it exists
+if [ -d "${PROJECT_DIR}" ]; then
+    rm -rf ${PROJECT_DIR}
+fi
+
+# Clone the repository
+git clone https://${encodedUsername}:${encodedPassword}@git.cardiff.ac.uk/c23051986/teamatramshedtech.git
+
+# Navigate to the repository directory
+cd ${PROJECT_DIR}
+
+# Checkout to the specific branch
+git checkout 82_Deploy_project_to_production_environment
+EOF
+"""
+                        sh 'echo "Project cloned to the AWS instance."'
                     } else {
                         error "Instance IP is not available."
                     }
                 }
             }
+        }
+
+        stage('Build Project on AWS Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Build commands on the AWS instance
+                        sh """
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
+cd ${PROJECT_DIR}
+chmod +x gradlew
+./gradlew clean
+./gradlew build
+EOF
+"""
+                        sh 'echo "Project built on the AWS instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+
+        stage('Run Project on AWS Instance') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        // Run project on the AWS instance in the background
+                        sh """
+ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${INSTANCE_IP} << EOF
+cd ${PROJECT_DIR}
+nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+echo \$! > app.pid
+EOF
+"""
+                        sh 'echo "Application started in the background on the AWS instance."'
+                    } else {
+                        error "Instance IP is not available."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            sh 'echo "Pipeline completed successfully!"'
+        }
+        failure {
+            sh 'echo "Pipeline failed!"'
         }
     }
 }
