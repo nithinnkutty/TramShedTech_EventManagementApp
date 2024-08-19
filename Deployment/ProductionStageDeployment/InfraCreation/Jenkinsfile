@@ -132,28 +132,6 @@ EOF
                 }
             }
         }
-
-        stage('Configure MinIO') {
-            steps {
-                script {
-                    def configContent = """
-minio.endpoint=http://${env.INSTANCE_IP}:9000
-minio.accessKey=$MINIO_CREDS_USR
-minio.secretKey=$MINIO_CREDS_PSW
-minio.bucketName=avatar
-"""
-                    writeFile file: 'minio.properties', text: configContent
-                    sh """
-ssh -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << EOF
-sudo mkdir -p /etc/minio
-sudo chown -R ec2-user:ec2-user /etc/minio
-sudo chmod -R u+rwX /etc/minio
-EOF
-"""
-                    sh "scp -i $AWS_SSH_KEY -o StrictHostKeyChecking=no ${WORKSPACE}/minio.properties ec2-user@${env.INSTANCE_IP}:/etc/minio/minio.properties"
-                }
-            }
-        }
     }
 
     post {
