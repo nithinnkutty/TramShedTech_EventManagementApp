@@ -8,6 +8,14 @@ pipeline {
         GIT_CREDS = credentials('NITHIN_GIT_CREDS')
     }
 
+    parameters {
+        booleanParam(
+                name: 'KEEP_RUNNING',
+                defaultValue: true,
+                description: 'SCheck the box to keep the project running after it starts, or Uncheck to stop it after a few minutes.'
+        )
+    }
+
     stages {
         stage('Get instance IP') {
             steps {
@@ -104,8 +112,7 @@ git checkout 82_Deploy_project_to_production_environment
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 chmod +x gradlew
-./gradlew clean
-./gradlew build
+./gradlew clean build
 EOF
 """
                         sh 'echo "Build Project on the instance."'
@@ -167,11 +174,13 @@ EOF
 """
                         sh 'echo "Application started in the background on the instance."'
 
-                        // Wait for 30 seconds to let the application start
-                        sleep 30
 
-                        // Stop the application
-                        sh """
+                        if (!params.KEEP_RUNNING) {
+                            // Wait for 30 seconds to let the application start
+                            sleep 30
+
+                            // Stop the application
+                            sh """
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
 cd teamatramshedtech
 if [ -f app.pid ]; then
@@ -180,6 +189,7 @@ if [ -f app.pid ]; then
 fi
 EOF
 """
+                        }
                     } else {
                         error "Instance IP is not available."
                     }
