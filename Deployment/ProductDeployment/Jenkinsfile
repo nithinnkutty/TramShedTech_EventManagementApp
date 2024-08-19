@@ -3,9 +3,6 @@ pipeline {
 
     environment {
         OS_SSH_KEY = credentials('OS_SSH_KEY')
-        REPO_URL = 'git@git.cardiff.ac.uk:c23051986/teamatramshedtech.git'
-        PROJECT_DIR = 'teamatramshedtech'
-        GIT_CREDS = credentials('NITHIN_GIT_CREDS')
     }
 
     parameters {
@@ -69,55 +66,20 @@ EOF
             }
         }
 
-        stage('Clone Project to Instance') {
+        stage('Build the Project') {
             steps {
                 script {
-                    deleteDir() // Deletes the workspace directory
-                    if (env.INSTANCE_IP) {
-                        def encodedUsername = URLEncoder.encode(GIT_CREDS_USR, "UTF-8")
-                        def encodedPassword = URLEncoder.encode(GIT_CREDS_PSW, "UTF-8")
-
-                        // Clone the repository to the instance
-                        sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-# Remove existing directory if it exists
-if [ -d "teamatramshedtech" ]; then
-    rm -rf teamatramshedtech
-fi
-
-# Clone the repository
-git clone https://${encodedUsername}:${encodedPassword}@git.cardiff.ac.uk/c23051986/teamatramshedtech.git
-
-# Navigate to the repository directory
-cd teamatramshedtech
-
-# Checkout to the specific branch
-git checkout 82_Deploy_project_to_production_environment
-"""
-                        sleep 30
-                        sh 'echo "Project cloned to the instance."'
-                    } else {
-                        error "Instance IP is not available."
-                    }
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    if (env.INSTANCE_IP) {
-                        // Build commands on the instance
-                        sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech
-chmod +x gradlew
-./gradlew clean build
-EOF
-"""
-                        sh 'echo "Build Project on the instance."'
-                    } else {
-                        error "Instance IP is not available."
+                    dir("${WORKSPACE}"){
+                        if (env.INSTANCE_IP) {
+                            // Build commands on the instance
+                            sh '''
+                                chmod +x gradlew
+                                ./gradlew clean build
+                            '''
+                            sh 'echo "Build Project Completed."'
+                        } else {
+                            error "Instance IP is not available."
+                        }
                     }
                 }
             }
@@ -126,35 +88,14 @@ EOF
         stage('Test') {
             steps {
                 script {
-                    if (env.INSTANCE_IP) {
-                        // Test commands on the instance
-                        sh """
-ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech
-./gradlew test
-./gradlew jacocoTestReport
-EOF
-"""
-                        sh """
-                            # Copy test results XML back to Jenkins server
-                            scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP}:~/teamatramshedtech/build/test-results/test/*.xml ${WORKSPACE}
-                            
-                            # Create directory for JaCoCo files in Jenkins workspace
-                            mkdir -p ${WORKSPACE}/build/jacoco
-                            scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP}:~/teamatramshedtech/build/jacoco/*.exec ${WORKSPACE}/build/jacoco/
-                            
-                            # Create directory for class files in Jenkins workspace
-                            mkdir -p ${WORKSPACE}/build/classes
-                            scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/build/classes/* ${WORKSPACE}/build/classes/
-                            
-                            # Copy source files to Jenkins workspace
-                            mkdir -p ${WORKSPACE}/src
-                            scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no -r rocky@${INSTANCE_IP}:~/teamatramshedtech/src/* ${WORKSPACE}/src/
-                        """
-
-                        sh 'echo "Test Project on the instance."'
-                    } else {
-                        error "Instance IP is not available."
+                    dir("${WORKSPACE}") {
+                        if (env.INSTANCE_IP) {
+                            // Test commands on the instance
+                            sh './gradlew test jacocoTestReport'
+                            sh 'echo "Test Completed."'
+                        } else {
+                            error "Instance IP is not available."
+                        }
                     }
                 }
             }
@@ -166,14 +107,13 @@ EOF
                     if (env.INSTANCE_IP) {
                         // Run project on the instance in the background
                         sh """
+scp -i $OS_SSH_KEY -o StrictHostKeyChecking=no build/libs/eventmanagement-0.0.1-SNAPSHOT.jar rocky@${INSTANCE_IP}:~ 
 ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-cd teamatramshedtech
-nohup java -jar build/libs/eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+nohup java -jar eventmanagement-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 echo \$! > app.pid
 EOF
 """
                         sh 'echo "Application started in the background on the instance."'
-
 
                         if (!params.KEEP_RUNNING) {
                             // Wait for 30 seconds to let the application start
@@ -202,19 +142,9 @@ EOF
         always {
             script {
                 if (env.INSTANCE_IP) {
-                    junit testResults: '**/*.xml' //for publishing JUnit Test results
+                    junit testResults: '**/build/test-results/test/*.xml' //for publishing JUnit Test results
                     jacoco execPattern: '**/build/jacoco/**.exec', sourceInclusionPattern: '**/*.java' // For publishing JaCoCo coverage results
 
-//                    // Archived log files
-//                    archiveArtifacts artifacts: 'app.log', allowEmptyArchive: true
-//                    sh 'echo "Logs have been archived."'
-//
-//                    // Clean up log files
-//                    sh """
-//ssh -i $OS_SSH_KEY -o StrictHostKeyChecking=no rocky@${INSTANCE_IP} << EOF
-//rm -rf ${PROJECT_DIR}/*.log
-//EOF
-//"""
                 } else {
                     echo "Instance IP is not available, skipping cleanup."
                 }
